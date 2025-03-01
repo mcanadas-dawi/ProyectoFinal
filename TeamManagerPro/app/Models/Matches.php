@@ -1,0 +1,21 @@
+<?php
+
+namespace App\Models;
+
+use Illuminate\Database\Eloquent\Factories\HasFactory;
+use Illuminate\Database\Eloquent\Model;
+
+class Matches extends Model
+{
+    use HasFactory;
+
+    protected $fillable = [
+        'team_id', 'numero_jornada', 'equipo_rival', 'fecha_partido',
+        'resultado', 'goles_a_favor', 'goles_en_contra', 'actuacion_equipo'
+    ];
+
+    public function team()
+    {
+        return $this->belongsTo(Team::class);
+    }    
+}
