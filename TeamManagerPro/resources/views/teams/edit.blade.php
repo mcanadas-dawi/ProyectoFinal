@@ -18,4 +18,6 @@
             <option value="F11" {{ $team->modalidad == 'F11' ? 'selected' : '' }}>Fútbol 11</option>
         </select>
 
-        <button type="submi
+        <button type="submit" class="mt-4 bg-green-500 text-black px-4 py-2 rounded">Guardar</button>
+    </form>
+@endsection

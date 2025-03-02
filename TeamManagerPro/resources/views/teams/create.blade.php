@@ -17,6 +17,6 @@
             <option value="F11">Fútbol 11</option>
         </select>
 
-        <button type="submit" class="mt-4 bg-green-500 text-white px-4 py-2 rounded">Guardar</button>
+        <button type="submit" class="mt-4 bg-green-500 text-black px-4 py-2 rounded">Guardar</button>
     </form>
 @endsection
