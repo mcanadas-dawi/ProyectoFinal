@@ -1,26 +1,26 @@
 <?php
 
-use App\Http\Controllers\ProfileController;
-use App\Http\Controllers\PlayerController;
-use App\Http\Controllers\TeamController;
-use App\Http\Controllers\MatchController;
 use Illuminate\Support\Facades\Route;
+use App\Http\Controllers\DashboardController;
 
 Route::get('/', function () {
     return view('welcome');
 });
 
-Route::get('/dashboard', function () {
-    return view('dashboard');
-})->middleware(['auth', 'verified'])->name('dashboard');
-
-Route::middleware('auth')->group(function () {
-    Route::get('/profile', [ProfileController::class, 'edit'])->name('profile.edit');
-    Route::patch('/profile', [ProfileController::class, 'update'])->name('profile.update');
-    Route::delete('/profile', [ProfileController::class, 'destroy'])->name('profile.destroy');
-    Route::resource('players', PlayerController::class);
-    Route::resource('teams', TeamController::class);
-    Route::resource('matches', MatchController::class);
+Route::middleware(['auth', 'verified'])->group(function () {
+    Route::get('/dashboard', [DashboardController::class, 'index'])->name('dashboard');
+    Route::post('/teams', [DashboardController::class, 'storeTeam'])->name('teams.store');
+    Route::post('/players', [DashboardController::class, 'storePlayer'])->name('players.store');
+    Route::post('/matches', [DashboardController::class, 'storeMatch'])->name('matches.store');
+    Route::delete('/teams/{id}', [DashboardController::class, 'destroyTeam'])->name('teams.destroy');
+    Route::get('/teams/{id}', [DashboardController::class, 'show'])->name('teams.show');
+    Route::patch('/players/updateAll', [DashboardController::class, 'updateAllPlayers'])->name('players.updateAll');
+    Route::delete('/players/{id}', [DashboardController::class, 'destroyPlayer'])->name('players.destroy');
+    Route::patch('/matches/updateAll', [DashboardController::class, 'updateAllMatches'])->name('matches.updateAll');
+    Route::delete('/teams/{id}', [DashboardController::class, 'destroyTeam'])->name('teams.destroy');
+    Route::patch('/players/{id}', [DashboardController::class, 'updatePlayer'])->name('players.update');
+    Route::patch('/matches/{id}', [DashboardController::class, 'updateMatch'])->name('matches.update');
+    Route::delete('/matches/{id}', [DashboardController::class, 'destroyMatch'])->name('matches.destroy');
 });
 
 require __DIR__.'/auth.php';
