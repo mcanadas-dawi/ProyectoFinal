@@ -20,4 +20,17 @@ class Player extends Model
     {
         return $this->belongsToMany(Team::class, 'player_team');
     }
+
+    public function matches() {
+    return $this->belongsToMany(Matches::class, 'player_match', 'player_id', 'match_id')
+                ->withPivot('valoracion'); 
 }
+
+// Calcula la media de valoraciones del jugador
+public function getValoracionAttribute() {
+    return $this->matches()->avg('player_match.valoracion') ?? 0;
+}
+
+    
+}
+

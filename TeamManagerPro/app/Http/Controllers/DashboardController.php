@@ -171,4 +171,21 @@ public function show($id)
     return view('dashboard.team_show', compact('team', 'allPlayers'));
 }
 
+// Vista para valorar jugadores
+public function ratePlayers($matchId) {
+    $match = Matches::with('players')->findOrFail($matchId);
+    return view('matches.rate_players', compact('match'));
+}
+
+// Guardar valoraciones
+public function saveRatings(Request $request, $matchId) {
+    $match = Matches::findOrFail($matchId);
+
+    foreach ($request->ratings as $playerId => $rating) {
+        $match->players()->updateExistingPivot($playerId, ['valoracion' => $rating]);
+    }
+
+    return redirect()->route('dashboard')->with('success', 'Valoraciones guardadas correctamente.');
+}
+
 }

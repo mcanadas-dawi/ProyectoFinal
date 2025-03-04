@@ -18,4 +18,10 @@ class Matches extends Model
     {
         return $this->belongsTo(Team::class);
     }    
+
+    public function players() {
+        return $this->belongsToMany(Player::class, 'player_match', 'match_id', 'player_id')
+                    ->withPivot('valoracion'); 
+    }
+    
 }

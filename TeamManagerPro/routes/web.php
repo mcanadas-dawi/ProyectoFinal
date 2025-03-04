@@ -19,6 +19,9 @@ Route::middleware(['auth', 'verified'])->group(function () {
     Route::patch('/matches/{id}', [DashboardController::class, 'updateMatch'])->name('matches.update');
     Route::delete('/matches/{id}', [DashboardController::class, 'destroyMatch'])->name('matches.destroy');
     Route::post('/players/add-to-team', [DashboardController::class, 'addPlayerToTeam'])->name('players.addToTeam');
+    Route::get('/matches/{match}/rate', [DashboardController::class, 'ratePlayers'])->name('matches.ratePlayers');
+    Route::post('/matches/{match}/rate', [DashboardController::class, 'saveRatings'])->name('matches.saveRatings');
+
 });
 
 require __DIR__.'/auth.php';
