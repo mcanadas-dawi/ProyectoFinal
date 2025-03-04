@@ -9,7 +9,7 @@ class Player extends Model
 {
     use HasFactory;
     protected $fillable = [
-        'nombre', 'apellido', 'dorsal', 'fecha_nacimiento',
+        'nombre', 'apellido', 'dni', 'dorsal', 'fecha_nacimiento',
         'posicion', 'perfil', 'minutos_jugados', 'goles',
         'asistencias', 'goles_encajados', 'titular',
         'suplente', 'valoracion'

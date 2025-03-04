@@ -48,6 +48,8 @@
                                     class="w-full p-2 border rounded-lg mb-2">
                                 <input type="text" name="apellido" placeholder="Apellido" required
                                     class="w-full p-2 border rounded-lg mb-2">
+                                <input type="text" name="dni" placeholder="DNI" required
+                                    class="w-full p-2 border rounded-lg mb-2">    
                                 <input type="number" name="dorsal" placeholder="Dorsal" required
                                     class="w-full p-2 border rounded-lg mb-2">
                                 <input type="date" name="fecha_nacimiento" required
@@ -61,7 +63,6 @@
                                 <select name="perfil" required class="w-full p-2 border rounded-lg mb-2">
                                     <option value="Diestro">Diestro</option>
                                     <option value="Zurdo">Zurdo</option>
-                                    <option value="Ambidiestro">Ambidiestro</option>
                                 </select>
                                 <button type="submit" class="bg-green-500 text-white px-4 py-2 rounded-lg">Añadir Jugador</button>
                             </form>
