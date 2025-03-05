@@ -36,10 +36,12 @@
 
     <!-- Sección de Jugadores -->
     <div class="bg-blue-200 shadow-lg rounded-lg p-6 mb-6">
-        <div class="flex justify-between items-center mb-4">
-            <h2 class="text-2xl font-semibold text-gray-900">Jugadores</h2>
-            <button onclick="openAddPlayerModal()" class="bg-blue-600 text-white px-4 py-2 rounded-lg hover:bg-blue-700">Añadir Jugador</button>
-        </div>
+    <div class="flex items-center justify-center mb-4">
+        <h2 class="text-2xl font-semibold text-gray-900 flex-grow text-center">Jugadores</h2>
+        <button onclick="openAddPlayerModal()" class="bg-blue-600 text-white px-4 py-2 rounded-lg hover:bg-blue-700">
+            Añadir Jugador
+        </button>
+    </div>
         <table class="w-full text-center border-collapse">
             <thead class="bg-blue-300 text-gray-900">
                 <tr class="border-b">
@@ -124,9 +126,11 @@
 
 <!-- Sección de Partidos -->
 <div class="bg-green-200 shadow-lg rounded-lg p-6 mb-6">
-    <div class="flex justify-between items-center mb-4">
-        <h2 class="text-2xl font-semibold text-gray-900">Partidos</h2>
-        <button onclick="openAddMatchModal()" class="bg-green-600 text-white px-4 py-2 rounded-lg hover:bg-green-700">Añadir Partido</button>
+    <div class="flex items-center justify-center mb-4">
+        <h2 class="text-2xl font-semibold text-gray-900 flex-grow text-center">Partidos</h2>
+        <button onclick="openAddMatchModal()" class="bg-green-600 text-white px-4 py-2 rounded-lg hover:bg-green-700">
+            Añadir Partido
+        </button>
     </div>
 
     <table class="w-full text-center border-collapse bg-white rounded-lg">
@@ -138,6 +142,7 @@
                 <th class="p-2">Goles a Favor</th>
                 <th class="p-2">Goles en Contra</th>
                 <th class="p-2">Alineación</th>
+                <th class="p-2">Convocatoria</th>
                 <th class="p-2">Acciones</th>
             </tr>
         </thead>
@@ -150,14 +155,19 @@
                 <td class="p-2 text-center">{{ $match->goles_a_favor }}</td>
                 <td class="p-2 text-center">{{ $match->goles_en_contra }}</td>
                 <td class="p-2 text-center">
+                    <button onclick="openConvocatoriaModal('{{ $match->id }}')" class="bg-blue-500 text-white px-3 py-1 rounded">
+                        Convocatoria
+                    </button>
+                </td>
+                <td class="p-2 text-center">
                     <button onclick="openAlineador('{{ $match->id }}')" class="bg-indigo-500 text-white px-3 py-1 rounded">
                         Alineador
                     </button>
                 </td>
                 <td class="p-2 text-center">
-                <a href="{{ route('matches.ratePlayers', $match->id) }}" class="bg-orange-400 text-white px-3 py-1 rounded block mb-2">
+                    <a href="{{ route('matches.ratePlayers', $match->id) }}" class="bg-orange-400 text-white px-3 py-1 rounded block mb-2">
                     Valorar Jugadores 
-                </a>
+                    </a>
 
                     <button onclick="editMatch('{{ $match->id }}')" id="edit-btn-match-{{ $match->id }}" class="bg-yellow-500 text-white px-3 py-1 rounded">Editar</button>
                     <button onclick="saveMatch('{{ $match->id }}')" id="save-btn-match-{{ $match->id }}" class="hidden bg-green-500 text-white px-3 py-1 rounded">Guardar</button>
@@ -179,12 +189,33 @@
         <form action="{{ route('players.store') }}" method="POST">
             @csrf
             <input type="hidden" name="team_id" value="{{ $team->id }}">
+
             <input type="text" name="nombre" placeholder="Nombre" class="w-full p-2 border rounded mb-2" required>
             <input type="text" name="apellido" placeholder="Apellido" class="w-full p-2 border rounded mb-2" required>
             <input type="text" name="dni" placeholder="DNI" class="w-full p-2 border rounded mb-2" required>
             <input type="number" name="dorsal" placeholder="Dorsal" class="w-full p-2 border rounded mb-2" required>
-            <button type="submit" class="bg-blue-500 text-white px-4 py-2 rounded-lg">Guardar</button>
-            <button type="button" onclick="closeAddPlayerModal()" class="bg-gray-500 text-white px-4 py-2 rounded-lg">Cancelar</button>
+
+            <label class="block text-gray-700 font-semibold">Fecha de nacimiento</label>
+            <input type="date" name="fecha_nacimiento" class="w-full p-2 border rounded mb-2" required>
+
+            <label class="block text-gray-700 font-semibold">Posición</label>
+            <select name="posicion" required class="w-full p-2 border rounded-lg mb-2">
+                <option value="Portero">Portero</option>
+                <option value="Defensa">Defensa</option>
+                <option value="Centrocampista">Centrocampista</option>
+                <option value="Delantero">Delantero</option>
+            </select>
+
+            <label class="block text-gray-700 font-semibold">Perfil</label>
+            <select name="perfil" required class="w-full p-2 border rounded-lg mb-2">
+                <option value="Diestro">Diestro</option>
+                <option value="Zurdo">Zurdo</option>
+            </select>
+
+            <div class="flex justify-end space-x-2 mt-4">
+                <button type="submit" class="bg-green-500 text-white px-4 py-2 rounded-lg">Guardar</button>
+                <button type="button" onclick="closeAddPlayerModal()" class="bg-gray-500 text-white px-4 py-2 rounded-lg">Cancelar</button>
+            </div>
         </form>
     </div>
 </div>
@@ -208,26 +239,99 @@
 <!-- Modal del Alineador -->
 <div id="alineadorModal" class="hidden fixed inset-0 bg-gray-900 bg-opacity-50 flex justify-center items-center">
     <div class="bg-white rounded-lg p-6 w-3/4">
-        <h2 class="text-2xl font-semibold text-gray-800 mb-4">Alineador Táctico</h2>
-        <p class="text-gray-600 mb-4">Selecciona la alineación para el partido.</p>
-        
-        <select id="formation-selector-modal" class="w-full p-2 border rounded-lg mb-2 bg-white">
-            <option value="1-4-4-2">1-4-4-2</option>
-            <option value="1-4-3-3">1-4-3-3</option>
-            <option value="1-5-3-2">1-5-3-2</option>
-            <option value="libre">Libre</option>
-        </select>
+        <h2 class="text-2xl font-semibold text-gray-800 mb-4 text-center">Alineador Táctico</h2>
 
-        <div id="field-container-modal" class="bg-green-500 h-96 flex justify-center items-center">
+        <label class="block text-gray-700 font-semibold">Seleccionar Formación:</label>
+            <select id="formation-selector" class="w-full p-2 border rounded-lg mb-4" onchange="updateFormation()">
+                <option value="">Seleccionar...</option>
+                <option value="libre">Libre</option>
+                @if ($team->modalidad == 'F5')
+                    <option value="1-1-2-1">1-1-2-1</option>
+                    <option value="1-2-1-1">1-2-1-1</option>
+                @elseif ($team->modalidad == 'F7')
+                    <option value="1-3-2-1">1-3-2-1</option>
+                    <option value="1-2-3-1">1-2-3-1</option>
+                @elseif ($team->modalidad == 'F8')
+                    <option value="1-3-3-1">1-3-3-1</option>
+                    <option value="1-2-4-1">1-2-4-1</option>
+                @elseif ($team->modalidad == 'F11')
+                    <option value="1-4-4-2">1-4-4-2</option>
+                    <option value="1-4-3-3">1-4-3-3</option>
+                    <option value="1-5-3-2">1-5-3-2</option>
+                @endif
+            </select>
+
+
+        <!-- Campo de Fútbol -->
+        <div id="field-container" class="relative bg-green-500 h-96 flex justify-center items-center">
             <img src="{{ asset('Imagenes/campo_futbol.jpg') }}" alt="Campo de Fútbol" class="w-full h-full object-cover">
+            <div id="player-spots" class="absolute inset-0 flex flex-wrap justify-center items-center">
+                <!-- Aquí se inyectarán los jugadores según la formación -->
+            </div>
         </div>
 
-        <div class="mt-4 flex justify-end">
-            <button onclick="closeAlineador()" class="bg-red-500 text-white px-4 py-2 rounded-lg">Cerrar</button>
+        <!-- Lista de suplentes -->
+        <h3 class="text-xl font-semibold text-gray-800 mt-4">Suplentes</h3>
+        <div id="suplentes-list" class="max-h-40 overflow-y-auto bg-gray-100 p-2 rounded-lg">
+            <table class="w-full">
+                <thead>
+                    <tr class="text-gray-700">
+                        <th class="p-2">Nombre</th>
+                        <th class="p-2">Apellido</th>
+                        <th class="p-2">Dorsal</th>
+                        <th class="p-2">Posición</th>
+                        <th class="p-2">Perfil</th>
+                    </tr>
+                </thead>
+                <tbody id="suplentes-body">
+                    <!-- Aquí se inyectarán los suplentes -->
+                </tbody>
+            </table>
+        </div>
+
+        <div class="mt-4 flex justify-between">
+            <button onclick="saveAlineacion()" class="bg-green-500 text-white px-4 py-2 rounded-lg">
+                Guardar Alineación
+            </button>
+            <button onclick="closeAlineador()" class="bg-gray-500 text-white px-4 py-2 rounded-lg">
+                Cerrar
+            </button>
         </div>
     </div>
 </div>
 
+
+<!-- Modal para Convocatoria -->
+<div id="convocatoriaModal" class="hidden fixed inset-0 bg-gray-900 bg-opacity-50 flex justify-center items-center">
+    <div class="bg-white rounded-lg p-6 w-1/3">
+        <h2 class="text-xl font-semibold text-gray-800 mb-4 text-center">Seleccionar Jugadores Convocados</h2>
+        <form id="convocatoriaForm">
+            @csrf
+            <input type="hidden" name="match_id" value="{{ $match->id }}">
+
+            <!-- Lista de jugadores con checkboxes -->
+            <div class="max-h-60 overflow-y-auto">
+                @foreach ($team->players as $player)
+                <div class="flex items-center mb-2">
+                    <input type="checkbox" id="player-{{ $player->id }}" name="convocados[]"
+                        value="{{ $player->id }}" class="mr-2"
+                        {{ in_array($player->id, $convocados) ? 'checked' : '' }}>
+                    <label for="player-{{ $player->id }}">{{ $player->nombre }} {{ $player->apellido }}</label>
+                </div>
+                @endforeach
+            </div>
+
+            <div class="mt-4 flex justify-between">
+                <button type="button" onclick="saveConvocatoria()" class="bg-green-500 text-white px-4 py-2 rounded-lg">
+                    Guardar Convocatoria
+                </button>
+                <button type="button" onclick="closeConvocatoriaModal()" class="bg-gray-500 text-white px-4 py-2 rounded-lg">
+                    Cancelar
+                </button>
+            </div>
+        </form>
+    </div>
+</div>
 
 <script>
     function editPlayer(id) {
@@ -357,8 +461,156 @@
     function closeAddMatchModal() {
         document.getElementById('addMatchModal').classList.add('hidden');
     }
+
+    document.addEventListener('DOMContentLoaded', function () {
+    const formationSelector = document.getElementById('formation-selector');
+    const fieldContainer = document.getElementById('player-spots');
+    const saveFormationButton = document.getElementById('save-formation');
+    const suplentesBody = document.getElementById('suplentes-body');
+
+    const formaciones = {
+        "1-1-2-1": ["Portero", "Defensa", "Centrocampista", "Centrocampista", "Delantero"],
+        "1-2-1-1": ["Portero", "Defensa", "Defensa", "Centrocampista", "Delantero"],
+        "1-3-2-1": ["Portero", "Defensa", "Defensa", "Defensa", "Centrocampista", "Centrocampista", "Delantero"],
+        "1-2-3-1": ["Portero", "Defensa", "Defensa", "Centrocampista", "Centrocampista", "Centrocampista", "Delantero"],
+        "1-3-3-1": ["Portero", "Defensa", "Defensa", "Defensa", "Centrocampista", "Centrocampista", "Centrocampista", "Delantero"],
+        "1-2-4-1": ["Portero", "Defensa", "Defensa", "Centrocampista", "Centrocampista", "Centrocampista", "Centrocampista", "Delantero"],
+        "1-4-4-2": ["Portero", "Defensa", "Defensa", "Defensa", "Defensa", "Centrocampista", "Centrocampista", "Delantero", "Delantero"],
+        "1-4-3-3": ["Portero", "Defensa", "Defensa", "Defensa", "Defensa", "Centrocampista", "Centrocampista", "Centrocampista", "Delantero", "Delantero", "Delantero"],
+        "1-5-3-2": ["Portero", "Defensa", "Defensa", "Defensa", "Defensa", "Defensa", "Centrocampista", "Centrocampista", "Centrocampista", "Delantero", "Delantero"]
+    };
+
+    function updateFormation() {
+        let formation = document.getElementById('formation-selector').value;
+        let fieldContainer = document.getElementById('player-spots');
+        fieldContainer.innerHTML = '';
+
+        let convocados = JSON.parse('{!! json_encode($convocados[$match->id] ?? []) !!}');
+        let selectedPlayers = new Set();
+
+        if (formation === "libre") {
+            createFreeFormation(fieldContainer, convocados);
+            return;
+        }
+
+        if (!formation || !formaciones[formation]) return;
+
+        formaciones[formation].forEach((posicion, index) => {
+            let select = document.createElement('select');
+            select.classList.add("absolute", "border", "rounded", "p-2", "bg-white", "draggable-player");
+            select.style.top = `${(index + 1) * 10}%`;
+            select.style.left = `${50 - (index * 5)}%`;
+
+            let defaultOption = document.createElement('option');
+            defaultOption.value = "";
+            defaultOption.text = posicion;
+            select.appendChild(defaultOption);
+
+            convocados.forEach(player => {
+                let option = document.createElement('option');
+                option.value = player.id;
+                option.text = `${player.nombre} (${player.posicion})`;
+
+                if (!selectedPlayers.has(player.id)) {
+                    select.appendChild(option);
+                }
+            });
+
+            select.addEventListener("change", function() {
+                selectedPlayers.add(select.value);
+                updateSuplentes(convocados, selectedPlayers);
+            });
+
+            fieldContainer.appendChild(select);
+        });
+
+        updateSuplentes(convocados, selectedPlayers);
+    }
+
+    function createFreeFormation(container, convocados) {
+        container.innerHTML = "";
+
+        for (let i = 0; i < 11; i++) {
+            let div = document.createElement("div");
+            div.classList.add("absolute", "w-10", "h-10", "bg-blue-500", "rounded-full", "cursor-move", "draggable-player");
+            div.style.top = `${Math.random() * 80 + 10}%`;
+            div.style.left = `${Math.random() * 80 + 10}%`;
+
+            let select = document.createElement('select');
+            select.classList.add("border", "rounded", "p-1", "bg-white");
+
+            let defaultOption = document.createElement('option');
+            defaultOption.value = "";
+            defaultOption.text = "Seleccionar";
+            select.appendChild(defaultOption);
+
+            convocados.forEach(player => {
+                let option = document.createElement('option');
+                option.value = player.id;
+                option.text = `${player.nombre} (${player.posicion})`;
+                select.appendChild(option);
+            });
+
+            div.appendChild(select);
+            container.appendChild(div);
+
+            makeDraggable(div);
+        }
+    }
+
+    function makeDraggable(element) {
+        let isDragging = false;
+        let offsetX, offsetY;
+
+        element.addEventListener("mousedown", (e) => {
+            isDragging = true;
+            offsetX = e.clientX - element.getBoundingClientRect().left;
+            offsetY = e.clientY - element.getBoundingClientRect().top;
+            element.style.zIndex = "1000";
+        });
+
+        document.addEventListener("mousemove", (e) => {
+            if (!isDragging) return;
+            element.style.left = `${e.clientX - offsetX}px`;
+            element.style.top = `${e.clientY - offsetY}px`;
+        });
+
+        document.addEventListener("mouseup", () => {
+            isDragging = false;
+            element.style.zIndex = "1";
+        });
+    }
+
+    function updateSuplentes(convocados, titulares) {
+        let suplentesBody = document.getElementById("suplentes-body");
+        suplentesBody.innerHTML = "";
+
+        convocados.forEach(player => {
+            if (!titulares.has(player.id)) {
+                let row = document.createElement("tr");
+                row.innerHTML = `
+                    <td class="p-2">${player.nombre}</td>
+                    <td class="p-2">${player.apellido}</td>
+                    <td class="p-2">${player.dorsal}</td>
+                    <td class="p-2">${player.posicion}</td>
+                    <td class="p-2">${player.perfil}</td>
+                `;
+                suplentesBody.appendChild(row);
+            }
+        });
+    }
+
+    function saveAlineacion() {
+        alert("Alineación guardada correctamente.");
+        closeAlineador();
+    }
+
+    function closeAlineador() {
+        document.getElementById('alineadorModal').classList.add('hidden');
+    }
+});
+
+
 </script>
-
-
 
 @endsection

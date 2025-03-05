@@ -23,5 +23,10 @@ class Matches extends Model
         return $this->belongsToMany(Player::class, 'player_match', 'match_id', 'player_id')
                     ->withPivot('valoracion'); 
     }
+
+    public function convocados()
+    {
+    return $this->belongsToMany(Player::class, 'player_match')->wherePivot('convocado', true);
+    }
     
 }

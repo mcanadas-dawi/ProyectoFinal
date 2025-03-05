@@ -52,14 +52,17 @@
                                     class="w-full p-2 border rounded-lg mb-2">    
                                 <input type="number" name="dorsal" placeholder="Dorsal" required
                                     class="w-full p-2 border rounded-lg mb-2">
+                                <label class="block text-gray-700 font-semibold">Fecha de nacimiento</label>
                                 <input type="date" name="fecha_nacimiento" required
                                     class="w-full p-2 border rounded-lg mb-2">
+                                <label class="block text-gray-700 font-semibold">Posición</label>
                                 <select name="posicion" required class="w-full p-2 border rounded-lg mb-2">
                                     <option value="Portero">Portero</option>
                                     <option value="Defensa">Defensa</option>
                                     <option value="Centrocampista">Centrocampista</option>
                                     <option value="Delantero">Delantero</option>
                                 </select>
+                                <label class="block text-gray-700 font-semibold">Perfil</label>
                                 <select name="perfil" required class="w-full p-2 border rounded-lg mb-2">
                                     <option value="Diestro">Diestro</option>
                                     <option value="Zurdo">Zurdo</option>

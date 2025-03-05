@@ -168,8 +168,16 @@ public function show($id)
 {
     $team = Team::with('players', 'matches')->findOrFail($id);
     $allPlayers = Player::all(); // Obtener todos los jugadores disponibles
-    return view('dashboard.team_show', compact('team', 'allPlayers'));
+
+    // Obtener los jugadores convocados por partido
+    $convocados = [];
+    foreach ($team->matches as $match) {
+        $convocados[$match->id] = $match->players()->pluck('players.id')->toArray();
+    }
+
+    return view('dashboard.team_show', compact('team', 'allPlayers', 'convocados'));
 }
+
 
 // Vista para valorar jugadores
 public function ratePlayers($matchId) {
@@ -186,6 +194,32 @@ public function saveRatings(Request $request, $matchId) {
     }
 
     return redirect()->route('dashboard')->with('success', 'Valoraciones guardadas correctamente.');
+}
+
+public function storeConvocatoria(Request $request) //CONVOCATORIA
+{
+    $request->validate([
+        'match_id' => 'required|exists:matches,id',
+        'players' => 'array',
+        'players.*' => 'exists:players,id',
+    ]);
+
+    $match = Matches::findOrFail($request->match_id);
+    $match->players()->sync($request->players); // Actualiza la relación entre partido y jugadores convocados
+
+    return back()->with('success', 'Convocatoria guardada correctamente.');
+}
+public function updateConvocatoria(Request $request, $matchId) //ACTUALIZAR CONVOCATORIA
+{
+    $match = Matches::findOrFail($matchId);
+
+    // Obtener IDs de jugadores seleccionados
+    $convocados = $request->input('convocados', []);
+
+    // Sincronizar los jugadores convocados
+    $match->players()->sync($convocados);
+
+    return response()->json(['success' => true]);
 }
 
 }

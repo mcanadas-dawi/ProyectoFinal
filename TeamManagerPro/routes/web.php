@@ -21,6 +21,8 @@ Route::middleware(['auth', 'verified'])->group(function () {
     Route::post('/players/add-to-team', [DashboardController::class, 'addPlayerToTeam'])->name('players.addToTeam');
     Route::get('/matches/{match}/rate', [DashboardController::class, 'ratePlayers'])->name('matches.ratePlayers');
     Route::post('/matches/{match}/rate', [DashboardController::class, 'saveRatings'])->name('matches.saveRatings');
+    Route::post('/matches/convocatoria', [DashboardController::class, 'storeConvocatoria'])->name('matches.convocatoria');
+    Route::post('/matches/{match}/convocatoria', [DashboardController::class, 'updateConvocatoria'])->name('matches.updateConvocatoria');
 
 });
 
