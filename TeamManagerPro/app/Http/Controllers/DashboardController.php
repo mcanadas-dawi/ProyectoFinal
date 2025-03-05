@@ -66,35 +66,33 @@ class DashboardController extends Controller
         return back()->with('success', 'Jugador añadido.');
     }
 
-        public function updatePlayer(Request $request, $id) //ACTUALIZAR JUGADOR
-    {
-        $player = Player::findOrFail($id);
+    public function updatePlayer(Request $request, $id) // ACTUALIZAR JUGADOR
+{
+    $player = Player::findOrFail($id);
 
-        $request->validate([
-            'posicion' => 'required|in:Portero,Defensa,Centrocampista,Delantero',
-            'perfil' => 'required|in:Diestro,Zurdo',
-            'minutos_jugados' => 'nullable|integer|min:0',
-            'goles' => 'nullable|integer|min:0',
-            'asistencias' => 'nullable|integer|min:0',
-            'titular' => 'nullable|integer|min:0',
-            'suplente' => 'nullable|integer|min:0',
-            'valoracion' => 'nullable|numeric|min:0|max:10',
-        ]);
+    $request->validate([
+        'posicion' => 'nullable|in:Portero,Defensa,Centrocampista,Delantero',
+        'perfil' => 'nullable|in:Diestro,Zurdo',
+        'minutos_jugados' => 'nullable|integer|min:0',
+        'goles' => 'nullable|integer|min:0',
+        'asistencias' => 'nullable|integer|min:0',
+        'titular' => 'nullable|integer|min:0',
+        'suplente' => 'nullable|integer|min:0',
+        'valoracion' => 'nullable|numeric|min:0|max:10',
+    ]);
 
-        $player->update([
-            'posicion' => $request->posicion,
-            'perfil' => $request->perfil,
-            'minutos_jugados' => $request->minutos_jugados,
-            'goles' => $request->goles,
-            'asistencias' => $request->asistencias,
-            'titular' => $request->titular,
-            'suplente' => $request->suplente,
-            'valoracion' => $request->valoracion,
+    // Filtrar los datos para no sobrescribir con null
+    $data = array_filter($request->all(), function ($value) {
+        return !is_null($value);
+    });
 
-        ]);
+    // Actualizar solo los datos que se enviaron
+    $player->update($data);
 
-        return redirect()->back()->with('success', 'Jugador actualizado con éxito.');
-    }
+    return redirect()->back()->with('success', 'Jugador actualizado con éxito.');
+}
+
+
     public function addPlayerToTeam(Request $request)
 {
     $request->validate([
@@ -138,24 +136,21 @@ class DashboardController extends Controller
 }
 
 
-public function updateMatch(Request $request, $id) //ACTUALIZAR PARTIDO
-{
-    $match = Matches::findOrFail($id);
+public function updateMatch(Request $request, $id) 
+    {
+        $match = Matches::findOrFail($id);
 
-    $request->validate([
-        'fecha_partido' => 'required|date',
-        'goles_a_favor' => 'required|integer|min:0',
-        'goles_en_contra' => 'required|integer|min:0',
-    ]);
+        $request->validate([
+            'fecha_partido' => 'nullable|date',
+            'goles_a_favor' => 'nullable|integer|min:0',
+            'goles_en_contra' => 'nullable|integer|min:0',
+        ]);
 
-    $match->update([
-        'fecha_partido' => $request->fecha_partido,
-        'goles_a_favor' => $request->goles_a_favor,
-        'goles_en_contra' => $request->goles_en_contra,
-    ]);
+        $data = array_filter($request->all(), fn($value) => !is_null($value));
+        $match->update($data);
 
-    return redirect()->back()->with('success', 'Partido actualizado con éxito.');
-}
+        return redirect()->back()->with('success', 'Partido actualizado con éxito.');
+    }
 
 
 public function destroyMatch($id) //ELIMINAR PARTIDO
@@ -185,31 +180,46 @@ public function ratePlayers($matchId) {
     return view('matches.rate_players', compact('match'));
 }
 
-// Guardar valoraciones
-public function saveRatings(Request $request, $matchId) {
-    $match = Matches::findOrFail($matchId);
 
-    foreach ($request->ratings as $playerId => $rating) {
-        $match->players()->updateExistingPivot($playerId, ['valoracion' => $rating]);
+public function saveRatings(Request $request, $matchId) 
+{
+    Log::info('Iniciando guardado de valoraciones', ['match_id' => $matchId, 'ratings' => $request->ratings]);
+
+    $match = Matches::with('players')->findOrFail($matchId);
+    
+    if ($request->has('ratings')) {
+        foreach ($request->ratings as $playerId => $rating) {
+            Log::info('Procesando jugador', ['player_id' => $playerId, 'rating' => $rating]);
+            
+            if (!is_null($rating)) {
+                $match->players()->syncWithoutDetaching([$playerId => ['valoracion' => $rating]]);
+                Log::info('Valoración actualizada', ['player_id' => $playerId, 'valoracion' => $rating]);
+            } else {
+                Log::warning('Valor nulo recibido para jugador', ['player_id' => $playerId]);
+            }
+        }
+    } else {
+        Log::error('No se recibieron valoraciones en la solicitud');
     }
 
-    return redirect()->route('dashboard')->with('success', 'Valoraciones guardadas correctamente.');
+    return redirect()->route('teams.show', $match->team_id)->with('success', 'Valoraciones guardadas correctamente.');
 }
 
-public function storeConvocatoria(Request $request) //CONVOCATORIA
+public function storeConvocatoria(Request $request) 
 {
     $request->validate([
         'match_id' => 'required|exists:matches,id',
-        'players' => 'array',
+        'players' => 'nullable|array',
         'players.*' => 'exists:players,id',
     ]);
 
     $match = Matches::findOrFail($request->match_id);
-    $match->players()->sync($request->players); // Actualiza la relación entre partido y jugadores convocados
+    $match->players()->sync($request->players ?? []); 
 
     return back()->with('success', 'Convocatoria guardada correctamente.');
 }
-public function updateConvocatoria(Request $request, $matchId) //ACTUALIZAR CONVOCATORIA
+
+public function updateConvocatoria(Request $request, $matchId)
 {
     $match = Matches::findOrFail($matchId);
 
@@ -221,5 +231,4 @@ public function updateConvocatoria(Request $request, $matchId) //ACTUALIZAR CONV
 
     return response()->json(['success' => true]);
 }
-
 }
