@@ -119,21 +119,28 @@ class DashboardController extends Controller
     }
 
     //PARTIDOS
-    public function storeMatch(Request $request) //GUARDAR PARTIDO
-{
-    $request->validate([
-        'team_id' => 'required|exists:teams,id',
-        'numero_jornada' => 'required|integer|min:1|unique:matches,numero_jornada,NULL,id,team_id,' . $request->team_id,
-        'equipo_rival' => 'required|string|max:255',
-        'fecha_partido' => 'required|date',
-        'goles_a_favor' => 'required|integer|min:0',
-        'goles_en_contra' => 'required|integer|min:0',
-    ]);
+    public function storeMatch(Request $request) 
+    {
+        $request->validate([
+            'team_id' => 'required|exists:teams,id',
+            'numero_jornada' => 'required|integer|min:1',
+            'equipo_rival' => 'required|string|max:255',
+            'fecha_partido' => 'required|date',
+            'goles_a_favor' => 'nullable|integer|min:0',
+            'goles_en_contra' => 'nullable|integer|min:0',
+        ]);
 
-    Matches::create($request->all());
 
-    return back()->with('success', 'Partido añadido con éxito.');
-}
+        $match = Matches::create([
+            'team_id' => $request->team_id,
+            'numero_jornada' => $request->numero_jornada,
+            'equipo_rival' => $request->equipo_rival,
+            'fecha_partido' => $request->fecha_partido,
+        ]);
+
+
+        return redirect()->route('teams.show', $request->team_id)->with('success', 'Partido añadido con éxito.');
+    }
 
 
 public function updateMatch(Request $request, $id) 
@@ -183,17 +190,17 @@ public function ratePlayers($matchId) {
 
 public function saveRatings(Request $request, $matchId) 
 {
-    Log::info('Iniciando guardado de valoraciones', ['match_id' => $matchId, 'ratings' => $request->ratings]);
+    
 
     $match = Matches::with('players')->findOrFail($matchId);
     
     if ($request->has('ratings')) {
         foreach ($request->ratings as $playerId => $rating) {
-            Log::info('Procesando jugador', ['player_id' => $playerId, 'rating' => $rating]);
+            
             
             if (!is_null($rating)) {
                 $match->players()->syncWithoutDetaching([$playerId => ['valoracion' => $rating]]);
-                Log::info('Valoración actualizada', ['player_id' => $playerId, 'valoracion' => $rating]);
+               
             } else {
                 Log::warning('Valor nulo recibido para jugador', ['player_id' => $playerId]);
             }
