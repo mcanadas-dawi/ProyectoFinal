@@ -12,27 +12,27 @@
         <button type="submit" class="bg-red-500 text-white px-4 py-2 rounded-lg">Eliminar Equipo</button>
     </form>
 
-    <!-- AÑADIR JUGADORES DE OTRAS PLANTILLAS-->
-    <div class="bg-purple-200 shadow-lg rounded-lg p-6 mb-6">
-        <h2 class="text-2xl font-semibold text-gray-900 mb-4 text-center">Añadir Jugador Existente</h2>
-        <form action="{{ route('players.addToTeam') }}" method="POST">
-            @csrf
-            <input type="hidden" name="team_id" value="{{ $team->id }}">
-            <div class="mb-4">
-                <label for="player_id" class="block text-gray-700 font-semibold">Seleccionar jugador procedente de otra plantilla:</label>
-                <select name="player_id" id="player_id" class="w-full p-2 border rounded bg-white text-center" required>
-                    <option value=""> Seleccionar </option>
-                    @foreach ($allPlayers as $player)
-                    @if(!$team->players->contains($player->id)) <!-- Evita mostrar jugadores ya en la plantilla -->
+   <!-- AÑADIR JUGADORES DE OTRAS PLANTILLAS-->
+<div class="bg-purple-200 shadow-lg rounded-lg p-6 mb-6">
+    <h2 class="text-2xl font-semibold text-gray-900 mb-4 text-center">Añadir Jugador Existente</h2>
+    <form action="{{ route('players.addToTeam') }}" method="POST">
+        @csrf
+        <input type="hidden" name="team_id" value="{{ $team->id }}">
+        <div class="mb-4">
+            <label for="player_id" class="block text-gray-700 font-semibold">Seleccionar jugador procedente de otra plantilla:</label>
+            <select name="player_id" id="player_id" class="w-full p-2 border rounded bg-white text-center" required>
+                <option value=""> Seleccionar </option>
+                @foreach ($allPlayers as $player)
                     <option value="{{ $player->id }}">{{ $player->nombre }} {{ $player->apellido }} (DNI: {{ $player->dni }})</option>
-                    @endif
-                    @endforeach
-                </select>
-            </div>
+                @endforeach
+            </select>
+        </div>
 
-            <button type="submit" class="bg-purple-600 text-white px-4 py-2 rounded-lg hover:bg-purple-700">Añadir Jugador</button>
-        </form>
-    </div>
+        <button type="submit" class="bg-purple-600 text-white px-4 py-2 rounded-lg hover:bg-purple-700">Añadir Jugador</button>
+    </form>
+</div>
+
+
 
     <!-- Sección de Jugadores -->
     <div class="bg-blue-200 shadow-lg rounded-lg p-6 mb-6">
@@ -147,51 +147,55 @@
             </tr>
         </thead>
         <tbody class="text-gray-800">
+        @if ($team->matches->isNotEmpty())
     @foreach ($team->matches as $match)
-    <tr class="border-b bg-green-100">
-                <td class="p-2 text-center">{{ $match->numero_jornada }}</td>
-                <td class="p-2 text-center">{{ $match->equipo_rival }}</td>
-                
-                <td class="p-2 text-center">
-            <span id="min-fecha-{{ $match->id }}">{{ $match->fecha_partido }}</span>
-            <input type="date" name="fecha_partido" class="hidden w-16 p-1 border rounded" id="edit-fecha-{{ $match->id }}">
-        </td>
+        <tr class="border-b bg-green-100">
+            <td class="p-2 text-center">{{ $match->numero_jornada }}</td>
+            <td class="p-2 text-center">{{ $match->equipo_rival }}</td>
+            
+            <td class="p-2 text-center">
+                <span id="min-fecha-{{ $match->id }}">{{ $match->fecha_partido }}</span>
+                <input type="date" name="fecha_partido" class="hidden w-16 p-1 border rounded" id="edit-fecha-{{ $match->id }}">
+            </td>
 
-        <td class="p-2 text-center">
-            <span id="min-goles-favor-{{ $match->id }}">{{ $match->goles_a_favor }}</span>
-            <input type="number" name="goles_a_favor" class="hidden w-16 p-1 border rounded" id="edit-goles-favor-{{ $match->id }}">
-        </td>
+            <td class="p-2 text-center">
+                <span id="min-goles-favor-{{ $match->id }}">{{ $match->goles_a_favor }}</span>
+                <input type="number" name="goles_a_favor" class="hidden w-16 p-1 border rounded" id="edit-goles-favor-{{ $match->id }}">
+            </td>
 
-        <td class="p-2 text-center">
-            <span id="min-goles-contra-{{ $match->id }}">{{ $match->goles_en_contra }}</span>
-            <input type="number" name="goles_en_contra" class="hidden w-16 p-1 border rounded" id="edit-goles-contra-{{ $match->id }}">
-        </td>
+            <td class="p-2 text-center">
+                <span id="min-goles-contra-{{ $match->id }}">{{ $match->goles_en_contra }}</span>
+                <input type="number" name="goles_en_contra" class="hidden w-16 p-1 border rounded" id="edit-goles-contra-{{ $match->id }}">
+            </td>
 
-                <td class="p-2 text-center">
-                    <button onclick="openConvocatoriaModal('{{ $match->id }}')" class="bg-blue-500 text-white px-3 py-1 rounded">
-                        Convocatoria
-                    </button>
-                </td>
-                <td class="p-2 text-center">
-                    <button onclick="openAlineador('{{ $match->id }}')" class="bg-indigo-500 text-white px-3 py-1 rounded">
-                        Alineador
-                    </button>
-                </td>
-                <td class="p-2 text-center">
-                    <a href="{{ route('matches.ratePlayers', $match->id) }}" class="bg-orange-400 text-white px-3 py-1 rounded block mb-2">
+            <td class="p-2 text-center">
+                <button onclick="openConvocatoriaModal('{{ $match->id }}')" class="bg-blue-500 text-white px-3 py-1 rounded">
+                    Convocatoria
+                </button>
+            </td>
+            <td class="p-2 text-center">
+                <button onclick="openAlineador('{{ $match->id }}')" class="bg-indigo-500 text-white px-3 py-1 rounded">
+                    Alineador
+                </button>
+            </td>
+            <td class="p-2 text-center">
+                <a href="{{ route('matches.ratePlayers', $match->id) }}" class="bg-orange-400 text-white px-3 py-1 rounded block mb-2">
                     Valorar Jugadores 
-                    </a>
+                </a>
 
-                    <button onclick="editMatch('{{ $match->id }}')" id="edit-btn-match-{{ $match->id }}" class="bg-yellow-500 text-white px-3 py-1 rounded">Editar</button>
-                    <button onclick="saveMatch('{{ $match->id }}')" id="save-btn-match-{{ $match->id }}" class="hidden bg-green-500 text-white px-3 py-1 rounded">Guardar</button>
-                    <form action="{{ route('matches.destroy', $match->id) }}" method="POST" onsubmit="return confirm('¿Estás seguro de que deseas eliminar este partido? Esta acción no se puede deshacer.')" class="inline">
-                        @csrf
-                        @method('DELETE')
-                        <button type="submit" class="bg-red-500 text-white px-3 py-1 rounded">Eliminar</button>
-                    </form>
-                </td>
-            </tr>
+                <button onclick="editMatch('{{ $match->id }}')" id="edit-btn-match-{{ $match->id }}" class="bg-yellow-500 text-white px-3 py-1 rounded">Editar</button>
+                <button onclick="saveMatch('{{ $match->id }}')" id="save-btn-match-{{ $match->id }}" class="hidden bg-green-500 text-white px-3 py-1 rounded">Guardar</button>
+                
+                <form action="{{ route('matches.destroy', $match->id) }}" method="POST" onsubmit="return confirm('¿Estás seguro de que deseas eliminar este partido? Esta acción no se puede deshacer.')" class="inline">
+                    @csrf
+                    @method('DELETE')
+                    <button type="submit" class="bg-red-500 text-white px-3 py-1 rounded">Eliminar</button>
+                </form>
+            </td>
+        </tr>
             @endforeach
+        @endif
+        
         </tbody>
     </table>
 </div>
@@ -320,7 +324,10 @@
         <h2 class="text-xl font-semibold text-gray-800 mb-4 text-center">Seleccionar Jugadores Convocados</h2>
         <form id="convocatoriaForm">
             @csrf
-            <input type="hidden" name="match_id" value="{{ $match->id }}">
+                @if(isset($match))
+                    <input type="hidden" name="match_id" value="{{ $match->id }}">
+                @endif
+
 
             <!-- Lista de jugadores con checkboxes -->
             <div class="max-h-60 overflow-y-auto">

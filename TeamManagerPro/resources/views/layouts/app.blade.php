@@ -11,11 +11,8 @@
 <body class="bg-gray-100">
     <nav class="bg-blue-600 text-white p-4">
         <div class="container mx-auto flex justify-between">
-            <a href="{{ route('teams.index') }}" class="text-xl font-bold">TeamManagerPro</a>
+            <a href="{{ route('dashboard') }}" class="text-xl font-bold">TeamManagerPro</a>
             <div>
-                <a href="{{ route('teams.index') }}" class="mx-2">Plantillas</a>
-                <a href="{{ route('players.index') }}" class="mx-2">Jugadores</a>
-                <a href="{{ route('matches.index') }}" class="mx-2">Partidos</a>
                 <form action="{{ route('logout') }}" method="POST" class="inline">
                     @csrf
                     <button type="submit" class="bg-red-500 px-3 py-1 rounded">Cerrar sesión</button>
