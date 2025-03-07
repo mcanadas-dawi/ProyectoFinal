@@ -1,46 +1,31 @@
-<!-- resources/views/dashboard/team_show.blade.php -->
 @extends('layouts.dashboard')
 
 @section('content')
-<div class="container mx-auto p-6">
-    <h1 class="text-3xl font-bold text-gray-800 mb-6">{{ $team->nombre }} ({{ strtoupper($team->modalidad) }})</h1>
-
-    <!-- Botón para eliminar equipo -->
-    <form action="{{ route('teams.destroy', $team->id) }}" method="POST" onsubmit="return confirm('¿Estás seguro de que deseas eliminar este equipo? Esta acción no se puede deshacer.')" class="mb-4 text-right">
+<div class="flex justify-between items-center mb-6">
+    <h1 class="text-3xl font-bold text-gray-800">
+        {{ $team->nombre }} ({{ strtoupper($team->modalidad) }})
+    </h1>
+    <form action="{{ route('teams.destroy', $team->id) }}" method="POST" onsubmit="return confirm('¿Estás seguro de que deseas eliminar este equipo? Esta acción no se puede deshacer.')">
         @csrf
         @method('DELETE')
-        <button type="submit" class="bg-red-500 text-white px-4 py-2 rounded-lg">Eliminar Equipo</button>
-    </form>
-
-   <!-- AÑADIR JUGADORES DE OTRAS PLANTILLAS-->
-<div class="bg-purple-200 shadow-lg rounded-lg p-6 mb-6">
-    <h2 class="text-2xl font-semibold text-gray-900 mb-4 text-center">Añadir Jugador Existente</h2>
-    <form action="{{ route('players.addToTeam') }}" method="POST">
-        @csrf
-        <input type="hidden" name="team_id" value="{{ $team->id }}">
-        <div class="mb-4">
-            <label for="player_id" class="block text-gray-700 font-semibold">Seleccionar jugador procedente de otra plantilla:</label>
-            <select name="player_id" id="player_id" class="w-full p-2 border rounded bg-white text-center" required>
-                <option value=""> Seleccionar </option>
-                @foreach ($allPlayers as $player)
-                    <option value="{{ $player->id }}">{{ $player->nombre }} {{ $player->apellido }} (DNI: {{ $player->dni }})</option>
-                @endforeach
-            </select>
-        </div>
-
-        <button type="submit" class="bg-purple-600 text-white px-4 py-2 rounded-lg hover:bg-purple-700">Añadir Jugador</button>
+        <button type="submit" class="bg-red-500 text-white px-4 py-2 rounded-lg hover:bg-red-700">
+            Eliminar Equipo
+        </button>
     </form>
 </div>
-
 
 
     <!-- Sección de Jugadores -->
     <div class="bg-blue-200 shadow-lg rounded-lg p-6 mb-6">
     <div class="flex items-center justify-center mb-4">
-        <h2 class="text-2xl font-semibold text-gray-900 flex-grow text-center">Jugadores</h2>
+        <h2 class="text-2xl font-semibold text-gray-900 flex-grow text-left">Jugadores</h2>
         <button onclick="openAddPlayerModal()" class="bg-blue-600 text-white px-4 py-2 rounded-lg hover:bg-blue-700">
-            Añadir Jugador
+            Añadir Nuevo Jugador
         </button>
+        <button onclick="openExistingPlayerModal()" class="bg-purple-600 text-white px-4 py-2 rounded-lg hover:bg-purple-700 ml-4">
+            Añadir Jugador de Otra Plantilla
+        </button>
+
     </div>
         <table class="w-full text-center border-collapse">
             <thead class="bg-blue-300 text-gray-900">
@@ -106,15 +91,17 @@
                         <input type="number" name="suplente" class="hidden w-16 p-1 border rounded" id="edit-suplente-{{ $player->id }}">
                     </td>
                     <td class="p-2">
-                        <span id="valoracion-{{ $player->id }}">{{ $player->valoracion }}</span>
-                        <input type="number" name="valoracion" class="hidden w-16 p-1 border rounded" id="edit-valoracion-{{ $player->id }}">
+                        <span id="valoracion-{{ $player->id }}">{{ number_format($player->getValoracionPorPlantilla($team->id), 2) }}</span>
+                        <input type="number" name="valoracion" step="0.01" class="hidden w-16 p-1 border rounded" id="edit-valoracion-{{ $player->id }}">
                     </td>
+
                     <td class="p-2 text-center">
                         <button onclick="editPlayer('{{ $player->id }}')" id="edit-btn-{{ $player->id }}" class="bg-yellow-500 text-white px-3 py-1 rounded">Editar</button>
                         <button onclick="savePlayer('{{ $player->id }}')" id="save-btn-{{ $player->id }}" class="hidden bg-green-500 text-white px-3 py-1 rounded">Guardar</button>
                         <form action="{{ route('players.destroy', $player->id) }}" method="POST" onsubmit="return confirm('¿Estás seguro de que deseas eliminar a este jugador? Esta acción no se puede deshacer.')" class="inline">
                             @csrf
                             @method('DELETE')
+                            <input type="hidden" name="team_id" value="{{ $team->id }}">
                             <button type="submit" class="bg-red-500 text-white px-3 py-1 rounded">Eliminar</button>
                         </form>
                     </td>
@@ -127,7 +114,7 @@
 <!-- Sección de Partidos -->
 <div class="bg-green-200 shadow-lg rounded-lg p-6 mb-6">
     <div class="flex items-center justify-center mb-4">
-        <h2 class="text-2xl font-semibold text-gray-900 flex-grow text-center">Partidos</h2>
+        <h2 class="text-2xl font-semibold text-gray-900 flex-grow text-left">Partidos</h2>
         <button onclick="openAddMatchModal()" class="bg-green-600 text-white px-4 py-2 rounded-lg hover:bg-green-700">
             Añadir Partido
         </button>
@@ -259,30 +246,28 @@
         <h2 class="text-2xl font-semibold text-gray-800 mb-4 text-center">Alineador Táctico</h2>
 
         <label class="block text-gray-700 font-semibold">Seleccionar Formación:</label>
-            <select id="formation-selector" class="w-full p-2 border rounded-lg mb-4" onchange="updateFormation()">
-                <option value="">Seleccionar...</option>
-                <option value="libre">Libre</option>
-                @if ($team->modalidad == 'F5')
-                    <option value="1-1-2-1">1-1-2-1</option>
-                    <option value="1-2-1-1">1-2-1-1</option>
-                @elseif ($team->modalidad == 'F7')
-                    <option value="1-3-2-1">1-3-2-1</option>
-                    <option value="1-2-3-1">1-2-3-1</option>
-                @elseif ($team->modalidad == 'F8')
-                    <option value="1-3-3-1">1-3-3-1</option>
-                    <option value="1-2-4-1">1-2-4-1</option>
-                @elseif ($team->modalidad == 'F11')
-                    <option value="1-4-4-2">1-4-4-2</option>
-                    <option value="1-4-3-3">1-4-3-3</option>
-                    <option value="1-5-3-2">1-5-3-2</option>
-                @endif
-            </select>
-
+        <select id="formation-selector" class="w-full p-2 border rounded-lg mb-4" onchange="updateFormation()">
+            <option value="">Seleccionar...</option>
+            @if ($team->modalidad == 'F5')
+                <option value="1-1-2-1">1-1-2-1</option>
+                <option value="1-2-1-1">1-2-1-1</option>
+            @elseif ($team->modalidad == 'F7')
+                <option value="1-3-2-1">1-3-2-1</option>
+                <option value="1-2-3-1">1-2-3-1</option>
+            @elseif ($team->modalidad == 'F8')
+                <option value="1-3-3-1">1-3-3-1</option>
+                <option value="1-2-4-1">1-2-4-1</option>
+            @elseif ($team->modalidad == 'F11')
+                <option value="1-4-4-2">1-4-4-2</option>
+                <option value="1-4-3-3">1-4-3-3</option>
+                <option value="1-5-3-2">1-5-3-2</option>
+            @endif
+        </select>
 
         <!-- Campo de Fútbol -->
         <div id="field-container" class="relative bg-green-500 h-96 flex justify-center items-center">
             <img src="{{ asset('Imagenes/campo_futbol.jpg') }}" alt="Campo de Fútbol" class="w-full h-full object-cover">
-            <div id="player-spots" class="absolute inset-0 flex flex-wrap justify-center items-center">
+            <div id="player-spots" class="absolute inset-0 flex justify-center items-center">
                 <!-- Aquí se inyectarán los jugadores según la formación -->
             </div>
         </div>
@@ -294,25 +279,25 @@
                 <thead>
                     <tr class="text-gray-700">
                         <th class="p-2">Nombre</th>
-                        <th class="p-2">Apellido</th>
                         <th class="p-2">Dorsal</th>
                         <th class="p-2">Posición</th>
-                        <th class="p-2">Perfil</th>
                     </tr>
                 </thead>
                 <tbody id="suplentes-body">
-                    <!-- Aquí se inyectarán los suplentes -->
+                    @foreach ($team->players as $player)
+                        <tr id="suplente-{{ $player->id }}">
+                            <td class="p-2">{{ $player->nombre }}</td>
+                            <td class="p-2">{{ $player->dorsal }}</td>
+                            <td class="p-2">{{ $player->posicion }}</td>
+                        </tr>
+                    @endforeach
                 </tbody>
             </table>
         </div>
 
         <div class="mt-4 flex justify-between">
-            <button onclick="saveAlineacion()" class="bg-green-500 text-white px-4 py-2 rounded-lg">
-                Guardar Alineación
-            </button>
-            <button onclick="closeAlineador()" class="bg-gray-500 text-white px-4 py-2 rounded-lg">
-                Cerrar
-            </button>
+            <button onclick="saveAlineacion()" class="bg-green-500 text-white px-4 py-2 rounded-lg">Guardar Alineación</button>
+            <button onclick="closeAlineador()" class="bg-gray-500 text-white px-4 py-2 rounded-lg">Cerrar</button>
         </div>
     </div>
 </div>
@@ -352,6 +337,36 @@
         </form>
     </div>
 </div>
+<!-- Modal para Añadir Jugadores de Otras Plantillas -->
+<div id="existingPlayerModal" class="hidden fixed inset-0 bg-gray-900 bg-opacity-50 flex justify-center items-center">
+    <div class="bg-white rounded-lg p-6 w-1/3 shadow-lg">
+        <h2 class="text-2xl font-semibold text-gray-900 mb-4 text-center">Añadir Jugador Existente</h2>
+        <form action="{{ route('players.addToTeam') }}" method="POST">
+            @csrf
+            <input type="hidden" name="team_id" value="{{ $team->id }}">
+
+            <div class="mb-4">
+                <label for="player_id" class="block text-gray-700 font-semibold">Seleccionar jugador:</label>
+                <select name="player_id" id="player_id" class="w-full p-2 border rounded bg-white text-center" required>
+                    <option value="">Seleccionar...</option>
+                    @foreach ($allPlayers as $player)
+                        <option value="{{ $player->id }}">{{ $player->nombre }} {{ $player->apellido }} (DNI: {{ $player->dni }})</option>
+                    @endforeach
+                </select>
+            </div>
+
+            <div class="flex justify-between">
+                <button type="submit" class="bg-green-600 text-white px-4 py-2 rounded-lg hover:bg-green-700">
+                    Añadir Jugador
+                </button>
+                <button type="button" onclick="closeExistingPlayerModal()" class="bg-gray-500 text-white px-4 py-2 rounded-lg">
+                    Cancelar
+                </button>
+            </div>
+        </form>
+    </div>
+</div>
+
 
 <script>
     function editPlayer(id) {
@@ -571,6 +586,14 @@
             });
         }
     }
+    function openExistingPlayerModal() {
+        document.getElementById('existingPlayerModal').classList.remove('hidden');
+    }
+
+    function closeExistingPlayerModal() {
+        document.getElementById('existingPlayerModal').classList.add('hidden');
+    }
 </script>
 
 @endsection
+   

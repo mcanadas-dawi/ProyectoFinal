@@ -27,10 +27,13 @@ class Player extends Model
 }
 
 // Calcula la media de valoraciones del jugador
-public function getValoracionAttribute() {
-    return $this->matches()->avg('player_match.valoracion') ?? 0;
+public function getValoracionPorPlantilla($teamId)
+{
+    return $this->matches()
+        ->whereHas('team', function ($query) use ($teamId) {
+            $query->where('id', $teamId);
+        })
+        ->avg('player_match.valoracion') ?? 0;
 }
-
-    
 }
 

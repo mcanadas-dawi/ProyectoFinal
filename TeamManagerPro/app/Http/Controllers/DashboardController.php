@@ -108,20 +108,24 @@ class DashboardController extends Controller
     }
 }
 
-public function destroyPlayer($id)
+public function destroyPlayer(Request $request, $id)
 {
-    // Verificar que el jugador pertenece a un equipo del usuario autenticado
-    $player = Player::where('id', $id)->whereHas('teams', function ($query) {
-        $query->where('user_id', Auth::id());
-    })->firstOrFail();
+    $player = Player::findOrFail($id);
+    
+    // Verifica que el jugador pertenece a la plantilla específica del usuario
+    $team = Team::where('id', $request->team_id)
+                ->where('user_id', Auth::id())
+                ->firstOrFail();
 
-    // Eliminar relaciones con equipos antes de eliminar el jugador
-    $player->teams()->detach();
+    // Desvincular el jugador de la plantilla específica
+    $team->players()->detach($player->id);
 
-    // Finalmente, eliminar el jugador
-    $player->delete();
+    // Si el jugador ya no está en ninguna plantilla, puedes eliminarlo opcionalmente
+    if ($player->teams()->count() == 0) {
+        $player->delete();
+    }
 
-    return back()->with('success', 'Jugador eliminado correctamente.');
+    return back()->with('success', 'Jugador eliminado de la plantilla correctamente.');
 }
 
 
