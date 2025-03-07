@@ -27,6 +27,9 @@ Route::middleware(['auth', 'verified'])->group(function () {
     Route::post('/matches/{match}/rate', [DashboardController::class, 'saveRatings'])->name('matches.saveRatings');
     Route::post('/matches/convocatoria', [DashboardController::class, 'storeConvocatoria'])->name('matches.convocatoria');
     Route::post('/matches/{match}/convocatoria', [DashboardController::class, 'updateConvocatoria'])->name('matches.updateConvocatoria');
+    Route::post('/matches/{match}/save-alineacion', [DashboardController::class, 'saveAlineacion'])->name('matches.saveAlineacion');
+    Route::get('/matches/{match}/get-alineacion', [DashboardController::class, 'getAlineacion'])->name('matches.getAlineacion');
+
 
 });
 

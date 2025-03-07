@@ -272,4 +272,30 @@ public function updateConvocatoria(Request $request, $matchId)
 
     return response()->json(['success' => true]);
 }
+
+public function saveAlineacion(Request $request, $matchId)
+{
+    $match = Matches::findOrFail($matchId);
+
+    // Eliminar alineación anterior del partido
+    $match->players()->detach();
+
+    // Guardar la nueva alineación con las posiciones
+    foreach ($request->alineacion as $alineacion) {
+        $match->players()->attach($alineacion['player_id'], ['posicion' => $alineacion['posicion']]);
+    }
+
+    return response()->json(['success' => true]);
+}
+
+
+public function getAlineacion($matchId)
+{
+    $match = Matches::findOrFail($matchId);
+    $alineacion = $match->players()->select('player_id', 'posicion')->get();
+
+    return response()->json($alineacion);
+}
+
+
 }

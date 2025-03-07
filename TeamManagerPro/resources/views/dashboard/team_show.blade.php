@@ -245,6 +245,7 @@
     <div class="bg-white rounded-lg p-6 w-3/4">
         <h2 class="text-2xl font-semibold text-gray-800 mb-4 text-center">Alineador Táctico</h2>
 
+        <!-- Seleccionar Formación -->
         <label class="block text-gray-700 font-semibold">Seleccionar Formación:</label>
         <select id="formation-selector" class="w-full p-2 border rounded-lg mb-4" onchange="updateFormation()">
             <option value="">Seleccionar...</option>
@@ -272,7 +273,7 @@
             </div>
         </div>
 
-        <!-- Lista de suplentes -->
+        <!-- Lista de Suplentes -->
         <h3 class="text-xl font-semibold text-gray-800 mt-4">Suplentes</h3>
         <div id="suplentes-list" class="max-h-40 overflow-y-auto bg-gray-100 p-2 rounded-lg">
             <table class="w-full">
@@ -283,15 +284,7 @@
                         <th class="p-2">Posición</th>
                     </tr>
                 </thead>
-                <tbody id="suplentes-body">
-                    @foreach ($team->players as $player)
-                        <tr id="suplente-{{ $player->id }}">
-                            <td class="p-2">{{ $player->nombre }}</td>
-                            <td class="p-2">{{ $player->dorsal }}</td>
-                            <td class="p-2">{{ $player->posicion }}</td>
-                        </tr>
-                    @endforeach
-                </tbody>
+                <tbody id="suplentes-body"></tbody>
             </table>
         </div>
 
@@ -301,6 +294,7 @@
         </div>
     </div>
 </div>
+
 
 
 <!-- Modal para Convocatoria -->
@@ -366,7 +360,10 @@
         </form>
     </div>
 </div>
-
+<!-- Contenedor oculto con datos en `data-attributes` -->
+<div id="alineador-data" 
+     data-players='@json($team->players)' 
+     data-convocados='@json($convocados)'></div>
 
 <script>
     function editPlayer(id) {
@@ -480,13 +477,6 @@
         form.submit();
     }
 
-    function openAlineador(matchId) {
-        document.getElementById('alineadorModal').classList.remove('hidden');
-    }
-
-    function closeAlineador() {
-        document.getElementById('alineadorModal').classList.add('hidden');
-    }
 //CONVOCATORIA
     function openConvocatoriaModal(matchId) {
         document.getElementById('convocatoriaModal').classList.remove('hidden');
@@ -546,46 +536,7 @@
         document.getElementById('alineadorModal').classList.add('hidden');
     }
     
-    function updateFormation() {
-        let formation = document.getElementById('formation-selector').value;
-        let positions = {
-            '1-1-2-1': [[50, 90], [50, 70], [30, 50], [70, 50], [50, 30]],
-            '1-4-4-2': [[50, 90], [20, 70], [40, 70], [60, 70], [80, 70], [20, 50], [40, 50], [60, 50], [80, 50], [40, 30], [60, 30]],
-            '1-4-3-3': [[50, 90], [20, 70], [40, 70], [60, 70], [80, 70], [30, 50], [50, 50], [70, 50], [30, 30], [50, 30], [70, 30]]
-        };
-
-        let fieldContainer = document.getElementById('player-spots');
-        fieldContainer.innerHTML = '';
-        let allPlayers = JSON.parse(`{!! json_encode($team->players) !!}`);
-
-        if (positions[formation]) {
-            positions[formation].forEach((pos, index) => {
-                let playerCircle = document.createElement('div');
-                playerCircle.className = 'absolute w-12 h-12 bg-white border border-gray-800 rounded-full flex items-center justify-center text-lg font-bold shadow-md';
-                playerCircle.style.top = `${pos[1]}%`;
-                playerCircle.style.left = `${pos[0]}%`;
-                playerCircle.style.transform = 'translate(-50%, -50%)';
-                
-                let select = document.createElement('select');
-                select.className = 'hidden';
-                allPlayers.forEach(player => {
-                    let option = document.createElement('option');
-                    option.value = player.id;
-                    option.textContent = player.dorsal;
-                    select.appendChild(option);
-                });
-                select.addEventListener('change', function() {
-                    playerCircle.textContent = this.options[this.selectedIndex].text;
-                });
-                
-                playerCircle.appendChild(select);
-                playerCircle.addEventListener('click', function() {
-                    select.classList.toggle('hidden');
-                });
-                fieldContainer.appendChild(playerCircle);
-            });
-        }
-    }
+    
     function openExistingPlayerModal() {
         document.getElementById('existingPlayerModal').classList.remove('hidden');
     }
@@ -593,6 +544,152 @@
     function closeExistingPlayerModal() {
         document.getElementById('existingPlayerModal').classList.add('hidden');
     }
+
+ // ALINEADOR 
+
+let alineadorData = document.getElementById("alineador-data");
+let allPlayers = JSON.parse(alineadorData.dataset.players);
+let convocadosPorPartido = JSON.parse(alineadorData.dataset.convocados);
+let selectedPlayers = {};
+let currentMatchId = null;
+
+function openAlineador(matchId) {
+    currentMatchId = matchId;
+    document.getElementById('alineadorModal').classList.remove('hidden');
+    updateFormation();
+}
+
+function closeAlineador() {
+    document.getElementById('alineadorModal').classList.add('hidden');
+}
+
+function updateFormation() {
+    let formation = document.getElementById('formation-selector').value;
+    let fieldContainer = document.getElementById('player-spots');
+    fieldContainer.innerHTML = "";
+
+    let formations = {
+        '1-4-4-2': [[10, 50], [30, 60], [30, 40], [30, 20], [30, 80], [50, 60], [50, 40], [50, 20], [50, 80], [70, 40], [70, 60]],
+        '1-4-3-3': [[50, 90], [20, 70], [40, 70], [60, 70], [80, 70], [30, 50], [50, 50], [70, 50], [30, 30], [50, 30], [70, 30]]
+    };
+
+    let convocados = convocadosPorPartido[currentMatchId] || [];
+
+    if (formations[formation]) {
+        formations[formation].forEach((pos, index) => {
+            let playerCircle = document.createElement('div');
+            playerCircle.className = 'absolute w-12 h-12 bg-white border border-gray-800 rounded-full flex items-center justify-center text-lg font-bold shadow-md';
+            playerCircle.style.top = `${pos[1]}%`;
+            playerCircle.style.left = `${pos[0]}%`;
+            playerCircle.style.transform = 'translate(-50%, -50%)';
+            playerCircle.style.cursor = "pointer";
+            playerCircle.setAttribute('data-index', index);
+
+            let select = document.createElement('select');
+            select.className = 'border rounded p-1 text-sm absolute';
+            select.style.position = "absolute";
+            select.style.top = "100%";
+            select.style.left = "50%";
+            select.style.transform = "translate(-50%, 5px)";
+            select.style.display = "none"; // Se oculta hasta que se haga clic
+
+            let defaultOption = document.createElement('option');
+            defaultOption.value = "";
+            defaultOption.textContent = "Seleccionar";
+            select.appendChild(defaultOption);
+
+            convocados.forEach(playerId => {
+                let player = allPlayers.find(p => p.id == playerId);
+                if (player) {
+                    let option = document.createElement('option');
+                    option.value = player.id;
+                    option.textContent = `${player.dorsal} - ${player.nombre}`;
+                    select.appendChild(option);
+                }
+            });
+
+            // Mostrar select al hacer clic en el círculo
+            playerCircle.onclick = function(event) {
+                event.stopPropagation();
+                let allSelects = document.querySelectorAll("select");
+                allSelects.forEach(s => s.style.display = "none"); // Ocultar otros select abiertos
+                select.style.display = "block"; // Mostrar el select solo en el círculo clicado
+            };
+
+            // Manejar la selección del jugador
+            select.onchange = function() {
+                let selectedId = this.value;
+                selectedPlayers[index] = selectedId;
+                updateSuplentes();
+                let selectedPlayer = allPlayers.find(p => p.id == selectedId);
+                playerCircle.textContent = selectedPlayer ? selectedPlayer.dorsal : "";
+                select.style.display = "none"; // Oculta el select tras la selección
+            };
+
+            playerCircle.appendChild(select);
+            fieldContainer.appendChild(playerCircle);
+        });
+    }
+
+    updateSuplentes();
+}
+
+
+function updateSuplentes() {
+    let suplentesBody = document.getElementById('suplentes-body');
+    suplentesBody.innerHTML = "";
+
+    allPlayers.forEach(player => {
+        if (convocadosPorPartido[currentMatchId]?.includes(player.id) && !Object.values(selectedPlayers).includes(player.id.toString())) {
+            let row = `<tr>
+                <td class="p-2">${player.nombre}</td>
+                <td class="p-2">${player.dorsal}</td>
+                <td class="p-2">${player.posicion}</td>
+            </tr>`;
+            suplentesBody.innerHTML += row;
+        }
+    });
+}
+function saveAlineacion() {
+    let alineacion = [];
+
+    Object.keys(selectedPlayers).forEach(index => {
+        alineacion.push({
+            posicion: index,
+            player_id: selectedPlayers[index]
+        });
+    });
+
+    fetch(`/matches/${currentMatchId}/save-alineacion`, {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json',
+            'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').content
+        },
+        body: JSON.stringify({ alineacion })
+    })
+    .then(response => response.json())
+    .then(data => {
+        if (data.success) {
+            alert('Alineación guardada correctamente');
+            closeAlineador();
+        }
+    })
+    .catch(error => console.error('Error:', error));
+}
+function loadAlineacion() {
+    fetch(`/matches/${currentMatchId}/get-alineacion`)
+    .then(response => response.json())
+    .then(data => {
+        selectedPlayers = {};
+        data.forEach(player => {
+            selectedPlayers[player.posicion] = player.player_id;
+        });
+        updateFormation();
+    })
+    .catch(error => console.error('Error:', error));
+}
+
 </script>
 
 @endsection
