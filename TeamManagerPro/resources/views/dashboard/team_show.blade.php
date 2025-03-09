@@ -265,28 +265,30 @@
             @endif
         </select>
 
+        <!-- Lista de Jugadores Convocados -->
+        <h3 class="text-xl font-semibold text-gray-800 mt-4">Jugadores Convocados</h3>
+        <div id="convocados-list" class="max-h-40 overflow-y-auto bg-gray-100 p-2 rounded-lg">
+            <div id="convocados-body" class="flex flex-wrap gap-2">
+                <!-- Aquí se inyectarán los jugadores convocados -->
+            </div>
+        </div>
+
         <!-- Campo de Fútbol -->
-        <div id="field-container" class="relative bg-green-500 h-96 flex justify-center items-center">
+        <div id="field-container" class="relative bg-green-500 h-96 flex justify-center items-center mt-4">
             <img src="{{ asset('Imagenes/campo_futbol.jpg') }}" alt="Campo de Fútbol" class="w-full h-full object-cover">
             <div id="player-spots" class="absolute inset-0 flex justify-center items-center">
-                <!-- Aquí se inyectarán los jugadores según la formación -->
+                <!-- Aquí se inyectarán las posiciones según la formación -->
             </div>
         </div>
 
         <!-- Lista de Suplentes -->
-        <h3 class="text-xl font-semibold text-gray-800 mt-4">Suplentes</h3>
-        <div id="suplentes-list" class="max-h-40 overflow-y-auto bg-gray-100 p-2 rounded-lg">
-            <table class="w-full">
-                <thead>
-                    <tr class="text-gray-700">
-                        <th class="p-2">Nombre</th>
-                        <th class="p-2">Dorsal</th>
-                        <th class="p-2">Posición</th>
-                    </tr>
-                </thead>
-                <tbody id="suplentes-body"></tbody>
-            </table>
-        </div>
+       <!-- Lista de Suplentes -->
+<h3 class="text-xl font-semibold text-gray-800 mt-4">Suplentes</h3>
+<div id="suplentes-list" class="max-h-40 overflow-y-auto bg-gray-100 p-2 rounded-lg">
+    <div id="suplentes-body" class="flex flex-wrap gap-2 min-h-[50px]">
+    </div>
+</div>
+
 
         <div class="mt-4 flex justify-between">
             <button onclick="saveAlineacion()" class="bg-green-500 text-white px-4 py-2 rounded-lg">Guardar Alineación</button>
@@ -294,6 +296,13 @@
         </div>
     </div>
 </div>
+
+<!-- Contenedor oculto con datos en `data-attributes` -->
+<div id="alineador-data" 
+     data-players='@json($team->players)' 
+     data-convocados='@json($convocados)'></div>
+
+
 
 
 
@@ -310,6 +319,9 @@
 
             <!-- Lista de jugadores con checkboxes -->
             <div class="max-h-60 overflow-y-auto">
+            <button type="button" onclick="toggleSelectAll()" class="bg-gray-500 text-white px-4 py-2 rounded-lg mb-2">
+                Seleccionar Todos
+            </button>
                 @foreach ($team->players as $player)
                 <div class="flex items-center mb-2">
                     <input type="checkbox" id="player-{{ $player->id }}" name="convocados[]"
@@ -488,7 +500,6 @@
     let csrfToken = document.querySelector('meta[name="csrf-token"]').content;
     let matchId = document.querySelector('input[name="match_id"]').value;
     
-    // Obtener jugadores seleccionados
     let seleccionados = [];
     document.querySelectorAll('input[name="convocados[]"]:checked').forEach((checkbox) => {
         seleccionados.push(checkbox.value);
@@ -505,10 +516,22 @@
     .then(response => response.json())
     .then(data => {
         if (data.success) {
-            closeConvocatoriaModal();
+            alert('Convocatoria guardada correctamente');
+            location.reload();  // 🔄 Recargar la página después de guardar
+        } else {
+            alert('Error al guardar la convocatoria.');
         }
     })
-    .catch(error => console.error('Error:', error));
+    .catch(error => console.error('Error en saveConvocatoria():', error));
+}
+
+function toggleSelectAll() {
+    let checkboxes = document.querySelectorAll('input[name="convocados[]"]');
+    let allChecked = Array.from(checkboxes).every(checkbox => checkbox.checked);
+
+    checkboxes.forEach(checkbox => {
+        checkbox.checked = !allChecked;
+    });
 }
 
 //PLAYER MODAL
@@ -546,25 +569,65 @@
     }
 
  // ALINEADOR 
+    let alineadorData = document.getElementById("alineador-data");
+    let allPlayers = JSON.parse(alineadorData.dataset.players);
+    let convocadosPorPartido = JSON.parse(alineadorData.dataset.convocados);
+    let selectedPlayers = {}; // Almacena jugadores alineados
+    let currentMatchId = null;
 
-let alineadorData = document.getElementById("alineador-data");
-let allPlayers = JSON.parse(alineadorData.dataset.players);
-let convocadosPorPartido = JSON.parse(alineadorData.dataset.convocados);
-let selectedPlayers = {};
-let currentMatchId = null;
+    function openAlineador(matchId) {
+        currentMatchId = matchId;
+        document.getElementById('alineadorModal').classList.remove('hidden');
+        
+        // Cargar jugadores convocados en la lista principal
+        loadConvocados();
 
-function openAlineador(matchId) {
-    currentMatchId = matchId;
-    document.getElementById('alineadorModal').classList.remove('hidden');
-    updateFormation();
-}
+        // Cargar formación y alineación guardada
+        fetch(`/matches/${currentMatchId}/get-alineacion`)
+            .then(response => response.json())
+            .then(data => {
+                if (data.success) {
+                    let formationSelector = document.getElementById('formation-selector');
+                    formationSelector.value = data.formacion || '';
+                    updateFormation(data.formacion, data.alineacion);
+                } else {
+                    console.error("No se pudo cargar la alineación guardada.");
+                }
+            })
+            .catch(error => console.error("Error al obtener la alineación guardada:", error));
+    }
 
-function closeAlineador() {
-    document.getElementById('alineadorModal').classList.add('hidden');
-}
+    function loadConvocados() {
+        let convocadosBody = document.getElementById('convocados-body');
+        convocadosBody.innerHTML = "";
 
-function updateFormation() {
-    let formation = document.getElementById('formation-selector').value;
+        let convocados = convocadosPorPartido[currentMatchId] || [];
+        convocados.forEach(playerId => {
+            addToConvocados(playerId);
+        });
+    }
+
+    function addToConvocados(playerId) {
+        let convocadosBody = document.getElementById('convocados-body');
+        let player = allPlayers.find(p => p.id == playerId);
+        if (player) {
+            let playerDiv = document.createElement('div');
+            playerDiv.className = "draggable bg-blue-500 text-white px-3 py-1 rounded cursor-pointer w-full";
+            playerDiv.innerHTML = `<span>${player.dorsal} - ${player.nombre} (${player.posicion})</span>`;
+            playerDiv.setAttribute("draggable", true);
+            playerDiv.setAttribute("data-player-id", player.id);
+
+            playerDiv.ondragstart = function(event) {
+                event.dataTransfer.setData("playerId", player.id);
+            };
+
+            convocadosBody.appendChild(playerDiv);
+        }
+    }
+
+    function updateFormation(formation = null, alineacionGuardada = []) {
+    let formationSelector = document.getElementById('formation-selector');
+    let selectedFormation = formation || formationSelector.value;
     let fieldContainer = document.getElementById('player-spots');
     fieldContainer.innerHTML = "";
 
@@ -573,91 +636,153 @@ function updateFormation() {
         '1-4-3-3': [[50, 90], [20, 70], [40, 70], [60, 70], [80, 70], [30, 50], [50, 50], [70, 50], [30, 30], [50, 30], [70, 30]]
     };
 
-    let convocados = convocadosPorPartido[currentMatchId] || [];
+    if (!formations[selectedFormation]) return;
 
-    if (formations[formation]) {
-        formations[formation].forEach((pos, index) => {
-            let playerCircle = document.createElement('div');
-            playerCircle.className = 'absolute w-12 h-12 bg-white border border-gray-800 rounded-full flex items-center justify-center text-lg font-bold shadow-md';
-            playerCircle.style.top = `${pos[1]}%`;
-            playerCircle.style.left = `${pos[0]}%`;
-            playerCircle.style.transform = 'translate(-50%, -50%)';
-            playerCircle.style.cursor = "pointer";
-            playerCircle.setAttribute('data-index', index);
+    formations[selectedFormation].forEach((pos, index) => {
+        let positionDiv = document.createElement('div');
+        positionDiv.className = "dropzone w-12 h-12 bg-white border border-gray-800 rounded-full flex items-center justify-center";
+        positionDiv.style.position = "absolute";
+        positionDiv.style.top = `${pos[1]}%`;
+        positionDiv.style.left = `${pos[0]}%`;
+        positionDiv.setAttribute("data-index", index);
+        positionDiv.setAttribute("draggable", true);
 
-            let select = document.createElement('select');
-            select.className = 'border rounded p-1 text-sm absolute';
-            select.style.position = "absolute";
-            select.style.top = "100%";
-            select.style.left = "50%";
-            select.style.transform = "translate(-50%, 5px)";
-            select.style.display = "none"; // Se oculta hasta que se haga clic
+        let alineado = alineacionGuardada.find(a => a.posicion == index);
+        if (alineado) {
+            let player = allPlayers.find(p => p.id == alineado.player_id);
+            if (player) {
+                positionDiv.textContent = player.dorsal;
+                positionDiv.setAttribute("data-player-id", player.id);
+                selectedPlayers[index] = player.id;
+            }
+        }
 
-            let defaultOption = document.createElement('option');
-            defaultOption.value = "";
-            defaultOption.textContent = "Seleccionar";
-            select.appendChild(defaultOption);
+        positionDiv.ondragover = function(event) {
+            event.preventDefault();
+        };
 
-            convocados.forEach(playerId => {
+        positionDiv.ondrop = function(event) {
+            event.preventDefault();
+            let playerId = event.dataTransfer.getData("playerId");
+
+            let existingPlayerId = positionDiv.getAttribute("data-player-id");
+
+            if (existingPlayerId) {
+                // Intercambiar posiciones si ya hay un jugador en la posición destino
+                let sourceDiv = document.querySelector(`.dropzone[data-player-id='${playerId}']`);
+
+                if (sourceDiv) {
+                    // Intercambio de posiciones
+                    sourceDiv.textContent = positionDiv.textContent;
+                    sourceDiv.setAttribute("data-player-id", existingPlayerId);
+                    positionDiv.textContent = allPlayers.find(p => p.id == playerId).dorsal;
+                    positionDiv.setAttribute("data-player-id", playerId);
+                }
+            } else {
+                // Si la posición destino está vacía, simplemente mueve el jugador
                 let player = allPlayers.find(p => p.id == playerId);
                 if (player) {
-                    let option = document.createElement('option');
-                    option.value = player.id;
-                    option.textContent = `${player.dorsal} - ${player.nombre}`;
-                    select.appendChild(option);
+                    positionDiv.textContent = player.dorsal;
+                    positionDiv.setAttribute("data-player-id", player.id);
+                    selectedPlayers[index] = player.id;
+                    removeFromConvocados(playerId);
+                    removeFromSuplentes(playerId);
                 }
-            });
+            }
+        };
 
-            // Mostrar select al hacer clic en el círculo
-            playerCircle.onclick = function(event) {
-                event.stopPropagation();
-                let allSelects = document.querySelectorAll("select");
-                allSelects.forEach(s => s.style.display = "none"); // Ocultar otros select abiertos
-                select.style.display = "block"; // Mostrar el select solo en el círculo clicado
-            };
+        positionDiv.ondragstart = function(event) {
+            let playerId = positionDiv.getAttribute("data-player-id");
+            if (playerId) {
+                event.dataTransfer.setData("playerId", playerId);
+            }
+        };
 
-            // Manejar la selección del jugador
-            select.onchange = function() {
-                let selectedId = this.value;
-                selectedPlayers[index] = selectedId;
-                updateSuplentes();
-                let selectedPlayer = allPlayers.find(p => p.id == selectedId);
-                playerCircle.textContent = selectedPlayer ? selectedPlayer.dorsal : "";
-                select.style.display = "none"; // Oculta el select tras la selección
-            };
+        fieldContainer.appendChild(positionDiv);
+    });
 
-            playerCircle.appendChild(select);
-            fieldContainer.appendChild(playerCircle);
-        });
-    }
-
-    updateSuplentes();
+    enableSuplentesDrop();
 }
 
-
-function updateSuplentes() {
+function enableSuplentesDrop() {
     let suplentesBody = document.getElementById('suplentes-body');
-    suplentesBody.innerHTML = "";
 
-    allPlayers.forEach(player => {
-        if (convocadosPorPartido[currentMatchId]?.includes(player.id) && !Object.values(selectedPlayers).includes(player.id.toString())) {
-            let row = `<tr>
-                <td class="p-2">${player.nombre}</td>
-                <td class="p-2">${player.dorsal}</td>
-                <td class="p-2">${player.posicion}</td>
-            </tr>`;
-            suplentesBody.innerHTML += row;
+    suplentesBody.ondragover = function(event) {
+        event.preventDefault();
+    };
+
+    suplentesBody.ondrop = function(event) {
+        event.preventDefault();
+        let playerId = event.dataTransfer.getData("playerId");
+
+        if (playerId) {
+            addToSuplentes(playerId);
+            removeFromField(playerId);
+            removeFromConvocados(playerId);
+        }
+    };
+}
+
+function addToSuplentes(playerId) {
+    let suplentesBody = document.getElementById('suplentes-body');
+    if (suplentesBody.querySelector(`[data-player-id='${playerId}']`)) return; // Evita duplicados
+
+    let player = allPlayers.find(p => p.id == playerId);
+    if (player) {
+        let playerDiv = document.createElement('div');
+        playerDiv.className = "draggable bg-gray-500 text-white px-3 py-1 rounded cursor-pointer w-full";
+        playerDiv.innerHTML = `<span>${player.dorsal} - ${player.nombre} (${player.posicion})</span>`;
+        playerDiv.setAttribute("draggable", true);
+        playerDiv.setAttribute("data-player-id", player.id);
+
+        playerDiv.ondragstart = function(event) {
+            event.dataTransfer.setData("playerId", player.id);
+        };
+
+        suplentesBody.appendChild(playerDiv);
+    }
+}
+
+function removeFromSuplentes(playerId) {
+    let playerDiv = document.querySelector(`#suplentes-body [data-player-id='${playerId}']`);
+    if (playerDiv) {
+        playerDiv.remove();
+    }
+}
+
+function removeFromField(playerId) {
+    let fieldPositions = document.querySelectorAll('.dropzone');
+
+    fieldPositions.forEach(position => {
+        if (position.getAttribute("data-player-id") === playerId) {
+            position.textContent = "";
+            position.removeAttribute("data-player-id");
+            delete selectedPlayers[position.getAttribute("data-index")];
         }
     });
 }
+
+function removeFromConvocados(playerId) {
+    let playerDiv = document.querySelector(`#convocados-body [data-player-id='${playerId}']`);
+    if (playerDiv) {
+        playerDiv.remove();
+    }
+}
+
+enableSuplentesDrop();
+
 function saveAlineacion() {
     let alineacion = [];
 
-    Object.keys(selectedPlayers).forEach(index => {
-        alineacion.push({
-            posicion: index,
-            player_id: selectedPlayers[index]
-        });
+    document.querySelectorAll(".dropzone").forEach(positionDiv => {
+        let playerId = positionDiv.getAttribute("data-player-id");
+        let index = positionDiv.getAttribute("data-index");
+        if (playerId) {
+            alineacion.push({
+                posicion: index,
+                player_id: playerId
+            });
+        }
     });
 
     fetch(`/matches/${currentMatchId}/save-alineacion`, {
@@ -673,22 +798,18 @@ function saveAlineacion() {
         if (data.success) {
             alert('Alineación guardada correctamente');
             closeAlineador();
+        } else {
+            alert('Hubo un error al guardar la alineación.');
         }
     })
     .catch(error => console.error('Error:', error));
 }
-function loadAlineacion() {
-    fetch(`/matches/${currentMatchId}/get-alineacion`)
-    .then(response => response.json())
-    .then(data => {
-        selectedPlayers = {};
-        data.forEach(player => {
-            selectedPlayers[player.posicion] = player.player_id;
-        });
-        updateFormation();
-    })
-    .catch(error => console.error('Error:', error));
+
+function closeAlineador() {
+    document.getElementById('alineadorModal').classList.add('hidden');
 }
+
+
 
 </script>
 
