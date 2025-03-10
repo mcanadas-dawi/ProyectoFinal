@@ -247,23 +247,26 @@
 
         <!-- Seleccionar Formación -->
         <label class="block text-gray-700 font-semibold">Seleccionar Formación:</label>
-        <select id="formation-selector" class="w-full p-2 border rounded-lg mb-4" onchange="updateFormation()">
-            <option value="">Seleccionar...</option>
-            @if ($team->modalidad == 'F5')
-                <option value="1-1-2-1">1-1-2-1</option>
-                <option value="1-2-1-1">1-2-1-1</option>
-            @elseif ($team->modalidad == 'F7')
-                <option value="1-3-2-1">1-3-2-1</option>
-                <option value="1-2-3-1">1-2-3-1</option>
-            @elseif ($team->modalidad == 'F8')
-                <option value="1-3-3-1">1-3-3-1</option>
-                <option value="1-2-4-1">1-2-4-1</option>
-            @elseif ($team->modalidad == 'F11')
-                <option value="1-4-4-2">1-4-4-2</option>
-                <option value="1-4-3-3">1-4-3-3</option>
-                <option value="1-5-3-2">1-5-3-2</option>
-            @endif
-        </select>
+<select id="formation-selector" class="w-full p-2 border rounded-lg mb-4" onchange="updateFormation()">
+    <option value="" disabled selected>Seleccionar...</option> <!-- 🔹 La opción por defecto está deshabilitada -->
+    <option value="libre">Libre</option> <!-- 🔹 Se agrega la opción "Libre" -->
+    @if ($team->modalidad == 'F5')
+        <option value="1-1-2-1">1-1-2-1</option>
+        <option value="1-2-1-1">1-2-1-1</option>
+    @elseif ($team->modalidad == 'F7')
+        <option value="1-3-2-1">1-3-2-1</option>
+        <option value="1-2-3-1">1-2-3-1</option>
+    @elseif ($team->modalidad == 'F8')
+        <option value="1-3-3-1">1-3-3-1</option>
+        <option value="1-2-4-1">1-2-4-1</option>
+    @elseif ($team->modalidad == 'F11')
+        <option value="1-4-4-2">1-4-4-2</option>
+        <option value="1-4-3-3">1-4-3-3</option>
+        <option value="1-5-3-2">1-5-3-2</option>
+    @endif
+</select>
+
+
 
         <!-- Lista de Jugadores Convocados -->
         <h3 class="text-xl font-semibold text-gray-800 mt-4">Jugadores Convocados</h3>
@@ -273,13 +276,16 @@
             </div>
         </div>
 
-        <!-- Campo de Fútbol -->
-        <div id="field-container" class="relative bg-green-500 h-96 flex justify-center items-center mt-4">
+        <!-- Campo de Fútbol (Más Estrecho) -->
+        <div id="field-container" class="relative bg-green-500 h-96 w-4/5 mx-auto flex justify-center items-center mt-4">
             <img src="{{ asset('Imagenes/campo_futbol.jpg') }}" alt="Campo de Fútbol" class="w-full h-full object-cover">
             <div id="player-spots" class="absolute inset-0 flex justify-center items-center">
                 <!-- Aquí se inyectarán las posiciones según la formación -->
             </div>
         </div>
+
+
+
 
         <!-- Lista de Suplentes -->
        <!-- Lista de Suplentes -->
@@ -569,78 +575,83 @@ function toggleSelectAll() {
     }
 
  // ALINEADOR 
-    let alineadorData = document.getElementById("alineador-data");
-    let allPlayers = JSON.parse(alineadorData.dataset.players);
-    let convocadosPorPartido = JSON.parse(alineadorData.dataset.convocados);
-    let selectedPlayers = {}; // Almacena jugadores alineados
-    let currentMatchId = null;
+ let alineadorData = document.getElementById("alineador-data");
+let allPlayers = JSON.parse(alineadorData.dataset.players);
+let convocadosPorPartido = JSON.parse(alineadorData.dataset.convocados);
+let selectedPlayers = {}; 
+let currentMatchId = null;
 
-    function openAlineador(matchId) {
-        currentMatchId = matchId;
-        document.getElementById('alineadorModal').classList.remove('hidden');
-        
-        // Cargar jugadores convocados en la lista principal
-        loadConvocados();
+function openAlineador(matchId) {
+    let formationSelector = document.getElementById('formation-selector');
+    formationSelector.value = ""; 
+    let fieldContainer = document.getElementById('player-spots');
+    fieldContainer.innerHTML = "";
+    currentMatchId = matchId;
+    document.getElementById('alineadorModal').classList.remove('hidden');
 
-        // Cargar formación y alineación guardada
-        fetch(`/matches/${currentMatchId}/get-alineacion`)
-            .then(response => response.json())
-            .then(data => {
-                if (data.success) {
-                    let formationSelector = document.getElementById('formation-selector');
-                    formationSelector.value = data.formacion || '';
-                    updateFormation(data.formacion, data.alineacion);
-                } else {
-                    console.error("No se pudo cargar la alineación guardada.");
-                }
-            })
-            .catch(error => console.error("Error al obtener la alineación guardada:", error));
+    // Cargar jugadores convocados
+    loadConvocados();
+
+    // Cargar formación y alineación guardada
+    fetch(`/matches/${currentMatchId}/get-alineacion`)
+        .then(response => response.json())
+        .then(data => {
+            if (data.success) {
+                formationSelector.value = data.formacion || ''; 
+                updateFormation(data.formacion, data.alineacion);
+            } else {
+                console.error("No se pudo cargar la alineación guardada.");
+            }
+        })
+        .catch(error => console.error("Error al obtener la alineación guardada:", error));
+}
+
+function loadConvocados() {
+    let convocadosBody = document.getElementById('convocados-body');
+    convocadosBody.innerHTML = "";
+
+    let convocados = convocadosPorPartido[currentMatchId] || [];
+    convocados.forEach(playerId => {
+        addToConvocados(playerId);
+    });
+}
+
+function addToConvocados(playerId) {
+    let convocadosBody = document.getElementById('convocados-body');
+    let player = allPlayers.find(p => p.id == playerId);
+    if (player) {
+        let playerDiv = document.createElement('div');
+        playerDiv.className = "draggable bg-blue-500 text-white px-3 py-1 rounded cursor-pointer w-full";
+        playerDiv.innerHTML = `<span>${player.dorsal} - ${player.nombre} (${player.posicion})</span>`;
+        playerDiv.setAttribute("draggable", true);
+        playerDiv.setAttribute("data-player-id", player.id);
+
+        playerDiv.ondragstart = function(event) {
+            event.dataTransfer.setData("playerId", player.id);
+        };
+
+        convocadosBody.appendChild(playerDiv);
     }
+}
 
-    function loadConvocados() {
-        let convocadosBody = document.getElementById('convocados-body');
-        convocadosBody.innerHTML = "";
-
-        let convocados = convocadosPorPartido[currentMatchId] || [];
-        convocados.forEach(playerId => {
-            addToConvocados(playerId);
-        });
-    }
-
-    function addToConvocados(playerId) {
-        let convocadosBody = document.getElementById('convocados-body');
-        let player = allPlayers.find(p => p.id == playerId);
-        if (player) {
-            let playerDiv = document.createElement('div');
-            playerDiv.className = "draggable bg-blue-500 text-white px-3 py-1 rounded cursor-pointer w-full";
-            playerDiv.innerHTML = `<span>${player.dorsal} - ${player.nombre} (${player.posicion})</span>`;
-            playerDiv.setAttribute("draggable", true);
-            playerDiv.setAttribute("data-player-id", player.id);
-
-            playerDiv.ondragstart = function(event) {
-                event.dataTransfer.setData("playerId", player.id);
-            };
-
-            convocadosBody.appendChild(playerDiv);
-        }
-    }
-
-    function updateFormation(formation = null, alineacionGuardada = []) {
+function updateFormation(formation = null, alineacionGuardada = []) {
     let formationSelector = document.getElementById('formation-selector');
     let selectedFormation = formation || formationSelector.value;
     let fieldContainer = document.getElementById('player-spots');
     fieldContainer.innerHTML = "";
 
     let formations = {
-        '1-4-4-2': [[10, 50], [30, 60], [30, 40], [30, 20], [30, 80], [50, 60], [50, 40], [50, 20], [50, 80], [70, 40], [70, 60]],
-        '1-4-3-3': [[50, 90], [20, 70], [40, 70], [60, 70], [80, 70], [30, 50], [50, 50], [70, 50], [30, 30], [50, 30], [70, 30]]
+        '1-4-4-2': [[10, 45], [30, 80], [30, 55], [30, 35], [30, 10], [50, 80], [50, 55], [50, 35], [50, 10], [70, 55], [70, 35]],
+        '1-4-3-3': [[10, 45], [30, 80], [30, 55], [30, 35], [30, 10], [50, 20], [50, 45], [50, 70], [70, 20], [70, 45], [70, 70]],
+        '1-5-3-2': [[10, 45], [30, 20], [30, 45], [30, 70], [40, 87], [40, 0], [50, 20], [50, 45], [50, 70], [70, 55], [70, 35]],
+        'libre': [[10, 45], [20, 20], [20, 40], [20, 60], [20, 80], [40, 20], [40, 40], [40, 60], [40, 80], [70, 40], [70, 60]],
     };
 
     if (!formations[selectedFormation]) return;
 
     formations[selectedFormation].forEach((pos, index) => {
         let positionDiv = document.createElement('div');
-        positionDiv.className = "dropzone w-12 h-12 bg-white border border-gray-800 rounded-full flex items-center justify-center";
+        positionDiv.className = "dropzone w-12 h-12 bg-white border border-gray-800 rounded-full flex items-center justify-center cursor-pointer";
         positionDiv.style.position = "absolute";
         positionDiv.style.top = `${pos[1]}%`;
         positionDiv.style.left = `${pos[0]}%`;
@@ -657,6 +668,46 @@ function toggleSelectAll() {
             }
         }
 
+        // 🔹 Permitir mover libremente en "libre"
+        if (selectedFormation === "libre") {
+            positionDiv.style.cursor = "grab";
+
+            positionDiv.onmousedown = function (event) {
+                event.preventDefault();
+                positionDiv.style.cursor = "grabbing";
+
+                let initialX = event.clientX;
+                let initialY = event.clientY;
+                let startX = positionDiv.offsetLeft;
+                let startY = positionDiv.offsetTop;
+
+                function moveAt(event) {
+                    let newX = startX + (event.clientX - initialX);
+                    let newY = startY + (event.clientY - initialY);
+
+                    positionDiv.style.left = `${newX}px`;
+                    positionDiv.style.top = `${newY}px`;
+                }
+
+                function onMouseMove(event) {
+                    moveAt(event);
+                }
+
+                document.addEventListener('mousemove', onMouseMove);
+
+                positionDiv.onmouseup = function () {
+                    document.removeEventListener('mousemove', onMouseMove);
+                    positionDiv.style.cursor = "grab";
+                    positionDiv.onmouseup = null;
+                };
+            };
+
+            positionDiv.ondragstart = function () {
+                return false; // 🔹 Evita el comportamiento predeterminado de arrastre
+            };
+        }
+
+        // 🔹 Permitir arrastrar jugadores dentro del círculo y hacer intercambios
         positionDiv.ondragover = function(event) {
             event.preventDefault();
         };
@@ -668,18 +719,14 @@ function toggleSelectAll() {
             let existingPlayerId = positionDiv.getAttribute("data-player-id");
 
             if (existingPlayerId) {
-                // Intercambiar posiciones si ya hay un jugador en la posición destino
                 let sourceDiv = document.querySelector(`.dropzone[data-player-id='${playerId}']`);
-
                 if (sourceDiv) {
-                    // Intercambio de posiciones
                     sourceDiv.textContent = positionDiv.textContent;
                     sourceDiv.setAttribute("data-player-id", existingPlayerId);
                     positionDiv.textContent = allPlayers.find(p => p.id == playerId).dorsal;
                     positionDiv.setAttribute("data-player-id", playerId);
                 }
             } else {
-                // Si la posición destino está vacía, simplemente mueve el jugador
                 let player = allPlayers.find(p => p.id == playerId);
                 if (player) {
                     positionDiv.textContent = player.dorsal;
@@ -704,6 +751,8 @@ function toggleSelectAll() {
     enableSuplentesDrop();
 }
 
+
+// 🔹 Permitir arrastrar del campo a suplentes
 function enableSuplentesDrop() {
     let suplentesBody = document.getElementById('suplentes-body');
 
@@ -725,7 +774,7 @@ function enableSuplentesDrop() {
 
 function addToSuplentes(playerId) {
     let suplentesBody = document.getElementById('suplentes-body');
-    if (suplentesBody.querySelector(`[data-player-id='${playerId}']`)) return; // Evita duplicados
+    if (suplentesBody.querySelector(`[data-player-id='${playerId}']`)) return;
 
     let player = allPlayers.find(p => p.id == playerId);
     if (player) {
@@ -769,8 +818,6 @@ function removeFromConvocados(playerId) {
     }
 }
 
-enableSuplentesDrop();
-
 function saveAlineacion() {
     let alineacion = [];
 
@@ -798,8 +845,6 @@ function saveAlineacion() {
         if (data.success) {
             alert('Alineación guardada correctamente');
             closeAlineador();
-        } else {
-            alert('Hubo un error al guardar la alineación.');
         }
     })
     .catch(error => console.error('Error:', error));
@@ -808,7 +853,6 @@ function saveAlineacion() {
 function closeAlineador() {
     document.getElementById('alineadorModal').classList.add('hidden');
 }
-
 
 
 </script>
