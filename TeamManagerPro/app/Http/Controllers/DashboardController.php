@@ -199,7 +199,7 @@ public function updateMatch(Request $request, $id)
         $convocados = [];
         if ($team->matches->isNotEmpty()) {
             foreach ($team->matches as $match) {
-                $convocados[$match->id] = $match->players()->pluck('players.id')->toArray();
+                $convocados[$match->id] = $match->players->pluck('id')->toArray(); // Usa la relación ya cargada
             }
         }
     
@@ -255,7 +255,10 @@ public function storeConvocatoria(Request $request)
         
         Log::info('Guardando convocatoria', ['match_id' => $match->id, 'players' => $request->players]);
         
-        $match->players()->sync($request->players ?? []); 
+        if ($request->has('players')) {
+            $match->players()->sync($request->players);
+        }
+        
 
         return back()->with('success', 'Convocatoria guardada correctamente.');
     }
@@ -268,7 +271,13 @@ public function updateConvocatoria(Request $request, $matchId)
     $convocados = $request->input('convocados', []);
 
     // Sincronizar los jugadores convocados
-    $match->players()->sync($convocados);
+    $convocadosConEstado = [];
+foreach ($convocados as $playerId) {
+    $convocadosConEstado[$playerId] = ['convocado' => true];
+}
+
+$match->players()->sync($convocadosConEstado);
+
 
     return response()->json(['success' => true]);
 }

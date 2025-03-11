@@ -242,41 +242,39 @@
 
 <!-- Modal del Alineador -->
 <div id="alineadorModal" class="hidden fixed inset-0 bg-gray-900 bg-opacity-50 flex justify-center items-center">
-    <div class="bg-white rounded-lg p-6 w-3/4">
+    <div class="bg-white rounded-lg p-6 w-3/4 max-h-[90vh] overflow-y-auto flex flex-col">
         <h2 class="text-2xl font-semibold text-gray-800 mb-4 text-center">Alineador Táctico</h2>
 
         <!-- Seleccionar Formación -->
         <label class="block text-gray-700 font-semibold">Seleccionar Formación:</label>
-<select id="formation-selector" class="w-full p-2 border rounded-lg mb-4" onchange="updateFormation()">
-    <option value="" disabled selected>Seleccionar...</option> <!-- 🔹 La opción por defecto está deshabilitada -->
-    <option value="libre">Libre</option> <!-- 🔹 Se agrega la opción "Libre" -->
-    @if ($team->modalidad == 'F5')
-        <option value="1-1-2-1">1-1-2-1</option>
-        <option value="1-2-1-1">1-2-1-1</option>
-    @elseif ($team->modalidad == 'F7')
-        <option value="1-3-2-1">1-3-2-1</option>
-        <option value="1-2-3-1">1-2-3-1</option>
-    @elseif ($team->modalidad == 'F8')
-        <option value="1-3-3-1">1-3-3-1</option>
-        <option value="1-2-4-1">1-2-4-1</option>
-    @elseif ($team->modalidad == 'F11')
-        <option value="1-4-4-2">1-4-4-2</option>
-        <option value="1-4-3-3">1-4-3-3</option>
-        <option value="1-5-3-2">1-5-3-2</option>
-    @endif
-</select>
-
-
+        <select id="formation-selector" class="w-full p-2 border rounded-lg mb-4" onchange="updateFormation()">
+            <option value="" disabled selected>Seleccionar...</option>
+            <option value="libre">Formación personalizada</option>
+            @if ($team->modalidad == 'F5')
+                <option value="1-1-2-1">1-1-2-1</option>
+                <option value="1-2-1-1">1-2-1-1</option>
+            @elseif ($team->modalidad == 'F7')
+                <option value="1-3-2-1">1-3-2-1</option>
+                <option value="1-2-3-1">1-2-3-1</option>
+            @elseif ($team->modalidad == 'F8')
+                <option value="1-3-3-1">1-3-3-1</option>
+                <option value="1-2-4-1">1-2-4-1</option>
+            @elseif ($team->modalidad == 'F11')
+                <option value="1-4-4-2">1-4-4-2</option>
+                <option value="1-4-3-3">1-4-3-3</option>
+                <option value="1-5-3-2">1-5-3-2</option>
+            @endif
+        </select>
 
         <!-- Lista de Jugadores Convocados -->
         <h3 class="text-xl font-semibold text-gray-800 mt-4">Jugadores Convocados</h3>
-        <div id="convocados-list" class="max-h-40 overflow-y-auto bg-gray-100 p-2 rounded-lg">
+        <div id="convocados-list" class="bg-gray-100 p-2 rounded-lg min-h-[150px] max-h-[40vh] overflow-y-auto">
             <div id="convocados-body" class="flex flex-wrap gap-2">
                 <!-- Aquí se inyectarán los jugadores convocados -->
             </div>
         </div>
 
-        <!-- Campo de Fútbol (Más Estrecho) -->
+        <!-- Campo de Fútbol -->
         <div id="field-container" class="relative bg-green-500 h-96 w-4/5 mx-auto flex justify-center items-center mt-4">
             <img src="{{ asset('Imagenes/campo_futbol.jpg') }}" alt="Campo de Fútbol" class="w-full h-full object-cover">
             <div id="player-spots" class="absolute inset-0 flex justify-center items-center">
@@ -284,24 +282,36 @@
             </div>
         </div>
 
+        <!-- Botones de acción -->
+        <div class="flex justify-center mt-4">
+            <button id="edit-system-btn" class="hidden bg-blue-600 text-white px-4 py-2 rounded-lg hover:bg-blue-700" onclick="enableEditMode()">
+                Editar Formación
+            </button>
+            
+            <button id="save-system-btn" class="hidden bg-green-600 text-white px-4 py-2 rounded-lg hover:bg-green-700" onclick="saveFormationChanges()">
+                Guardar Formación
+            </button>
+        </div>
+
+        <!-- Lista de Suplentes (Ahora sin scroll y con ajuste automático de filas) -->
+        <h3 class="text-xl font-semibold text-gray-800 mt-4">Suplentes</h3>
+        <div id="suplentes-list" class="bg-gray-200 border border-gray-300 p-3 rounded-lg shadow-md">
+            <div id="suplentes-body" class="flex flex-wrap gap-3 justify-center">
+                <!-- Aquí se inyectarán los suplentes -->
+                 <br id="br-placeholder">
+            </div>
+        </div>
 
 
 
-        <!-- Lista de Suplentes -->
-       <!-- Lista de Suplentes -->
-<h3 class="text-xl font-semibold text-gray-800 mt-4">Suplentes</h3>
-<div id="suplentes-list" class="max-h-40 overflow-y-auto bg-gray-100 p-2 rounded-lg">
-    <div id="suplentes-body" class="flex flex-wrap gap-2 min-h-[50px]">
-    </div>
-</div>
-
-
-        <div class="mt-4 flex justify-between">
+        <!-- Botones de acción (Siempre visibles) -->
+        <div class="mt-4 flex justify-between bg-white p-4 shadow-md">
             <button onclick="saveAlineacion()" class="bg-green-500 text-white px-4 py-2 rounded-lg">Guardar Alineación</button>
-            <button onclick="closeAlineador()" class="bg-gray-500 text-white px-4 py-2 rounded-lg">Cerrar</button>
+            <button onclick="closeAlineador()" class="bg-red-500 text-white px-4 py-2 rounded-lg">Cerrar</button>
         </div>
     </div>
 </div>
+
 
 <!-- Contenedor oculto con datos en `data-attributes` -->
 <div id="alineador-data" 
@@ -575,65 +585,177 @@ function toggleSelectAll() {
     }
 
  // ALINEADOR 
- let alineadorData = document.getElementById("alineador-data");
+let alineadorData = document.getElementById("alineador-data");
 let allPlayers = JSON.parse(alineadorData.dataset.players);
 let convocadosPorPartido = JSON.parse(alineadorData.dataset.convocados);
 let selectedPlayers = {}; 
 let currentMatchId = null;
+let editMode = false; // 🔹 Estado de edición
 
 function openAlineador(matchId) {
     let formationSelector = document.getElementById('formation-selector');
-    formationSelector.value = ""; 
+    let editButton = document.getElementById('edit-system-btn');
+    let saveButton = document.getElementById('save-system-btn');
+
+    // Restablecer el selector de formación a "Seleccionar..."
+    formationSelector.selectedIndex = 0;
+
     let fieldContainer = document.getElementById('player-spots');
     fieldContainer.innerHTML = "";
     currentMatchId = matchId;
     document.getElementById('alineadorModal').classList.remove('hidden');
 
-    // Cargar jugadores convocados
+    // Ocultar botones al abrir el modal
+    editButton.classList.add('hidden');
+    saveButton.classList.add('hidden');
+
+    // Asegurar que convocadosPorPartido[currentMatchId] tenga datos
+    if (!convocadosPorPartido[currentMatchId]) {
+        let rawConvocados = document.getElementById('alineador-data').dataset.convocados;
+        try {
+            convocadosPorPartido[currentMatchId] = JSON.parse(rawConvocados);
+        } catch (error) {
+            console.error("⚠ Error al parsear convocados desde el HTML:", error);
+        }
+    }
+
+    console.log(`✅ Convocados cargados para el partido ${currentMatchId}:`, convocadosPorPartido[currentMatchId]);
+
     loadConvocados();
 
-    // Cargar formación y alineación guardada
     fetch(`/matches/${currentMatchId}/get-alineacion`)
         .then(response => response.json())
         .then(data => {
-            if (data.success) {
-                formationSelector.value = data.formacion || ''; 
+            if (data.success && data.formacion) {
+                let optionExists = Array.from(formationSelector.options).some(option => option.value === data.formacion);
+                
+                if (optionExists) {
+                    formationSelector.value = data.formacion;
+                    editButton.classList.remove('hidden');
+                } else {
+                    formationSelector.selectedIndex = 0;
+                }
+
                 updateFormation(data.formacion, data.alineacion);
             } else {
+                formationSelector.selectedIndex = 0;
                 console.error("No se pudo cargar la alineación guardada.");
             }
         })
         .catch(error => console.error("Error al obtener la alineación guardada:", error));
 }
 
-function loadConvocados() {
-    let convocadosBody = document.getElementById('convocados-body');
-    convocadosBody.innerHTML = "";
 
-    let convocados = convocadosPorPartido[currentMatchId] || [];
-    convocados.forEach(playerId => {
-        addToConvocados(playerId);
+
+// 🔹 Activar modo edición (Mover libremente los círculos)
+function enableEditMode() {
+    editMode = true;
+    document.getElementById('edit-system-btn').classList.add('hidden');
+    document.getElementById('save-system-btn').classList.remove('hidden');
+
+    document.querySelectorAll('.dropzone').forEach(positionDiv => {
+        positionDiv.style.cursor = "grab";
+        positionDiv.ondragstart = null; // Deshabilita el arrastre de jugadores
+
+        positionDiv.onmousedown = function(event) {
+            event.preventDefault();
+            positionDiv.style.cursor = "grabbing";
+
+            let initialX = event.clientX;
+            let initialY = event.clientY;
+            let startX = positionDiv.offsetLeft;
+            let startY = positionDiv.offsetTop;
+
+            function moveAt(event) {
+                let newX = startX + (event.clientX - initialX);
+                let newY = startY + (event.clientY - initialY);
+                positionDiv.style.left = `${newX}px`;
+                positionDiv.style.top = `${newY}px`;
+            }
+
+            function onMouseMove(event) {
+                moveAt(event);
+            }
+
+            document.addEventListener('mousemove', onMouseMove);
+
+            positionDiv.onmouseup = function() {
+                document.removeEventListener('mousemove', onMouseMove);
+                positionDiv.style.cursor = "grab";
+                positionDiv.onmouseup = null;
+            };
+        };
+
+        positionDiv.ondragstart = function() {
+            return false;
+        };
     });
 }
 
-function addToConvocados(playerId) {
-    let convocadosBody = document.getElementById('convocados-body');
-    let player = allPlayers.find(p => p.id == playerId);
-    if (player) {
-        let playerDiv = document.createElement('div');
-        playerDiv.className = "draggable bg-blue-500 text-white px-3 py-1 rounded cursor-pointer w-full";
-        playerDiv.innerHTML = `<span>${player.dorsal} - ${player.nombre} (${player.posicion})</span>`;
-        playerDiv.setAttribute("draggable", true);
-        playerDiv.setAttribute("data-player-id", player.id);
 
-        playerDiv.ondragstart = function(event) {
-            event.dataTransfer.setData("playerId", player.id);
-        };
+// 🔹 Guardar posiciones y volver al modo normal
+function saveFormationChanges() {
+    editMode = false;
+    document.getElementById('edit-system-btn').classList.remove('hidden');
+    document.getElementById('save-system-btn').classList.add('hidden');
 
-        convocadosBody.appendChild(playerDiv);
-    }
+    document.querySelectorAll('.dropzone').forEach(positionDiv => {
+        positionDiv.style.cursor = "pointer"; 
+        positionDiv.onmousedown = null;
+        enableDragDrop(positionDiv);
+    });
 }
 
+
+// 🔹 Función para permitir arrastrar jugadores dentro del círculo
+function enableDragDrop(positionDiv) {
+    positionDiv.ondragover = function(event) {
+        event.preventDefault();
+    };
+
+    positionDiv.ondrop = function(event) {
+        event.preventDefault();
+        let playerId = event.dataTransfer.getData("playerId");
+
+        if (!playerId) return; 
+
+        let existingPlayerId = positionDiv.getAttribute("data-player-id");
+
+        if (existingPlayerId) {
+            // Intercambiar jugadores si la posición está ocupada
+            let sourceDiv = document.querySelector(`.dropzone[data-player-id='${playerId}']`);
+            if (sourceDiv) {
+                let tempPlayerId = existingPlayerId;
+                sourceDiv.setAttribute("data-player-id", tempPlayerId);
+                sourceDiv.textContent = allPlayers.find(p => p.id == tempPlayerId).dorsal;
+
+                positionDiv.setAttribute("data-player-id", playerId);
+                positionDiv.textContent = allPlayers.find(p => p.id == playerId).dorsal;
+            }
+        } else {
+            // Mover jugador si la posición está vacía
+            let player = allPlayers.find(p => p.id == playerId);
+            if (player) {
+                removeFromField(playerId);
+                removeFromSuplentes(playerId);
+                removeFromConvocados(playerId); // 🔹 Ahora también lo elimina de la lista de convocados
+
+                positionDiv.textContent = player.dorsal;
+                positionDiv.setAttribute("data-player-id", player.id);
+                selectedPlayers[positionDiv.getAttribute("data-index")] = player.id;
+            }
+        }
+    };
+
+    positionDiv.ondragstart = function(event) {
+        let playerId = positionDiv.getAttribute("data-player-id");
+        if (playerId) {
+            event.dataTransfer.setData("playerId", playerId);
+        }
+    };
+}
+
+// 🔹 Modificar updateFormation para soportar modo edición y jugadores dentro de círculos
 function updateFormation(formation = null, alineacionGuardada = []) {
     let formationSelector = document.getElementById('formation-selector');
     let selectedFormation = formation || formationSelector.value;
@@ -644,7 +766,7 @@ function updateFormation(formation = null, alineacionGuardada = []) {
         '1-4-4-2': [[10, 45], [30, 80], [30, 55], [30, 35], [30, 10], [50, 80], [50, 55], [50, 35], [50, 10], [70, 55], [70, 35]],
         '1-4-3-3': [[10, 45], [30, 80], [30, 55], [30, 35], [30, 10], [50, 20], [50, 45], [50, 70], [70, 20], [70, 45], [70, 70]],
         '1-5-3-2': [[10, 45], [30, 20], [30, 45], [30, 70], [40, 87], [40, 0], [50, 20], [50, 45], [50, 70], [70, 55], [70, 35]],
-        'libre': [[10, 45], [20, 20], [20, 40], [20, 60], [20, 80], [40, 20], [40, 40], [40, 60], [40, 80], [70, 40], [70, 60]],
+        'libre': [[10, 45], [20, 20], [20, 40], [20, 60], [20, 80], [30, 20], [30, 40], [30, 60], [30, 80], [40, 40], [40, 60]],
         '1-1-2-1': [[10, 45], [30, 45], [50,25 ], [50, 65], [70, 45]],
         '1-2-1-1': [[10, 45], [30, 25], [30, 65], [50, 45], [70, 45]],
         '1-3-2-1': [[10, 45], [30, 20], [30, 45], [30, 70], [50, 30], [50, 60], [70, 45]],
@@ -675,87 +797,59 @@ function updateFormation(formation = null, alineacionGuardada = []) {
             }
         }
 
-        // 🔹 Permitir mover libremente en "libre"
-        if (selectedFormation === "libre") {
-            positionDiv.style.cursor = "grab";
-
-            positionDiv.onmousedown = function (event) {
-                event.preventDefault();
-                positionDiv.style.cursor = "grabbing";
-
-                let initialX = event.clientX;
-                let initialY = event.clientY;
-                let startX = positionDiv.offsetLeft;
-                let startY = positionDiv.offsetTop;
-
-                function moveAt(event) {
-                    let newX = startX + (event.clientX - initialX);
-                    let newY = startY + (event.clientY - initialY);
-
-                    positionDiv.style.left = `${newX}px`;
-                    positionDiv.style.top = `${newY}px`;
-                }
-
-                function onMouseMove(event) {
-                    moveAt(event);
-                }
-
-                document.addEventListener('mousemove', onMouseMove);
-
-                positionDiv.onmouseup = function () {
-                    document.removeEventListener('mousemove', onMouseMove);
-                    positionDiv.style.cursor = "grab";
-                    positionDiv.onmouseup = null;
-                };
-            };
-
-            positionDiv.ondragstart = function () {
-                return false; // 🔹 Evita el comportamiento predeterminado de arrastre
-            };
-        }
-
-        // 🔹 Permitir arrastrar jugadores dentro del círculo y hacer intercambios
-        positionDiv.ondragover = function(event) {
-            event.preventDefault();
-        };
-
-        positionDiv.ondrop = function(event) {
-            event.preventDefault();
-            let playerId = event.dataTransfer.getData("playerId");
-
-            let existingPlayerId = positionDiv.getAttribute("data-player-id");
-
-            if (existingPlayerId) {
-                let sourceDiv = document.querySelector(`.dropzone[data-player-id='${playerId}']`);
-                if (sourceDiv) {
-                    sourceDiv.textContent = positionDiv.textContent;
-                    sourceDiv.setAttribute("data-player-id", existingPlayerId);
-                    positionDiv.textContent = allPlayers.find(p => p.id == playerId).dorsal;
-                    positionDiv.setAttribute("data-player-id", playerId);
-                }
-            } else {
-                let player = allPlayers.find(p => p.id == playerId);
-                if (player) {
-                    positionDiv.textContent = player.dorsal;
-                    positionDiv.setAttribute("data-player-id", player.id);
-                    selectedPlayers[index] = player.id;
-                    removeFromConvocados(playerId);
-                    removeFromSuplentes(playerId);
-                }
-            }
-        };
-
-        positionDiv.ondragstart = function(event) {
-            let playerId = positionDiv.getAttribute("data-player-id");
-            if (playerId) {
-                event.dataTransfer.setData("playerId", playerId);
-            }
-        };
-
         fieldContainer.appendChild(positionDiv);
-    });
 
+        enableDragDrop(positionDiv); // 🔹 Activar la función de arrastrar jugadores  
+    });
     enableSuplentesDrop();
+}
+
+
+function loadConvocados() {
+    let convocadosBody = document.getElementById('convocados-body');
+    convocadosBody.innerHTML = "";
+
+    // Verificar si `currentMatchId` es válido
+    if (!currentMatchId) {
+        console.error("⚠ Error: currentMatchId no está definido.");
+        return;
+    }
+
+    // Verificar si `convocadosPorPartido[currentMatchId]` tiene datos
+    let convocados = convocadosPorPartido[currentMatchId];
+
+    if (!convocados || convocados.length === 0) {
+        console.warn(`⚠ No hay jugadores convocados para el partido ${currentMatchId}.`);
+        return;
+    }
+
+    console.log(`✅ Cargando convocados para el partido ${currentMatchId}:`, convocados);
+
+    convocados.forEach(playerId => {
+        addToConvocados(playerId);
+    });
+}
+
+function addToConvocados(playerId) {
+    let convocadosBody = document.getElementById('convocados-body');
+    let player = allPlayers.find(p => p.id == playerId);
+
+    if (!player) {
+        console.warn(`⚠ No se encontró el jugador con ID ${playerId} en la lista de jugadores.`);
+        return;
+    }
+
+    let playerDiv = document.createElement('div');
+    playerDiv.className = "draggable bg-blue-500 text-white px-3 py-1 rounded cursor-pointer w-full";
+    playerDiv.innerHTML = `<span>${player.dorsal} - ${player.nombre} (${player.posicion})</span>`;
+    playerDiv.setAttribute("draggable", true);
+    playerDiv.setAttribute("data-player-id", player.id);
+
+    playerDiv.ondragstart = function(event) {
+        event.dataTransfer.setData("playerId", player.id);
+    };
+
+    convocadosBody.appendChild(playerDiv);
 }
 
 
@@ -774,13 +868,14 @@ function enableSuplentesDrop() {
         if (playerId) {
             addToSuplentes(playerId);
             removeFromField(playerId);
-            removeFromConvocados(playerId);
+            removeFromConvocados(playerId); // 🔹 También lo elimina de la lista de convocados
         }
     };
 }
 
 function addToSuplentes(playerId) {
     let suplentesBody = document.getElementById('suplentes-body');
+    removePlaceholderBr();
     if (suplentesBody.querySelector(`[data-player-id='${playerId}']`)) return;
 
     let player = allPlayers.find(p => p.id == playerId);
@@ -799,13 +894,6 @@ function addToSuplentes(playerId) {
     }
 }
 
-function removeFromSuplentes(playerId) {
-    let playerDiv = document.querySelector(`#suplentes-body [data-player-id='${playerId}']`);
-    if (playerDiv) {
-        playerDiv.remove();
-    }
-}
-
 function removeFromField(playerId) {
     let fieldPositions = document.querySelectorAll('.dropzone');
 
@@ -816,6 +904,13 @@ function removeFromField(playerId) {
             delete selectedPlayers[position.getAttribute("data-index")];
         }
     });
+}
+
+function removeFromSuplentes(playerId) {
+    let playerDiv = document.querySelector(`#suplentes-body [data-player-id='${playerId}']`);
+    if (playerDiv) {
+        playerDiv.remove();
+    }
 }
 
 function removeFromConvocados(playerId) {
@@ -861,6 +956,32 @@ function closeAlineador() {
     document.getElementById('alineadorModal').classList.add('hidden');
 }
 
+document.getElementById('formation-selector').addEventListener('change', function() {
+    let formationSelector = document.getElementById('formation-selector');
+    let editButton = document.getElementById('edit-system-btn');
+    let saveButton = document.getElementById('save-system-btn');
+
+    // Solo mostrar el botón si el usuario ha seleccionado una formación válida
+    if (formationSelector.value && formationSelector.value !== "") {
+        editButton.classList.remove('hidden');
+        saveButton.classList.add('hidden');
+    } else {
+        editButton.classList.add('hidden');
+        saveButton.classList.add('hidden');
+    }
+});
+
+function removePlaceholderBr() {
+        let placeholder = document.getElementById("br-placeholder");
+        if (placeholder) {
+            placeholder.remove();
+        }
+    }
+
+    // Detectar cuando un jugador es soltado en la lista de suplentes
+    document.getElementById("suplentes-body").addEventListener("drop", function(event) {
+        removePlaceholderBr();
+    });
 
 </script>
 
