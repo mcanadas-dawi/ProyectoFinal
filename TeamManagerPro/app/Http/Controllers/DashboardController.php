@@ -153,37 +153,35 @@ public function destroyPlayer(Request $request, $id)
             'numero_jornada' => 'required|integer|min:1',
             'equipo_rival' => 'required|string|max:255',
             'fecha_partido' => 'required|date',
+            'resultado' => 'nullable|in:Victoria,Empate,Derrota',
+            'actuacion_equipo' => 'nullable|numeric|min:0|max:10',
         ]);
-
-        $team = Team::where('id', $request->team_id)->where('user_id', Auth::id())->firstOrFail();
-
-        $match = Matches::create([
-            'team_id' => $team->id,
-            'numero_jornada' => $request->numero_jornada,
-            'equipo_rival' => $request->equipo_rival,
-            'fecha_partido' => $request->fecha_partido,
-        ]);
-
-        return redirect()->route('teams.show', $team->id)->with('success', 'Partido añadido correctamente.');
+    
+        $match = Matches::create($request->all());
+    
+        return redirect()->route('teams.show', $request->team_id)->with('success', 'Partido añadido correctamente.');
     }
+    
 
 
 
-public function updateMatch(Request $request, $id) 
-    {
+    public function updateMatch(Request $request, $id) {
         $match = Matches::findOrFail($id);
-
+    
         $request->validate([
             'fecha_partido' => 'nullable|date',
             'goles_a_favor' => 'nullable|integer|min:0',
             'goles_en_contra' => 'nullable|integer|min:0',
+            'resultado' => 'nullable|in:Victoria,Empate,Derrota',
+            'actuacion_equipo' => 'nullable|numeric|min:0|max:10',
         ]);
-
-        $data = array_filter($request->all(), fn($value) => !is_null($value));
-        $match->update($data);
-
+    
+        $match->update($request->all());
+    
         return redirect()->back()->with('success', 'Partido actualizado con éxito.');
     }
+    
+    
 
 
     public function destroyMatch($id)

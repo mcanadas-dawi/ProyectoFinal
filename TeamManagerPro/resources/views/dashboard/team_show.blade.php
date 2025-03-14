@@ -115,7 +115,7 @@
                         <button onclick="savePlayer('{{ $player->id }}')" id="save-btn-{{ $player->id }}" class="hidden bg-green-500 text-white px-3 py-1 rounded">Guardar</button>
 
                         <!-- Botón Cancelar (oculto inicialmente) -->
-                        <button onclick="cancelEditPlayer('{{ $player->id }}')" id="cancel-btn-{{ $player->id }}" class="hidden bg-red-500 text-white px-3 py-1 rounded">Cancelar</button>
+                        <button onclick="cancelEditPlayer('{{ $player->id }}')" id="cancel-btn-{{ $player->id }}" class="hidden bg-gray-500 text-white px-3 py-1 rounded">Cancelar</button>
 
                         <!-- Botón Eliminar (visible inicialmente, oculto en modo edición) -->
                         <form action="{{ route('players.destroy', $player->id) }}" method="POST" onsubmit="return confirm('¿Estás seguro de que deseas eliminar a este jugador? Esta acción no se puede deshacer.')" id="delete-form-{{ $player->id }}" class="inline">
@@ -142,38 +142,56 @@
     </div>
 
     <table class="w-full text-center border-collapse bg-white rounded-lg">
-        <thead class="bg-green-300 text-gray-900">
-            <tr class="border-b">
-                <th class="p-2">Jornada</th>
-                <th class="p-2">Equipo Rival</th>
-                <th class="p-2">Fecha</th>
-                <th class="p-2">Goles a Favor</th>
-                <th class="p-2">Goles en Contra</th>
-                <th class="p-2">Alineación</th>
-                <th class="p-2">Convocatoria</th>
-                <th class="p-2">Acciones</th>
-            </tr>
-        </thead>
-        <tbody class="text-gray-800">
-        @if ($team->matches->isNotEmpty())
+    <thead class="bg-green-300 text-gray-900">
+    <tr class="border-b">
+        <th class="p-2">Jornada</th>
+        <th class="p-2">Equipo Rival</th>
+        <th class="p-2">Fecha</th>
+        <th class="p-2">Goles a Favor</th>
+        <th class="p-2">Goles en Contra</th>
+        <th class="p-2">Resultado</th>
+        <th class="p-2">Actuación del Equipo</th>
+        <th class="p-2">Alineación</th>
+        <th class="p-2">Convocatoria</th>
+        <th class="p-2">Acciones</th>
+    </tr>
+</thead>
+<tbody class="text-gray-800">
     @foreach ($team->matches as $match)
         <tr class="border-b bg-green-100">
             <td class="p-2 text-center">{{ $match->numero_jornada }}</td>
             <td class="p-2 text-center">{{ $match->equipo_rival }}</td>
             
             <td class="p-2 text-center">
-                <span id="min-fecha-{{ $match->id }}">{{ $match->fecha_partido }}</span>
-                <input type="date" name="fecha_partido" class="hidden w-16 p-1 border rounded" id="edit-fecha-{{ $match->id }}">
+                <span id="fecha-{{ $match->id }}">{{ $match->fecha_partido }}</span>
+                <input type="date" name="fecha_partido" class="hidden w-16 p-1 border rounded" id="edit-fecha-{{ $match->id }}" value="{{ $match->fecha_partido }}">
             </td>
 
             <td class="p-2 text-center">
-                <span id="min-goles-favor-{{ $match->id }}">{{ $match->goles_a_favor }}</span>
-                <input type="number" name="goles_a_favor" class="hidden w-16 p-1 border rounded" id="edit-goles-favor-{{ $match->id }}">
+                <span id="goles-favor-{{ $match->id }}">{{ $match->goles_a_favor }}</span>
+                <input type="number" name="goles_a_favor" class="hidden w-16 p-1 border rounded" id="edit-goles-favor-{{ $match->id }}" value="{{ $match->goles_a_favor }}">
             </td>
 
             <td class="p-2 text-center">
-                <span id="min-goles-contra-{{ $match->id }}">{{ $match->goles_en_contra }}</span>
-                <input type="number" name="goles_en_contra" class="hidden w-16 p-1 border rounded" id="edit-goles-contra-{{ $match->id }}">
+                <span id="goles-contra-{{ $match->id }}">{{ $match->goles_en_contra }}</span>
+                <input type="number" name="goles_en_contra" class="hidden w-16 p-1 border rounded" id="edit-goles-contra-{{ $match->id }}" value="{{ $match->goles_en_contra }}">
+            </td>
+
+            <!-- Resultado -->
+            <td class="p-2 text-center">
+                <span id="resultado-{{ $match->id }}">{{ $match->resultado ?? 'N/A' }}</span>
+                <select name="resultado" class="hidden w-full p-1 border rounded" id="edit-resultado-{{ $match->id }}">
+                    <option value="" @selected(is_null($match->resultado))>Seleccionar</option>
+                    <option value="Victoria" @selected($match->resultado == 'Victoria')>Victoria</option>
+                    <option value="Empate" @selected($match->resultado == 'Empate')>Empate</option>
+                    <option value="Derrota" @selected($match->resultado == 'Derrota')>Derrota</option>
+                </select>
+            </td>
+
+            <!-- Actuación del Equipo -->
+            <td class="p-2 text-center">
+                <span id="actuacion-{{ $match->id }}">{{ $match->actuacion_equipo !== null ? number_format($match->actuacion_equipo, 2) : 'N/A' }}</span>
+                <input type="number" name="actuacion_equipo" step="0.01" min="0" max="10" class="hidden w-16 p-1 border rounded" id="edit-actuacion-{{ $match->id }}" value="{{ $match->actuacion_equipo }}">
             </td>
 
             <td class="p-2 text-center">
@@ -193,18 +211,20 @@
 
                 <button onclick="editMatch('{{ $match->id }}')" id="edit-btn-match-{{ $match->id }}" class="bg-yellow-500 text-white px-3 py-1 rounded">Editar</button>
                 <button onclick="saveMatch('{{ $match->id }}')" id="save-btn-match-{{ $match->id }}" class="hidden bg-green-500 text-white px-3 py-1 rounded">Guardar</button>
-                
-                <form action="{{ route('matches.destroy', $match->id) }}" method="POST" onsubmit="return confirm('¿Estás seguro de que deseas eliminar este partido? Esta acción no se puede deshacer.')" class="inline">
+                <button onclick="cancelEditMatch('{{ $match->id }}')" id="cancel-btn-match-{{ $match->id }}" class="hidden bg-gray-500 text-white px-3 py-1 rounded">Cancelar</button>
+
+                <form action="{{ route('matches.destroy', $match->id) }}" method="POST" onsubmit="return confirm('¿Estás seguro de que deseas eliminar este partido? Esta acción no se puede deshacer.')" id="delete-form-match-{{ $match->id }}" class="inline">
                     @csrf
                     @method('DELETE')
                     <button type="submit" class="bg-red-500 text-white px-3 py-1 rounded">Eliminar</button>
                 </form>
             </td>
+
         </tr>
-            @endforeach
-        @endif
-        
-        </tbody>
+    @endforeach
+</tbody>
+
+
     </table>
 </div>
 <!-- Modal para Añadir Jugador -->
@@ -520,46 +540,61 @@ function cancelEditPlayer(id) {
     }
 
     function editMatch(id) {
-    // Ocultar el botón "Editar" y mostrar el botón "Guardar"
     document.getElementById('edit-btn-match-' + id).classList.add('hidden');
     document.getElementById('save-btn-match-' + id).classList.remove('hidden');
+    document.getElementById('cancel-btn-match-' + id).classList.remove('hidden');
+    document.getElementById('delete-form-match-' + id).classList.add('hidden');
 
-    // Mostrar inputs y ocultar spans
-    document.getElementById('min-fecha-' + id).classList.add('hidden');
-    document.getElementById('edit-fecha-' + id).classList.remove('hidden');
+    let fields = ['fecha', 'goles-favor', 'goles-contra', 'resultado', 'actuacion'];
 
-    document.getElementById('min-goles-favor-' + id).classList.add('hidden');
-    document.getElementById('edit-goles-favor-' + id).classList.remove('hidden');
-
-    document.getElementById('min-goles-contra-' + id).classList.add('hidden');
-    document.getElementById('edit-goles-contra-' + id).classList.remove('hidden');
-
-    // Asegurar que los campos sean editables
-    document.getElementById('edit-fecha-' + id).removeAttribute('disabled');
-    document.getElementById('edit-goles-favor-' + id).removeAttribute('disabled');
-    document.getElementById('edit-goles-contra-' + id).removeAttribute('disabled');
+    fields.forEach(field => {
+        document.getElementById(`${field}-${id}`).classList.add('hidden');
+        document.getElementById(`edit-${field}-${id}`).classList.remove('hidden');
+    });
 }
 
-    function saveMatch(id) {
-        let csrfToken = document.querySelector('meta[name="csrf-token"]').content;
 
-        let fecha = document.getElementById('edit-fecha-' + id).value;
-        let golesFavor = document.getElementById('edit-goles-favor-' + id).value;
-        let golesContra = document.getElementById('edit-goles-contra-' + id).value;
+function saveMatch(id) {
+    let csrfToken = document.querySelector('meta[name="csrf-token"]').content;
 
-        let form = document.createElement('form');
-        form.method = 'POST';
-        form.action = `/matches/${id}`;
+    let data = {
+        _token: csrfToken,
+        _method: 'PATCH',
+        fecha_partido: document.getElementById(`edit-fecha-${id}`).value,
+        goles_a_favor: document.getElementById(`edit-goles-favor-${id}`).value,
+        goles_en_contra: document.getElementById(`edit-goles-contra-${id}`).value,
+        resultado: document.getElementById(`edit-resultado-${id}`).value,
+        actuacion_equipo: document.getElementById(`edit-actuacion-${id}`).value
+    };
 
-        form.appendChild(createHiddenInput('_token', csrfToken));
-        form.appendChild(createHiddenInput('_method', 'PATCH'));
-        form.appendChild(createHiddenInput('fecha_partido', fecha));
-        form.appendChild(createHiddenInput('goles_a_favor', golesFavor));
-        form.appendChild(createHiddenInput('goles_en_contra', golesContra));
+    let form = document.createElement('form');
+    form.method = 'POST';
+    form.action = `/matches/${id}`;
 
-        document.body.appendChild(form);
-        form.submit();
+    for (let key in data) {
+        form.appendChild(createHiddenInput(key, data[key]));
     }
+
+    document.body.appendChild(form);
+    form.submit();
+}
+
+function cancelEditMatch(id) {
+    document.getElementById('edit-btn-match-' + id).classList.remove('hidden');
+    document.getElementById('save-btn-match-' + id).classList.add('hidden');
+    document.getElementById('cancel-btn-match-' + id).classList.add('hidden');
+    document.getElementById('delete-form-match-' + id).classList.remove('hidden');
+
+    let fields = ['fecha', 'goles-favor', 'goles-contra', 'resultado', 'actuacion'];
+
+    fields.forEach(field => {
+        document.getElementById(`${field}-${id}`).classList.remove('hidden');
+        document.getElementById(`edit-${field}-${id}`).classList.add('hidden');
+    });
+}
+
+
+
 
 //CONVOCATORIA
     function openConvocatoriaModal(matchId) {
