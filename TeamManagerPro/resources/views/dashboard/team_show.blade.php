@@ -38,7 +38,7 @@
                     <th class="p-2">Posición</th>
                     <th class="p-2">Perfil</th>
                     <th class="p-2">Minutos Jugados</th>
-                    <th class="p-2">Goles</th>
+                    <th class="p-2">Goles / Goles Encajados</th>
                     <th class="p-2">Asistencias</th>
                     <th class="p-2">Titular</th>
                     <th class="p-2">Suplente</th>
@@ -57,54 +57,75 @@
                     <td class="p-2">
                         <span id="pos-{{ $player->id }}">{{ $player->posicion }}</span>
                         <select name="posicion" class="hidden w-full p-1 border rounded" id="edit-pos-{{ $player->id }}">
-                            <option value="Portero">Portero</option>
-                            <option value="Defensa">Defensa</option>
-                            <option value="Centrocampista">Centrocampista</option>
-                            <option value="Delantero">Delantero</option>
+                            <option value="Portero" @selected($player->posicion == 'Portero')>Portero</option>
+                            <option value="Defensa" @selected($player->posicion == 'Defensa')>Defensa</option>
+                            <option value="Centrocampista" @selected($player->posicion == 'Centrocampista')>Centrocampista</option>
+                            <option value="Delantero" @selected($player->posicion == 'Delantero')>Delantero</option>
                         </select>
                     </td>
+
                     <td class="p-2">
                         <span id="perfil-{{ $player->id }}">{{ $player->perfil }}</span>
                         <select name="perfil" class="hidden w-full p-1 border rounded" id="edit-perfil-{{ $player->id }}">
-                            <option value="Diestro">Diestro</option>
-                            <option value="Zurdo">Zurdo</option>
+                            <option value="Diestro" @selected($player->perfil == 'Diestro')>Diestro</option>
+                            <option value="Zurdo" @selected($player->perfil == 'Zurdo')>Zurdo</option>
                         </select>
                     </td>
+
                     <td class="p-2">
                         <span id="min-{{ $player->id }}">{{ $player->minutos_jugados }}</span>
-                        <input type="number" name="minutos_jugados" class="hidden w-16 p-1 border rounded" id="edit-min-{{ $player->id }}">
-                    </td>
-                    <td class="p-2">
-                        <span id="goles-{{ $player->id }}">{{ $player->goles }}</span>
-                        <input type="number" name="goles" class="hidden w-16 p-1 border rounded" id="edit-goles-{{ $player->id }}">
-                    </td>
-                    <td class="p-2">
-                        <span id="asistencias-{{ $player->id }}">{{ $player->asistencias }}</span>
-                        <input type="number" name="asistencias" class="hidden w-16 p-1 border rounded" id="edit-asistencias-{{ $player->id }}">
-                    </td>
-                    <td class="p-2">
-                        <span id="titular-{{ $player->id }}">{{ $player->titular }}</span>
-                        <input type="number" name="titular" class="hidden w-16 p-1 border rounded" id="edit-titular-{{ $player->id }}">
-                    </td>
-                    <td class="p-2">
-                        <span id="suplente-{{ $player->id }}">{{ $player->suplente }}</span>
-                        <input type="number" name="suplente" class="hidden w-16 p-1 border rounded" id="edit-suplente-{{ $player->id }}">
-                    </td>
-                    <td class="p-2">
-                        <span id="valoracion-{{ $player->id }}">{{ number_format($player->getValoracionPorPlantilla($team->id), 2) }}</span>
-                        <input type="number" name="valoracion" step="0.01" class="hidden w-16 p-1 border rounded" id="edit-valoracion-{{ $player->id }}">
+                        <input type="number" name="minutos_jugados" class="hidden w-16 p-1 border rounded" id="edit-min-{{ $player->id }}" value="{{ $player->minutos_jugados }}">
                     </td>
 
+                    <td class="p-2">
+                        @if ($player->posicion == 'Portero')
+                            <span id="goles-{{ $player->id }}">{{ $player->goles_encajados }}</span>
+                            <input type="number" name="goles_encajados" class="hidden w-16 p-1 border rounded" id="edit-goles-{{ $player->id }}" value="{{ $player->goles_encajados }}">
+                        @else
+                            <span id="goles-{{ $player->id }}">{{ $player->goles }}</span>
+                            <input type="number" name="goles" class="hidden w-16 p-1 border rounded" id="edit-goles-{{ $player->id }}" value="{{ $player->goles }}">
+                        @endif
+                    </td>
+
+                    <td class="p-2">
+                        <span id="asistencias-{{ $player->id }}">{{ $player->asistencias }}</span>
+                        <input type="number" name="asistencias" class="hidden w-16 p-1 border rounded" id="edit-asistencias-{{ $player->id }}" value="{{ $player->asistencias }}">
+                    </td>
+
+                    <td class="p-2">
+                        <span id="titular-{{ $player->id }}">{{ $player->titular }}</span>
+                        <input type="number" name="titular" class="hidden w-16 p-1 border rounded" id="edit-titular-{{ $player->id }}" value="{{ $player->titular }}">
+                    </td>
+
+                    <td class="p-2">
+                        <span id="suplente-{{ $player->id }}">{{ $player->suplente }}</span>
+                        <input type="number" name="suplente" class="hidden w-16 p-1 border rounded" id="edit-suplente-{{ $player->id }}" value="{{ $player->suplente }}">
+                    </td>
+
+                    <td class="p-2">
+                        <span id="valoracion-{{ $player->id }}">{{ number_format($player->getValoracionPorPlantilla($team->id), 2) }}</span>
+                    </td>
+
+
                     <td class="p-2 text-center">
+                        <!-- Botón Editar -->
                         <button onclick="editPlayer('{{ $player->id }}')" id="edit-btn-{{ $player->id }}" class="bg-yellow-500 text-white px-3 py-1 rounded">Editar</button>
+
+                        <!-- Botón Guardar (oculto inicialmente) -->
                         <button onclick="savePlayer('{{ $player->id }}')" id="save-btn-{{ $player->id }}" class="hidden bg-green-500 text-white px-3 py-1 rounded">Guardar</button>
-                        <form action="{{ route('players.destroy', $player->id) }}" method="POST" onsubmit="return confirm('¿Estás seguro de que deseas eliminar a este jugador? Esta acción no se puede deshacer.')" class="inline">
+
+                        <!-- Botón Cancelar (oculto inicialmente) -->
+                        <button onclick="cancelEditPlayer('{{ $player->id }}')" id="cancel-btn-{{ $player->id }}" class="hidden bg-red-500 text-white px-3 py-1 rounded">Cancelar</button>
+
+                        <!-- Botón Eliminar (visible inicialmente, oculto en modo edición) -->
+                        <form action="{{ route('players.destroy', $player->id) }}" method="POST" onsubmit="return confirm('¿Estás seguro de que deseas eliminar a este jugador? Esta acción no se puede deshacer.')" id="delete-form-{{ $player->id }}" class="inline">
                             @csrf
                             @method('DELETE')
                             <input type="hidden" name="team_id" value="{{ $team->id }}">
                             <button type="submit" class="bg-red-500 text-white px-3 py-1 rounded">Eliminar</button>
                         </form>
                     </td>
+
                 </tr>
                 @endforeach
             </tbody>
@@ -394,65 +415,100 @@
      data-convocados='@json($convocados)'></div>
 
 <script>
+    //EDITAR JUGADOR
     function editPlayer(id) {
-        document.getElementById('edit-btn-' + id).classList.add('hidden');
-        document.getElementById('save-btn-' + id).classList.remove('hidden');
+    document.getElementById('edit-btn-' + id).classList.add('hidden');
+    document.getElementById('save-btn-' + id).classList.remove('hidden');
+    document.getElementById('cancel-btn-' + id).classList.remove('hidden'); // Mostrar botón Cancelar
+    document.getElementById('delete-form-' + id).classList.add('hidden'); // Ocultar botón Eliminar
 
-        document.getElementById('pos-' + id).classList.add('hidden');
-        document.getElementById('edit-pos-' + id).classList.remove('hidden');
+    document.getElementById('pos-' + id).classList.add('hidden');
+    document.getElementById('edit-pos-' + id).classList.remove('hidden');
 
-        document.getElementById('perfil-' + id).classList.add('hidden');
-        document.getElementById('edit-perfil-' + id).classList.remove('hidden');
+    document.getElementById('perfil-' + id).classList.add('hidden');
+    document.getElementById('edit-perfil-' + id).classList.remove('hidden');
 
-        document.getElementById('min-' + id).classList.add('hidden');
-        document.getElementById('edit-min-' + id).classList.remove('hidden');
+    document.getElementById('min-' + id).classList.add('hidden');
+    document.getElementById('edit-min-' + id).classList.remove('hidden');
 
-        document.getElementById('goles-' + id).classList.add('hidden');
-        document.getElementById('edit-goles-' + id).classList.remove('hidden');
+    document.getElementById('goles-' + id).classList.add('hidden');
+    document.getElementById('edit-goles-' + id).classList.remove('hidden');
 
-        document.getElementById('asistencias-' + id).classList.add('hidden');
-        document.getElementById('edit-asistencias-' + id).classList.remove('hidden');
+    document.getElementById('asistencias-' + id).classList.add('hidden');
+    document.getElementById('edit-asistencias-' + id).classList.remove('hidden');
 
-        document.getElementById('titular-' + id).classList.add('hidden');
-        document.getElementById('edit-titular-' + id).classList.remove('hidden');
+    document.getElementById('titular-' + id).classList.add('hidden');
+    document.getElementById('edit-titular-' + id).classList.remove('hidden');
 
-        document.getElementById('suplente-' + id).classList.add('hidden');
-        document.getElementById('edit-suplente-' + id).classList.remove('hidden');
+    document.getElementById('suplente-' + id).classList.add('hidden');
+    document.getElementById('edit-suplente-' + id).classList.remove('hidden');
+}
+//CANCELAR EDICION JUGADOR
+function cancelEditPlayer(id) {
+    document.getElementById('edit-btn-' + id).classList.remove('hidden');
+    document.getElementById('save-btn-' + id).classList.add('hidden');
+    document.getElementById('cancel-btn-' + id).classList.add('hidden'); // Ocultar botón Cancelar
+    document.getElementById('delete-form-' + id).classList.remove('hidden'); // Mostrar botón Eliminar
 
-        document.getElementById('valoracion-' + id).classList.add('hidden');
-        document.getElementById('edit-valoracion-' + id).classList.remove('hidden');
+    document.getElementById('pos-' + id).classList.remove('hidden');
+    document.getElementById('edit-pos-' + id).classList.add('hidden');
 
-    }
+    document.getElementById('perfil-' + id).classList.remove('hidden');
+    document.getElementById('edit-perfil-' + id).classList.add('hidden');
+
+    document.getElementById('min-' + id).classList.remove('hidden');
+    document.getElementById('edit-min-' + id).classList.add('hidden');
+
+    document.getElementById('goles-' + id).classList.remove('hidden');
+    document.getElementById('edit-goles-' + id).classList.add('hidden');
+
+    document.getElementById('asistencias-' + id).classList.remove('hidden');
+    document.getElementById('edit-asistencias-' + id).classList.add('hidden');
+
+    document.getElementById('titular-' + id).classList.remove('hidden');
+    document.getElementById('edit-titular-' + id).classList.add('hidden');
+
+    document.getElementById('suplente-' + id).classList.remove('hidden');
+    document.getElementById('edit-suplente-' + id).classList.add('hidden');
+}
+
 
     function savePlayer(id) {
-        let csrfToken = document.querySelector('meta[name="csrf-token"]').content;
+    let csrfToken = document.querySelector('meta[name="csrf-token"]').content;
 
-        let posicion = document.getElementById('edit-pos-' + id).value;
-        let perfil = document.getElementById('edit-perfil-' + id).value;
-        let minutos = document.getElementById('edit-min-' + id).value;
-        let goles = document.getElementById('edit-goles-' + id).value;
-        let asistencias = document.getElementById('edit-asistencias-' + id).value;
-        let titular = document.getElementById('edit-titular-' + id).value;
-        let suplente = document.getElementById('edit-suplente-' + id).value;
-        let valoracion = document.getElementById('edit-valoracion-' + id).value;
-        let form = document.createElement('form');
-        form.method = 'POST';
-        form.action = `/players/${id}`;
+    let posicion = document.getElementById('edit-pos-' + id).value;
+    let perfil = document.getElementById('edit-perfil-' + id).value;
+    let minutos = document.getElementById('edit-min-' + id).value;
+    let asistencias = document.getElementById('edit-asistencias-' + id).value;
+    let titular = document.getElementById('edit-titular-' + id).value;
+    let suplente = document.getElementById('edit-suplente-' + id).value;
+    
+    // Obtener goles o goles encajados según la posición
+    let goles = document.getElementById('edit-goles-' + id).value;
+    let form = document.createElement('form');
+    form.method = 'POST';
+    form.action = `/players/${id}`;
 
-        form.appendChild(createHiddenInput('_token', csrfToken));
-        form.appendChild(createHiddenInput('_method', 'PATCH'));
-        form.appendChild(createHiddenInput('posicion', posicion));
-        form.appendChild(createHiddenInput('perfil', perfil));
-        form.appendChild(createHiddenInput('minutos_jugados', minutos));
+    form.appendChild(createHiddenInput('_token', csrfToken));
+    form.appendChild(createHiddenInput('_method', 'PATCH'));
+    form.appendChild(createHiddenInput('posicion', posicion));
+    form.appendChild(createHiddenInput('perfil', perfil));
+    form.appendChild(createHiddenInput('minutos_jugados', minutos));
+    form.appendChild(createHiddenInput('asistencias', asistencias));
+    form.appendChild(createHiddenInput('titular', titular));
+    form.appendChild(createHiddenInput('suplente', suplente));
+
+    // 📌 Si el jugador es portero, enviar "goles_encajados" en lugar de "goles"
+    if (posicion === "Portero") {
+        form.appendChild(createHiddenInput('goles_encajados', goles));
+    } else {
         form.appendChild(createHiddenInput('goles', goles));
-        form.appendChild(createHiddenInput('asistencias', asistencias));
-        form.appendChild(createHiddenInput('titular', titular));
-        form.appendChild(createHiddenInput('suplente', suplente));
-        form.appendChild(createHiddenInput('valoracion', valoracion));
-
-        document.body.appendChild(form);
-        form.submit();
     }
+
+    document.body.appendChild(form);
+    form.submit();
+}
+
 
 
     function createHiddenInput(name, value) {

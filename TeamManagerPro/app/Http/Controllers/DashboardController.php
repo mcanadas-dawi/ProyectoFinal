@@ -62,31 +62,47 @@ class DashboardController extends Controller
         return back()->with('success', 'Jugador añadido correctamente.');
     }
 
-    public function updatePlayer(Request $request, $id) // ACTUALIZAR JUGADOR
+    public function updatePlayer(Request $request, $id)
 {
     $player = Player::findOrFail($id);
+
+    // Obtener la nueva posición
+    $nuevaPosicion = $request->input('posicion', $player->posicion);
 
     $request->validate([
         'posicion' => 'nullable|in:Portero,Defensa,Centrocampista,Delantero',
         'perfil' => 'nullable|in:Diestro,Zurdo',
         'minutos_jugados' => 'nullable|integer|min:0',
         'goles' => 'nullable|integer|min:0',
+        'goles_encajados' => 'nullable|integer|min:0',
         'asistencias' => 'nullable|integer|min:0',
         'titular' => 'nullable|integer|min:0',
         'suplente' => 'nullable|integer|min:0',
         'valoracion' => 'nullable|numeric|min:0|max:10',
     ]);
 
-    // Filtrar los datos para no sobrescribir con null
+    // Filtrar datos para evitar null
     $data = array_filter($request->all(), function ($value) {
-        return !is_null($value);
+        return $value !== null;
     });
 
-    // Actualizar solo los datos que se enviaron
+    // 📌 Si es portero, borrar goles y actualizar goles_encajados
+    if ($nuevaPosicion == 'Portero') {
+        unset($data['goles']); 
+    } else {
+        unset($data['goles_encajados']);
+    }
+
+    // Log para verificar qué datos se están guardando
+    Log::info("Datos que se guardarán para jugador $id:", $data);
+
+    // Actualizar jugador
     $player->update($data);
 
     return redirect()->back()->with('success', 'Jugador actualizado con éxito.');
 }
+
+    
 
 
     public function addPlayerToTeam(Request $request)
