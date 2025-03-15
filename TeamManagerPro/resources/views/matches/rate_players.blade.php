@@ -10,24 +10,80 @@
             <thead>
                 <tr class="bg-gray-200">
                     <th class="border p-2">Jugador</th>
+                    <th class="border p-2">Titular</th>
+                    <th class="border p-2">Minutos Jugados</th>
+                    <th class="border p-2">Goles</th>
+                    <th class="border p-2">Asistencias</th>
+                    <th class="border p-2">Tarjetas Amarillas</th>
+                    <th class="border p-2">Tarjeta Roja</th>
                     <th class="border p-2">Valoración</th>
                 </tr>
             </thead>
             <tbody>
                 @if (!empty($match->players) && $match->players->count() > 0)
                     @foreach ($match->players as $player)
+                        @php
+                            $stats = $player->matchStats($match->id);
+                        @endphp
                         <tr class="border">
                             <td class="p-2">{{ $player->nombre }} {{ $player->apellido }} (Dorsal: {{ $player->dorsal }})</td>
+
+                            <!-- Checkbox para Titular -->
                             <td class="p-2 text-center">
-                                <input type="number" name="ratings[{{ $player->id }}]" min="1" max="10" required 
-                                       class="w-16 p-2 border rounded text-center"
-                                       value="{{ $player->pivot->valoracion ?? '' }}">
+                                <input type="checkbox" name="players[{{ $player->id }}][titular]" value="1"
+                                    class="w-5 h-5" 
+                                    {{ $stats && $stats->titular ? 'checked' : '' }}>
+                            </td>
+
+                            <!-- Minutos Jugados -->
+                            <td class="p-2 text-center">
+                                <input type="number" name="players[{{ $player->id }}][minutos_jugados]" min="0" 
+                                    class="w-16 p-2 border rounded text-center" 
+                                    value="{{ $stats->minutos_jugados ?? 0 }}">
+                            </td>
+
+                            <!-- Goles -->
+                            <td class="p-2 text-center">
+                                <input type="number" name="players[{{ $player->id }}][goles]" min="0" 
+                                    class="w-16 p-2 border rounded text-center" 
+                                    value="{{ $stats->goles ?? 0 }}">
+                            </td>
+
+                            <!-- Asistencias -->
+                            <td class="p-2 text-center">
+                                <input type="number" name="players[{{ $player->id }}][asistencias]" min="0" 
+                                    class="w-16 p-2 border rounded text-center" 
+                                    value="{{ $stats->asistencias ?? 0 }}">
+                            </td>
+
+                            <!-- Tarjetas Amarillas -->
+                            <td class="p-2 text-center">
+                                <input type="number" name="players[{{ $player->id }}][tarjetas_amarillas]" min="0" max="2"
+                                    class="w-16 p-2 border rounded text-center tarjetas-amarillas" 
+                                    value="{{ $stats->tarjetas_amarillas ?? 0 }}" 
+                                    data-player-id="{{ $player->id }}">
+                            </td>
+
+                            <!-- Tarjeta Roja (Editable si NO hay 2 amarillas) -->
+                            <td class="p-2 text-center">
+                                <input type="number" name="players[{{ $player->id }}][tarjetas_rojas]" min="0" max="1"
+                                    class="w-16 p-2 border rounded text-center tarjetas-rojas" 
+                                    value="{{ $stats->tarjetas_rojas ?? 0 }}" 
+                                    data-player-id="{{ $player->id }}" 
+                                    {{ ($stats->tarjetas_amarillas ?? 0) == 2 ? 'readonly' : '' }}>
+                            </td>
+
+                            <!-- Valoración -->
+                            <td class="p-2 text-center">
+                                <input type="number" name="players[{{ $player->id }}][valoracion]" min="1" max="10" step="0.1"
+                                    class="w-16 p-2 border rounded text-center" 
+                                    value="{{ $stats->valoracion ?? '' }}">
                             </td>
                         </tr>
                     @endforeach
                 @else
                     <tr>
-                        <td colspan="2" class="p-4 text-center text-gray-500">No hay jugadores convocados para este partido.</td>
+                        <td colspan="8" class="p-4 text-center text-gray-500">No hay jugadores convocados para este partido.</td>
                     </tr>
                 @endif
             </tbody>

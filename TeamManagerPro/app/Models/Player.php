@@ -12,7 +12,7 @@ class Player extends Model
         'nombre', 'apellido', 'dni', 'dorsal', 'fecha_nacimiento',
         'posicion', 'perfil', 'minutos_jugados', 'goles',
         'asistencias', 'goles_encajados', 'titular',
-        'suplente', 'valoracion'
+        'suplente', 'valoracion','tarjetas_amarillas','tarjetas_rojas'
     ];
 
     // Un jugador puede pertenecer a múltiples plantillas
@@ -35,5 +35,12 @@ public function getValoracionPorPlantilla($teamId)
         })
         ->avg('player_match.valoracion') ?? 0;
 }
+public function matchStats($matchId)
+{
+    return $this->hasOne(MatchPlayerStat::class)
+                ->where('match_id', $matchId)
+                ->first();
+}
+
 }
 

@@ -3,7 +3,7 @@
 
 @section('content')
 <div class="container mx-auto p-6">
-    <h1 class="text-3xl font-bold text-gray-800 mb-6">Gestión de Plantillas</h1>
+    <h1 class="text-3xl font-bold text-purple-600 mb-6">Gestión de Plantillas</h1>
 
     @include('components.alert')
 
@@ -15,7 +15,7 @@
             <div class="bg-white shadow-lg rounded-lg p-6 mb-6">
                 <div class="flex justify-between items-center">
                 <h2 class="text-2xl font-semibold text-gray-700">
-                    <a href="{{ route('teams.show', $team->id) }}" class="text-blue-500 hover:underline">
+                    <a href="{{ route('teams.show', $team->id) }}" class="text-green-600 hover:underline">
                         {{ $team->nombre }} ({{ strtoupper($team->modalidad) }})
                     </a>
                 </h2>
@@ -24,7 +24,7 @@
                     <form action="{{ route('teams.destroy', $team->id) }}" method="POST" onsubmit="return confirmDelete(event, '{{ $team->nombre }}')">
                         @csrf
                         @method('DELETE')
-                        <button type="submit" class="bg-red-500 text-white px-4 py-2 rounded-lg">Eliminar</button>
+                        <button type="submit" class="bg-red-500 text-white px-4 py-2 rounded-lg">Eliminar Plantilla</button>
                     </form>
                 </div>
                 
@@ -32,9 +32,9 @@
                 @if ($team->exists)
                     <div class="mt-4 flex space-x-4">
                         <button onclick="toggleSection('player-form-{{ $team->id }}')" 
-                                class="bg-green-500 text-white px-4 py-2 rounded-lg">Añadir Jugadores</button>
+                                class="bg-blue-600 text-white px-4 py-2 rounded-lg">Añadir Jugador</button>
                         <button onclick="toggleSection('match-form-{{ $team->id }}')" 
-                                class="bg-red-500 text-white px-4 py-2 rounded-lg">Añadir Partidos</button>
+                                class="bg-yellow-500 text-white px-4 py-2 rounded-lg">Añadir Partido</button>
                     </div>
                 
                     <!-- Sección oculta para agregar jugadores -->

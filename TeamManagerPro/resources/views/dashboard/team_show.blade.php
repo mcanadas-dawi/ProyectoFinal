@@ -14,6 +14,40 @@
     </form>
 </div>
 
+<!-- Sección de Estadísticas -->
+<div class="bg-teal-400 shadow-lg rounded-lg p-6 mb-6">
+    <h2 class="text-2xl font-semibold text-gray-900 mb-4">Estadísticas de la plantilla</h2>
+
+    <table class="w-full text-center border-collapse bg-white rounded-lg">
+        <thead class="bg-teal-500 text-gray-900">
+            <tr class="border-b">
+                <th class="p-2">Victorias</th>
+                <th class="p-2">Empates</th>
+                <th class="p-2">Derrotas</th>
+                <th class="p-2">Puntos</th>
+                <th class="p-2">Goles a Favor</th>
+                <th class="p-2">Goles en Contra</th>
+                <th class="p-2">Tarjetas Amarillas</th>
+                <th class="p-2">Tarjetas Rojas</th>
+                <th class="p-2">Valoración Media</th>
+            </tr>
+        </thead>
+        <tbody class="text-gray-800">
+            <tr class="border-b bg-blue-100">
+                <td class="p-2">{{ $stats['victorias'] }}</td>
+                <td class="p-2">{{ $stats['empates'] }}</td>
+                <td class="p-2">{{ $stats['derrotas'] }}</td>
+                <td class="p-2 font-bold">{{ $stats['puntos'] }}</td>
+                <td class="p-2">{{ $stats['goles_favor'] }}</td>
+                <td class="p-2">{{ $stats['goles_contra'] }}</td>
+                <td class="p-2 text-yellow-600 font-bold">{{ $stats['tarjetas_amarillas'] }}</td>
+                <td class="p-2 text-red-600 font-bold">{{ $stats['tarjetas_rojas'] }}</td>
+                <td class="p-2 text-green-600 font-bold">{{ number_format($stats['valoracion_media'], 2) }}</td> <!-- Nueva celda -->
+            </tr>
+        </tbody>
+    </table>
+</div>
+
 
     <!-- Sección de Jugadores -->
     <div class="bg-blue-200 shadow-lg rounded-lg p-6 mb-6">
@@ -32,17 +66,18 @@
                 <tr class="border-b">
                     <th class="p-2">Nombre</th>
                     <th class="p-2">Apellido</th>
-                    <th class="p-2">DNI</th>
                     <th class="p-2">Dorsal</th>
-                    <th class="p-2">Fecha Nac.</th>
+                    <th class="p-2">Edad</th>
                     <th class="p-2">Posición</th>
-                    <th class="p-2">Perfil</th>
-                    <th class="p-2">Minutos Jugados</th>
-                    <th class="p-2">Goles / Goles Encajados</th>
-                    <th class="p-2">Asistencias</th>
-                    <th class="p-2">Titular</th>
-                    <th class="p-2">Suplente</th>
+                    <th class="p-2">Pie</th>
+                    <th class="p-2">Minutos</th>
+                    <th class="p-2">Goles/Encajados(POR)</th>
+                    <th class="p-2">Asist</th>
+                    <th class="p-2">Tit</th>
+                    <th class="p-2">Supl</th>
                     <th class="p-2">Valoración</th>
+                    <th class="p-2">Amarillas</th>
+                    <th class="p-2">Rojas</th>
                     <th class="p-2">Acciones</th>
                 </tr>
             </thead>
@@ -51,9 +86,11 @@
                 <tr class="border-b bg-blue-100" id="player-row-{{ $player->id }}">
                     <td class="p-2">{{ $player->nombre }}</td>
                     <td class="p-2">{{ $player->apellido }}</td>
-                    <td class="p-2">{{ $player->dni }}</td>
                     <td class="p-2">{{ $player->dorsal }}</td>
-                    <td class="p-2">{{ $player->fecha_nacimiento }}</td>
+                    <td class="p-2">
+                        <span id="edad-{{ $player->id }}"></span> <!-- Aquí se mostrará la edad -->
+                        <span class="hidden" id="fecha-nacimiento-{{ $player->id }}">{{ $player->fecha_nacimiento }}</span>
+                    </td>
                     <td class="p-2">
                         <span id="pos-{{ $player->id }}">{{ $player->posicion }}</span>
                         <select name="posicion" class="hidden w-full p-1 border rounded" id="edit-pos-{{ $player->id }}">
@@ -65,46 +102,25 @@
                     </td>
 
                     <td class="p-2">
-                        <span id="perfil-{{ $player->id }}">{{ $player->perfil }}</span>
+                    <span id="perfil-{{ $player->id }}">
+                        @if($player->perfil == 'Diestro') D @else I @endif
+                    </span>
                         <select name="perfil" class="hidden w-full p-1 border rounded" id="edit-perfil-{{ $player->id }}">
                             <option value="Diestro" @selected($player->perfil == 'Diestro')>Diestro</option>
                             <option value="Zurdo" @selected($player->perfil == 'Zurdo')>Zurdo</option>
                         </select>
                     </td>
 
-                    <td class="p-2">
-                        <span id="min-{{ $player->id }}">{{ $player->minutos_jugados }}</span>
-                        <input type="number" name="minutos_jugados" class="hidden w-16 p-1 border rounded" id="edit-min-{{ $player->id }}" value="{{ $player->minutos_jugados }}">
-                    </td>
+                    <td class="p-2">{{ $player->minutos_jugados }}</td>
+                    <td class="p-2">{{ $player->goles }}</td>
+                    <td class="p-2">{{ $player->asistencias }}</td>
+                    <td class="p-2">{{ $player->titular }}</td>
+                    <td class="p-2">{{ $player->suplente }}</td>
+                    <td class="p-2 font-bold text-blue-600">{{ number_format($player->valoracion, 2) }}</td>
+                    <td class="p-2 text-yellow-600 font-bold">{{ $player->tarjetas_amarillas }}</td>
+                    <td class="p-2 text-red-600 font-bold">{{ $player->tarjetas_rojas }}</td>
+                    
 
-                    <td class="p-2">
-                        @if ($player->posicion == 'Portero')
-                            <span id="goles-{{ $player->id }}">{{ $player->goles_encajados }}</span>
-                            <input type="number" name="goles_encajados" class="hidden w-16 p-1 border rounded" id="edit-goles-{{ $player->id }}" value="{{ $player->goles_encajados }}">
-                        @else
-                            <span id="goles-{{ $player->id }}">{{ $player->goles }}</span>
-                            <input type="number" name="goles" class="hidden w-16 p-1 border rounded" id="edit-goles-{{ $player->id }}" value="{{ $player->goles }}">
-                        @endif
-                    </td>
-
-                    <td class="p-2">
-                        <span id="asistencias-{{ $player->id }}">{{ $player->asistencias }}</span>
-                        <input type="number" name="asistencias" class="hidden w-16 p-1 border rounded" id="edit-asistencias-{{ $player->id }}" value="{{ $player->asistencias }}">
-                    </td>
-
-                    <td class="p-2">
-                        <span id="titular-{{ $player->id }}">{{ $player->titular }}</span>
-                        <input type="number" name="titular" class="hidden w-16 p-1 border rounded" id="edit-titular-{{ $player->id }}" value="{{ $player->titular }}">
-                    </td>
-
-                    <td class="p-2">
-                        <span id="suplente-{{ $player->id }}">{{ $player->suplente }}</span>
-                        <input type="number" name="suplente" class="hidden w-16 p-1 border rounded" id="edit-suplente-{{ $player->id }}" value="{{ $player->suplente }}">
-                    </td>
-
-                    <td class="p-2">
-                        <span id="valoracion-{{ $player->id }}">{{ number_format($player->getValoracionPorPlantilla($team->id), 2) }}</span>
-                    </td>
 
 
                     <td class="p-2 text-center">
@@ -158,7 +174,16 @@
 </thead>
 <tbody class="text-gray-800">
     @foreach ($team->matches as $match)
-        <tr class="border-b bg-green-100">
+        @php
+            // Determinar el color de la fila según el resultado
+            $colorClase = match ($match->resultado) {
+                'Victoria' => 'bg-green-700', // Verde para victoria
+                'Empate' => 'bg-yellow-500', // Amarillo para empate
+                'Derrota' => 'bg-red-300', // Rojo para derrota
+                default => 'bg-green-100', // Color neutro si no hay resultado
+            };
+        @endphp
+        <tr id="match-row-{{ $match->id }}" class="border-b {{ $colorClase }}">
             <td class="p-2 text-center">{{ $match->numero_jornada }}</td>
             <td class="p-2 text-center">{{ $match->equipo_rival }}</td>
             
@@ -223,10 +248,9 @@
         </tr>
     @endforeach
 </tbody>
-
-
-    </table>
+</table>
 </div>
+
 <!-- Modal para Añadir Jugador -->
 <div id="addPlayerModal" class="hidden fixed inset-0 bg-gray-900 bg-opacity-50 flex justify-center items-center">
     <div class="bg-white rounded-lg p-6 w-1/3">
@@ -439,30 +463,14 @@
     function editPlayer(id) {
     document.getElementById('edit-btn-' + id).classList.add('hidden');
     document.getElementById('save-btn-' + id).classList.remove('hidden');
-    document.getElementById('cancel-btn-' + id).classList.remove('hidden'); // Mostrar botón Cancelar
-    document.getElementById('delete-form-' + id).classList.add('hidden'); // Ocultar botón Eliminar
 
     document.getElementById('pos-' + id).classList.add('hidden');
     document.getElementById('edit-pos-' + id).classList.remove('hidden');
 
     document.getElementById('perfil-' + id).classList.add('hidden');
     document.getElementById('edit-perfil-' + id).classList.remove('hidden');
-
-    document.getElementById('min-' + id).classList.add('hidden');
-    document.getElementById('edit-min-' + id).classList.remove('hidden');
-
-    document.getElementById('goles-' + id).classList.add('hidden');
-    document.getElementById('edit-goles-' + id).classList.remove('hidden');
-
-    document.getElementById('asistencias-' + id).classList.add('hidden');
-    document.getElementById('edit-asistencias-' + id).classList.remove('hidden');
-
-    document.getElementById('titular-' + id).classList.add('hidden');
-    document.getElementById('edit-titular-' + id).classList.remove('hidden');
-
-    document.getElementById('suplente-' + id).classList.add('hidden');
-    document.getElementById('edit-suplente-' + id).classList.remove('hidden');
 }
+
 //CANCELAR EDICION JUGADOR
 function cancelEditPlayer(id) {
     document.getElementById('edit-btn-' + id).classList.remove('hidden');
@@ -472,39 +480,15 @@ function cancelEditPlayer(id) {
 
     document.getElementById('pos-' + id).classList.remove('hidden');
     document.getElementById('edit-pos-' + id).classList.add('hidden');
-
-    document.getElementById('perfil-' + id).classList.remove('hidden');
-    document.getElementById('edit-perfil-' + id).classList.add('hidden');
-
-    document.getElementById('min-' + id).classList.remove('hidden');
-    document.getElementById('edit-min-' + id).classList.add('hidden');
-
-    document.getElementById('goles-' + id).classList.remove('hidden');
-    document.getElementById('edit-goles-' + id).classList.add('hidden');
-
-    document.getElementById('asistencias-' + id).classList.remove('hidden');
-    document.getElementById('edit-asistencias-' + id).classList.add('hidden');
-
-    document.getElementById('titular-' + id).classList.remove('hidden');
-    document.getElementById('edit-titular-' + id).classList.add('hidden');
-
-    document.getElementById('suplente-' + id).classList.remove('hidden');
-    document.getElementById('edit-suplente-' + id).classList.add('hidden');
 }
 
 
-    function savePlayer(id) {
+function savePlayer(id) {
     let csrfToken = document.querySelector('meta[name="csrf-token"]').content;
 
     let posicion = document.getElementById('edit-pos-' + id).value;
     let perfil = document.getElementById('edit-perfil-' + id).value;
-    let minutos = document.getElementById('edit-min-' + id).value;
-    let asistencias = document.getElementById('edit-asistencias-' + id).value;
-    let titular = document.getElementById('edit-titular-' + id).value;
-    let suplente = document.getElementById('edit-suplente-' + id).value;
-    
-    // Obtener goles o goles encajados según la posición
-    let goles = document.getElementById('edit-goles-' + id).value;
+
     let form = document.createElement('form');
     form.method = 'POST';
     form.action = `/players/${id}`;
@@ -513,21 +497,11 @@ function cancelEditPlayer(id) {
     form.appendChild(createHiddenInput('_method', 'PATCH'));
     form.appendChild(createHiddenInput('posicion', posicion));
     form.appendChild(createHiddenInput('perfil', perfil));
-    form.appendChild(createHiddenInput('minutos_jugados', minutos));
-    form.appendChild(createHiddenInput('asistencias', asistencias));
-    form.appendChild(createHiddenInput('titular', titular));
-    form.appendChild(createHiddenInput('suplente', suplente));
-
-    // 📌 Si el jugador es portero, enviar "goles_encajados" en lugar de "goles"
-    if (posicion === "Portero") {
-        form.appendChild(createHiddenInput('goles_encajados', goles));
-    } else {
-        form.appendChild(createHiddenInput('goles', goles));
-    }
 
     document.body.appendChild(form);
     form.submit();
 }
+
 
 
 
@@ -545,7 +519,7 @@ function cancelEditPlayer(id) {
     document.getElementById('cancel-btn-match-' + id).classList.remove('hidden');
     document.getElementById('delete-form-match-' + id).classList.add('hidden');
 
-    let fields = ['fecha', 'goles-favor', 'goles-contra', 'resultado', 'actuacion'];
+    let fields = ['fecha', 'goles-favor', 'goles-contra', 'actuacion'];
 
     fields.forEach(field => {
         document.getElementById(`${field}-${id}`).classList.add('hidden');
@@ -1074,6 +1048,73 @@ function removePlaceholderBr() {
         removePlaceholderBr();
     });
 
+    //CALCULAR EDAD 
+    let players = document.querySelectorAll('[id^="fecha-nacimiento-"]'); // Selecciona todas las fechas de nacimiento
+
+    players.forEach(player => {
+        let playerId = player.id.split("-")[2]; // Extraer el ID del jugador
+        let fechaNacimiento = player.textContent.trim(); // Obtener la fecha de nacimiento del HTML
+
+        let edad = calcularEdad(fechaNacimiento); // Calcular la edad
+
+        // Insertar la edad en el span correspondiente
+        document.getElementById(`edad-${playerId}`).textContent = edad ;
+    });
+    function calcularEdad(fechaNacimiento) {
+    let fechaNac = new Date(fechaNacimiento);
+    let hoy = new Date();
+    
+    let edad = hoy.getFullYear() - fechaNac.getFullYear();
+    let mes = hoy.getMonth() - fechaNac.getMonth();
+
+    // Si el mes actual es menor al mes de nacimiento, o es el mismo pero el día es menor, restamos un año
+    if (mes < 0 || (mes === 0 && hoy.getDate() < fechaNac.getDate())) {
+        edad--;
+    }
+
+    return edad;
+}
+// CALCULAR RESLTADO EN BASE A LOS GOLES A FAVOR Y EN CONTRA
+let golesInputs = document.querySelectorAll('[id^="edit-goles-favor"], [id^="edit-goles-contra"]');
+
+golesInputs.forEach(input => {
+        input.addEventListener("input", function () {
+            let matchId = input.id.split("-").pop();
+            actualizarResultado(matchId);
+            actualizarColorFila(matchId);
+        });
+    });
+
+// Función para actualizar el resultado automáticamente
+function actualizarResultado(id) {
+    let golesFavor = parseInt(document.getElementById(`edit-goles-favor-${id}`).value) || 0;
+    let golesContra = parseInt(document.getElementById(`edit-goles-contra-${id}`).value) || 0;
+    let resultadoSelect = document.getElementById(`edit-resultado-${id}`);
+
+    if (golesFavor > golesContra) {
+        resultadoSelect.value = "Victoria";
+    } else if (golesFavor < golesContra) {
+        resultadoSelect.value = "Derrota";
+    } else {
+        resultadoSelect.value = "Empate";
+    }
+}
+
+// Función para cambiar el color de la fila según el resultado
+function actualizarColorFila(id) {
+    let resultado = document.getElementById(`edit-resultado-${id}`).value;
+    let fila = document.getElementById(`match-row-${id}`);
+
+    fila.classList.remove("bg-green-300", "bg-yellow-300", "bg-red-300");
+
+    if (resultado === "Victoria") {
+        fila.classList.add("bg-green-300");
+    } else if (resultado === "Empate") {
+        fila.classList.add("bg-yellow-300");
+    } else if (resultado === "Derrota") {
+        fila.classList.add("bg-red-300");
+    }
+}
 </script>
 
 @endsection

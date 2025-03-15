@@ -7,6 +7,7 @@ use Illuminate\Support\Facades\Auth;
 use App\Models\Team;
 use App\Models\Player;
 use App\Models\Matches;
+use App\Models\MatchPlayerStat;
 use Illuminate\Support\Facades\Log;
 
 class DashboardController extends Controller
@@ -66,44 +67,18 @@ class DashboardController extends Controller
 {
     $player = Player::findOrFail($id);
 
-    // Obtener la nueva posición
-    $nuevaPosicion = $request->input('posicion', $player->posicion);
-
     $request->validate([
-        'posicion' => 'nullable|in:Portero,Defensa,Centrocampista,Delantero',
-        'perfil' => 'nullable|in:Diestro,Zurdo',
-        'minutos_jugados' => 'nullable|integer|min:0',
-        'goles' => 'nullable|integer|min:0',
-        'goles_encajados' => 'nullable|integer|min:0',
-        'asistencias' => 'nullable|integer|min:0',
-        'titular' => 'nullable|integer|min:0',
-        'suplente' => 'nullable|integer|min:0',
-        'valoracion' => 'nullable|numeric|min:0|max:10',
+        'posicion' => 'required|in:Portero,Defensa,Centrocampista,Delantero',
+        'perfil' => 'required|in:Diestro,Zurdo',
     ]);
 
-    // Filtrar datos para evitar null
-    $data = array_filter($request->all(), function ($value) {
-        return $value !== null;
-    });
+    $player->update([
+        'posicion' => $request->posicion,
+        'perfil' => $request->perfil,
+    ]);
 
-    // 📌 Si es portero, borrar goles y actualizar goles_encajados
-    if ($nuevaPosicion == 'Portero') {
-        unset($data['goles']); 
-    } else {
-        unset($data['goles_encajados']);
-    }
-
-    // Log para verificar qué datos se están guardando
-    Log::info("Datos que se guardarán para jugador $id:", $data);
-
-    // Actualizar jugador
-    $player->update($data);
-
-    return redirect()->back()->with('success', 'Jugador actualizado con éxito.');
+    return redirect()->back()->with('success', 'Posición y perfil actualizados con éxito.');
 }
-
-    
-
 
     public function addPlayerToTeam(Request $request)
 {
@@ -176,10 +151,24 @@ public function destroyPlayer(Request $request, $id)
             'actuacion_equipo' => 'nullable|numeric|min:0|max:10',
         ]);
     
-        $match->update($request->all());
+        $data = $request->all();
+    
+        // 📌 Calcular resultado automáticamente si no se ha enviado manualmente
+        if (!isset($data['resultado']) || empty($data['resultado'])) {
+            if ($data['goles_a_favor'] > $data['goles_en_contra']) {
+                $data['resultado'] = "Victoria";
+            } elseif ($data['goles_a_favor'] < $data['goles_en_contra']) {
+                $data['resultado'] = "Derrota";
+            } else {
+                $data['resultado'] = "Empate";
+            }
+        }
+    
+        $match->update($data);
     
         return redirect()->back()->with('success', 'Partido actualizado con éxito.');
     }
+    
     
     
 
@@ -196,29 +185,35 @@ public function destroyPlayer(Request $request, $id)
     }
 
     public function show($id)
-    {
-        $team = Team::where('id', $id)
-            ->where('user_id', Auth::id())
-            ->with('players', 'matches')
-            ->firstOrFail();
-    
-        // Obtener jugadores del usuario autenticado que NO estén en el equipo actual
-        $allPlayers = Player::whereHas('teams', function ($query) {
-            $query->where('teams.user_id', Auth::id());
-        })->whereDoesntHave('teams', function ($query) use ($team) {
-            $query->where('teams.id', $team->id);
-        })->get();
-    
-        // Obtener jugadores convocados por partido
-        $convocados = [];
-        if ($team->matches->isNotEmpty()) {
-            foreach ($team->matches as $match) {
-                $convocados[$match->id] = $match->players->pluck('id')->toArray(); // Usa la relación ya cargada
-            }
+{
+    $team = Team::where('id', $id)
+        ->where('user_id', Auth::id())
+        ->with(['players', 'matches' => function ($query) {
+            $query->orderBy('fecha_partido', 'desc'); // Ordenar partidos por fecha (más reciente primero)
+        }])
+        ->firstOrFail();
+
+    // Obtener jugadores del usuario autenticado que NO estén en el equipo actual
+    $allPlayers = Player::whereHas('teams', function ($query) {
+        $query->where('teams.user_id', Auth::id());
+    })->whereDoesntHave('teams', function ($query) use ($team) {
+        $query->where('teams.id', $team->id);
+    })->get();
+
+    // Obtener jugadores convocados por partido
+    $convocados = [];
+    if ($team->matches->isNotEmpty()) {
+        foreach ($team->matches as $match) {
+            $convocados[$match->id] = $match->players->pluck('id')->toArray(); // Usa la relación ya cargada
         }
-    
-        return view('dashboard.team_show', compact('team', 'allPlayers', 'convocados'));
     }
+
+    $stats = $this->getTeamStats($id);
+    $latestMatch = $team->matches->first(); // Ahora realmente obtiene el partido más reciente
+
+    return view('dashboard.team_show', compact('team', 'allPlayers', 'convocados', 'stats', 'latestMatch'));
+}
+
     
     
     
@@ -231,25 +226,46 @@ public function ratePlayers($matchId) {
 
 public function saveRatings(Request $request, $matchId) 
 {
-    Log::info('Iniciando guardado de valoraciones', ['match_id' => $matchId, 'ratings' => $request->ratings]);
+    Log::info('Guardando valoraciones', ['match_id' => $matchId, 'players' => $request->players]);
 
-    $match = Matches::whereHas('team', function ($query) {
-        $query->where('user_id', Auth::id());
-    })->findOrFail($matchId);
-    
-    if ($request->has('ratings')) {
-        foreach ($request->ratings as $playerId => $rating) {
-            Log::info('Procesando jugador', ['player_id' => $playerId, 'rating' => $rating]);
-            
-            if (!is_null($rating)) {
-                $match->players()->syncWithoutDetaching([$playerId => ['valoracion' => $rating]]);
-                Log::info('Valoración actualizada', ['player_id' => $playerId, 'valoracion' => $rating]);
-            } else {
-                Log::warning('Valor nulo recibido para jugador', ['player_id' => $playerId]);
-            }
+    $match = Matches::findOrFail($matchId);
+
+    if ($request->has('players')) {
+        foreach ($request->players as $playerId => $data) {
+            $player = Player::findOrFail($playerId);
+
+            // Determinar si es titular o suplente
+            $esTitular = isset($data['titular']) ? 1 : 0;
+            $esSuplente = $esTitular ? 0 : 1;
+
+            // Calcular tarjeta roja si hay 2 amarillas
+            $tarjetasRojas = ($data['tarjetas_amarillas'] ?? 0) == 2 ? 1 : ($data['tarjetas_rojas'] ?? 0);
+
+            // **Guardar estadísticas en `match_player_stats`**
+            MatchPlayerStat::updateOrCreate(
+                [
+                    'match_id' => $matchId,
+                    'player_id' => $playerId
+                ],
+                [
+                    'minutos_jugados' => $data['minutos_jugados'] ?? 0,
+                    'goles' => $data['goles'] ?? 0,
+                    'asistencias' => $data['asistencias'] ?? 0,
+                    'tarjetas_amarillas' => $data['tarjetas_amarillas'] ?? 0,
+                    'tarjetas_rojas' => $tarjetasRojas,
+                    'valoracion' => $data['valoracion'] ?? null
+                ]
+            );
+
+            // **Actualizar estadísticas acumuladas en la tabla `players`**
+            $player->increment('minutos_jugados', $data['minutos_jugados'] ?? 0);
+            $player->increment('goles', $data['goles'] ?? 0);
+            $player->increment('asistencias', $data['asistencias'] ?? 0);
+            $player->increment('tarjetas_amarillas', $data['tarjetas_amarillas'] ?? 0);
+            $player->increment('tarjetas_rojas', $tarjetasRojas);
+            $player->increment('titular', $esTitular);
+            $player->increment('suplente', $esSuplente);
         }
-    } else {
-        Log::error('No se recibieron valoraciones en la solicitud');
     }
 
     return redirect()->route('teams.show', $match->team_id)->with('success', 'Valoraciones guardadas correctamente.');
@@ -365,6 +381,38 @@ public function getAlineacion($matchId)
         Log::error("Error al obtener alineación: " . $e->getMessage());
         return response()->json(['success' => false, 'error' => $e->getMessage()], 500);
     }
+}
+
+//ESTADISTICAS DE LA PLANTILLA
+public function getTeamStats($teamId)
+{
+    $team = Team::with('matches')->findOrFail($teamId);
+
+    // Calcular estadísticas
+    $victorias = $team->matches->where('resultado', 'Victoria')->count();
+    $empates = $team->matches->where('resultado', 'Empate')->count();
+    $derrotas = $team->matches->where('resultado', 'Derrota')->count();
+    
+    $puntos = ($victorias * 3) + ($empates * 1);
+    $golesFavor = $team->matches->sum('goles_a_favor');
+    $golesContra = $team->matches->sum('goles_en_contra');
+
+    // ⚠️ Asegúrate de añadir las tarjetas en la base de datos más adelante
+    $tarjetasAmarillas = $team->players->sum('tarjetas_amarillas');
+    $tarjetasRojas = $team->players->sum('tarjetas_rojas');
+    $valoracionMedia = $team->matches->avg('actuacion_equipo');
+
+    return [
+        'victorias' => $victorias,
+        'empates' => $empates,
+        'derrotas' => $derrotas,
+        'puntos' => $puntos,
+        'goles_favor' => $golesFavor,
+        'goles_contra' => $golesContra,
+        'tarjetas_amarillas' => $tarjetasAmarillas,
+        'tarjetas_rojas' => $tarjetasRojas,
+        'valoracion_media' => round($valoracionMedia, 2)
+    ];
 }
 
 
