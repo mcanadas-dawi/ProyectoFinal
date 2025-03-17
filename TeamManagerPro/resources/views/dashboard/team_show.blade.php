@@ -606,7 +606,6 @@ function cancelEditMatch(id) {
     .then(response => response.json())
     .then(data => {
         if (data.success) {
-            alert('Convocatoria guardada correctamente');
             location.reload();  // 🔄 Recargar la página después de guardar
         } else {
             alert('Error al guardar la convocatoria.');

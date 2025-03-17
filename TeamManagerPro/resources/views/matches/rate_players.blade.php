@@ -24,6 +24,8 @@
                     @foreach ($match->players as $player)
                         @php
                             $stats = $player->matchStats($match->id);
+                            $amarillas = $stats->tarjetas_amarillas ?? 0;
+                            $rojas = $stats->tarjetas_rojas ?? 0;
                         @endphp
                         <tr class="border">
                             <td class="p-2">{{ $player->nombre }} {{ $player->apellido }} (Dorsal: {{ $player->dorsal }})</td>
@@ -60,7 +62,7 @@
                             <td class="p-2 text-center">
                                 <input type="number" name="players[{{ $player->id }}][tarjetas_amarillas]" min="0" max="2"
                                     class="w-16 p-2 border rounded text-center tarjetas-amarillas" 
-                                    value="{{ $stats->tarjetas_amarillas ?? 0 }}" 
+                                    value="{{ $amarillas }}" 
                                     data-player-id="{{ $player->id }}">
                             </td>
 
@@ -68,9 +70,9 @@
                             <td class="p-2 text-center">
                                 <input type="number" name="players[{{ $player->id }}][tarjetas_rojas]" min="0" max="1"
                                     class="w-16 p-2 border rounded text-center tarjetas-rojas" 
-                                    value="{{ $stats->tarjetas_rojas ?? 0 }}" 
+                                    value="{{ $rojas }}" 
                                     data-player-id="{{ $player->id }}" 
-                                    {{ ($stats->tarjetas_amarillas ?? 0) == 2 ? 'readonly' : '' }}>
+                                    {{ ($amarillas == 2) ? 'readonly' : '' }}>
                             </td>
 
                             <!-- Valoración -->
@@ -95,4 +97,24 @@
         </div>
     </form>
 </div>
+
+<!-- JavaScript para actualizar automáticamente la tarjeta roja según las amarillas -->
+<script>
+    let tarjetasAmarillasInputs = document.querySelectorAll(".tarjetas-amarillas");
+
+    tarjetasAmarillasInputs.forEach(input => {
+        input.addEventListener("change", function () {
+            let playerId = this.dataset.playerId;
+            let tarjetasRojaInput = document.querySelector(`.tarjetas-rojas[data-player-id='${playerId}']`);
+            
+            if (this.value == 2) {
+                tarjetasRojaInput.value = 1;
+                tarjetasRojaInput.setAttribute("readonly", "readonly"); // Bloquear edición
+            } else {
+                tarjetasRojaInput.removeAttribute("readonly"); // Permitir edición
+                tarjetasRojaInput.value = 0; // Resetear a 0 si no tiene 2 amarillas
+            }
+        });
+    });
+</script>
 @endsection
