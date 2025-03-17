@@ -83,6 +83,9 @@
             </thead>
             <tbody>
                 @foreach ($team->players as $player)
+                @php
+                    $stats = $player->teamStats($team->id);
+                @endphp
                 <tr class="border-b bg-blue-100" id="player-row-{{ $player->id }}">
                     <td class="p-2">{{ $player->nombre }}</td>
                     <td class="p-2">{{ $player->apellido }}</td>
@@ -111,14 +114,14 @@
                         </select>
                     </td>
 
-                    <td class="p-2">{{ $player->minutos_jugados }}</td>
-                    <td class="p-2">{{ $player->goles }}</td>
-                    <td class="p-2">{{ $player->asistencias }}</td>
-                    <td class="p-2">{{ $player->titular }}</td>
-                    <td class="p-2">{{ $player->suplente }}</td>
-                    <td class="p-2 font-bold text-blue-600">{{ number_format($player->valoracion, 2) }}</td>
-                    <td class="p-2 text-yellow-600 font-bold">{{ $player->tarjetas_amarillas }}</td>
-                    <td class="p-2 text-red-600 font-bold">{{ $player->tarjetas_rojas }}</td>
+                    <td class="p-2">{{ $stats->minutos_jugados ?? 0}}</td>
+                    <td class="p-2">{{ $stats->goles ?? 0}}</td>
+                    <td class="p-2">{{ $stats->asistencias ?? 0 }}</td>
+                    <td class="p-2">{{ $stats->titular ?? 0 }}</td>
+                    <td class="p-2">{{ $stats->suplente ?? 0 }}</td>
+                    <td class="p-2 font-bold text-blue-600">{{ number_format($stats->valoracion ?? 0, 2 ) }}</td>
+                    <td class="p-2 text-yellow-600 font-bold">{{ $stats->tarjetas_amarillas ?? 0 }}</td>
+                    <td class="p-2 text-red-600 font-bold">{{ $stats->tarjetas_rojas ?? 0 }}</td>
                     
 
 
@@ -459,10 +462,12 @@
      data-convocados='@json($convocados)'></div>
 
 <script>
-    //EDITAR JUGADOR
-    function editPlayer(id) {
-    document.getElementById('edit-btn-' + id).classList.add('hidden');
-    document.getElementById('save-btn-' + id).classList.remove('hidden');
+    // EDITAR JUGADOR
+function editPlayer(id) {
+    document.getElementById('edit-btn-' + id).classList.add('hidden'); // Ocultar "Editar"
+    document.getElementById('save-btn-' + id).classList.remove('hidden'); // Mostrar "Guardar"
+    document.getElementById('cancel-btn-' + id).classList.remove('hidden'); // Mostrar "Cancelar"
+    document.getElementById('delete-form-' + id).classList.add('hidden'); // Ocultar "Eliminar"
 
     document.getElementById('pos-' + id).classList.add('hidden');
     document.getElementById('edit-pos-' + id).classList.remove('hidden');
@@ -471,16 +476,20 @@
     document.getElementById('edit-perfil-' + id).classList.remove('hidden');
 }
 
-//CANCELAR EDICION JUGADOR
+// CANCELAR EDICIÓN JUGADOR
 function cancelEditPlayer(id) {
-    document.getElementById('edit-btn-' + id).classList.remove('hidden');
-    document.getElementById('save-btn-' + id).classList.add('hidden');
-    document.getElementById('cancel-btn-' + id).classList.add('hidden'); // Ocultar botón Cancelar
-    document.getElementById('delete-form-' + id).classList.remove('hidden'); // Mostrar botón Eliminar
+    document.getElementById('edit-btn-' + id).classList.remove('hidden'); // Mostrar "Editar"
+    document.getElementById('save-btn-' + id).classList.add('hidden'); // Ocultar "Guardar"
+    document.getElementById('cancel-btn-' + id).classList.add('hidden'); // Ocultar "Cancelar"
+    document.getElementById('delete-form-' + id).classList.remove('hidden'); // Mostrar "Eliminar"
 
     document.getElementById('pos-' + id).classList.remove('hidden');
     document.getElementById('edit-pos-' + id).classList.add('hidden');
+
+    document.getElementById('perfil-' + id).classList.remove('hidden');
+    document.getElementById('edit-perfil-' + id).classList.add('hidden');
 }
+
 
 
 function savePlayer(id) {

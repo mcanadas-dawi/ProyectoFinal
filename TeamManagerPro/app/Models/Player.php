@@ -4,6 +4,7 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
+use App\Models\PlayerTeamStats;
 
 class Player extends Model
 {
@@ -39,6 +40,13 @@ public function matchStats($matchId)
 {
     return $this->hasOne(MatchPlayerStat::class)
                 ->where('match_id', $matchId)
+                ->first();
+}
+
+public function teamStats($teamId)
+{
+    return $this->hasOne(PlayerTeamStats::class)
+                ->where('team_id', $teamId)
                 ->first();
 }
 

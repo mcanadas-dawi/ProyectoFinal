@@ -30,9 +30,9 @@
 
                             <!-- Checkbox para Titular -->
                             <td class="p-2 text-center">
-                                <input type="checkbox" name="players[{{ $player->id }}][titular]" value="1"
-                                    class="w-5 h-5" 
-                                    {{ $stats && $stats->titular ? 'checked' : '' }}>
+                                <input type="checkbox" name="players[{{ $player->id }}][titular]" 
+                                    value="1" 
+                                    @if($stats && $stats->titular) checked @endif>
                             </td>
 
                             <!-- Minutos Jugados -->

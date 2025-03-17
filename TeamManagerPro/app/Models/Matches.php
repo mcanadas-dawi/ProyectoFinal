@@ -21,12 +21,16 @@ class Matches extends Model
 
     public function players() {
         return $this->belongsToMany(Player::class, 'player_match', 'match_id', 'player_id')
-                    ->withPivot('valoracion'); 
+                    ->withPivot('convocado', 'valoracion') // 📌 Agregar 'convocado' al pivot
+                    ->withTimestamps();
     }
-
+    
     public function convocados()
     {
-    return $this->belongsToMany(Player::class, 'player_match')->wherePivot('convocado', true);
+        return $this->belongsToMany(Player::class, 'player_match', 'match_id', 'player_id')
+                    ->wherePivot('convocado', true)
+                    ->withTimestamps();
     }
+    
     
 }
