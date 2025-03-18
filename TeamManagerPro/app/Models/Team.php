@@ -25,4 +25,14 @@ class Team extends Model
     {
         return $this->hasMany(Matches::class);
     }
+    
+    public function partidosLiga()
+    {
+    return $this->hasMany(Matches::class)->where('tipo', 'liga');
+    }
+
+    public function partidosAmistosos()
+    {
+        return $this->hasMany(Matches::class)->where('tipo', 'amistoso');
+    }
 }

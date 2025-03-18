@@ -2,6 +2,9 @@
 
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\DashboardController;
+use App\Http\Controllers\MatchesController;
+use App\Http\Controllers\RivalesLigaController;
+
 
 Route::get('/', function () {
     return view('welcome');
@@ -29,6 +32,10 @@ Route::middleware(['auth', 'verified'])->group(function () {
     Route::post('/matches/{match}/convocatoria', [DashboardController::class, 'updateConvocatoria'])->name('matches.updateConvocatoria');
     Route::post('/matches/{match}/save-alineacion', [DashboardController::class, 'saveAlineacion'])->name('matches.saveAlineacion');
     Route::get('/matches/{match}/get-alineacion', [DashboardController::class, 'getAlineacion'])->name('matches.getAlineacion');
+    Route::get('/api/verify-jornada/{teamId}/{numeroJornada}', [DashboardController::class, 'verifyJornada']);
+    Route::resource('matches', MatchesController::class);
+    Route::resource('rivales_liga', RivalesLigaController::class)->only(['store']);
+    Route::get('/teams/{team}', [MatchesController::class, 'show'])->name('teams.show');
 
 
 });
