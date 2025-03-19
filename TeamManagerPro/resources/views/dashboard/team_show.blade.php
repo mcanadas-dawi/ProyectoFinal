@@ -9,10 +9,6 @@
     <form action="{{ route('teams.destroy', $team->id) }}" method="POST" onsubmit="return confirm('¿Estás seguro de que deseas eliminar este equipo? Esta acción no se puede deshacer.')">
         @csrf
         @method('DELETE')
-        <!-- 📌 Botón para añadir competición -->
-        <button onclick="toggleForm('competicion-form')" class="bg-blue-600 text-white px-4 py-2 rounded mb-4">
-            Añadir Competición
-        </button>
         <button type="submit" class="bg-red-500 text-white px-4 py-2 rounded-lg hover:bg-red-700">
             Eliminar Equipo
         </button>
@@ -182,9 +178,8 @@
     <table class="w-full text-center border-collapse bg-white rounded-lg">
     <thead class="bg-green-300 text-gray-900">
     <tr class="border-b">
-        <th class="p-2">Jornada</th>
-        <th class="p-2">Equipo Rival</th>
         <th class="p-2">Fecha</th>
+        <th class="p-2">Equipo Rival</th>
         <th class="p-2">Goles a Favor</th>
         <th class="p-2">Goles en Contra</th>
         <th class="p-2">Resultado</th>
@@ -205,14 +200,14 @@
                 default => 'bg-green-100', // Color neutro si no hay resultado
             };
         @endphp
+        
         <tr id="match-row-{{ $match->id }}" class="border-b {{ $colorClase }}">
-            <td class="p-2 text-center">{{ $match->numero_jornada }}</td>
-            <td class="p-2 text-center">{{ $match->equipo_rival }}</td>
-            
-            <td class="p-2 text-center">
+        <td class="p-2 text-center">
                 <span id="fecha-{{ $match->id }}">{{ $match->fecha_partido }}</span>
                 <input type="date" name="fecha_partido" class="hidden w-16 p-1 border rounded" id="edit-fecha-{{ $match->id }}" value="{{ $match->fecha_partido }}">
             </td>
+            <td class="p-2 text-center">{{ $match->equipo_rival }}</td>
+            
 
             <td class="p-2 text-center">
                 <span id="goles-favor-{{ $match->id }}">{{ $match->goles_a_favor }}</span>
@@ -242,12 +237,12 @@
             </td>
 
             <td class="p-2 text-center">
-                <button onclick="openConvocatoriaModal('{{ $match->id }}')" class="bg-blue-500 text-white px-3 py-1 rounded">
+                <button onclick="openModal('convocatoriaModal')" class="bg-blue-500 text-white px-3 py-1 rounded">
                     Convocatoria
                 </button>
             </td>
             <td class="p-2 text-center">
-                <button onclick="openAlineador('{{ $match->id }}')" class="bg-indigo-500 text-white px-3 py-1 rounded">
+                <button onclick="openModal('alineadorModal')" class="bg-indigo-500 text-white px-3 py-1 rounded">
                     Alineador
                 </button>
             </td>
@@ -418,7 +413,7 @@
             <input type="date" name="fecha_partido" class="w-full border p-2 rounded mb-2" required>
 
             <div class="flex justify-between mt-4">
-                <button type="submit" class="bg-blue-500 text-white px-4 py-2 rounded">Guardar</button>
+                <button type="submit" class="bg-green-500 text-white px-4 py-2 rounded">Guardar</button>
                 <button type="button" onclick="closeModal('ligaModal')" class="bg-gray-500 text-white px-4 py-2 rounded">Cancelar</button>
             </div>
         </form>
@@ -492,7 +487,7 @@
         <!-- Botones de acción (Siempre visibles) -->
         <div class="mt-4 flex justify-between bg-white p-4 shadow-md">
             <button onclick="saveAlineacion()" class="bg-green-500 text-white px-4 py-2 rounded-lg">Guardar Alineación</button>
-            <button onclick="closeAlineador()" class="bg-red-500 text-white px-4 py-2 rounded-lg">Cerrar</button>
+            <button onclick="closeModal('alineadorModal')" class="bg-red-500 text-white px-4 py-2 rounded-lg">Cerrar</button>
         </div>
     </div>
 </div>
@@ -528,7 +523,7 @@
                 <button type="button" onclick="saveConvocatoria()" class="bg-green-500 text-white px-4 py-2 rounded-lg">
                     Guardar Convocatoria
                 </button>
-                <button type="button" onclick="closeConvocatoriaModal()" class="bg-gray-500 text-white px-4 py-2 rounded-lg">
+                <button type="button" onclick="closeModal('convocatoriaModal')" class="bg-gray-500 text-white px-4 py-2 rounded-lg">
                     Cancelar
                 </button>
             </div>

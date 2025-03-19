@@ -12,7 +12,7 @@
         @foreach ($teams as $team)
             <div class="bg-white shadow-lg rounded-lg p-6 mb-6">
                 <div class="flex justify-between items-center">
-                    <h2 class="text-2xl font-semibold text-gray-700">
+                    <h2 class="text-3xl font-semibold text-gray-700">
                         <a href="{{ route('teams.show', $team->id) }}" class="text-green-600 hover:underline">
                             {{ $team->nombre }} ({{ strtoupper($team->modalidad) }})
                         </a>
@@ -32,7 +32,7 @@
                         <button onclick="toggleSection('player-form-{{ $team->id }}')" 
                                 class="bg-blue-600 text-white px-4 py-2 rounded-lg">Añadir Jugador</button>
                         <button onclick="toggleSection('competicion-form-{{ $team->id }}')" 
-                                class="bg-purple-600 text-white px-4 py-2 rounded-lg">Añadir Calendario Liga</button>
+                                class="bg-purple-600 text-white px-4 py-2 rounded-lg">Añadir Partido de Liga</button>
                         <button onclick="toggleSection('amistoso-form-{{ $team->id }}')" 
                                 class="bg-yellow-500 text-white px-4 py-2 rounded-lg">Añadir Partido Amistoso</button>
                     </div>
@@ -68,7 +68,7 @@
 
                     <!-- Sección oculta para agregar competición -->
                     <div id="competicion-form-{{ $team->id }}" class="hidden mt-4 bg-gray-100 p-4 rounded-lg">
-                        <h3 class="text-lg font-semibold text-gray-800">Añadir Calendario Liga</h3>
+                        <h3 class="text-lg font-semibold text-gray-800">Añadir Partido de Liga</h3>
                         <form action="{{ route('rivales_liga.store') }}" method="POST">
                             @csrf
                             <input type="hidden" name="team_id" value="{{ $team->id }}">

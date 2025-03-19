@@ -216,4 +216,13 @@ public function getAlineacion($matchId)
         return response()->json(['success' => false, 'error' => $e->getMessage()], 500);
     }
 }
+
+public function ratePlayers($matchId)
+{
+    $match = Matches::with('players')->findOrFail($matchId);
+
+    return view('matches.rate_players', compact('match'));
+}
+
+
 }
