@@ -55,7 +55,7 @@ class MatchesController extends Controller
         }
         $rivales = \App\Models\RivalLiga::all();
     
-        return view('dashboard.team_show', compact('team', 'partidosLiga', 'partidosAmistosos', 'convocados'.'rivales'));
+        return view('dashboard.team_show', compact('team', 'partidosLiga', 'partidosAmistosos', 'convocados', 'rivales'));
     }
     
 
@@ -222,6 +222,28 @@ public function ratePlayers($matchId)
     $match = Matches::with('players')->findOrFail($matchId);
 
     return view('matches.rate_players', compact('match'));
+}
+
+public function update(Request $request, $id)
+{
+    $request->validate([
+        'fecha_partido' => 'required|date',
+        'goles_a_favor' => 'nullable|integer|min:0',
+        'goles_en_contra' => 'nullable|integer|min:0',
+        'resultado' => 'nullable|string|in:Victoria,Empate,Derrota',
+        'actuacion_equipo' => 'nullable|numeric|min:0|max:10',
+    ]);
+
+    $match = Matches::findOrFail($id);
+    $match->update([
+        'fecha_partido' => $request->fecha_partido,
+        'goles_a_favor' => $request->goles_a_favor ?? 0,
+        'goles_en_contra' => $request->goles_en_contra ?? 0,
+        'resultado' => $request->resultado,
+        'actuacion_equipo' => $request->actuacion_equipo ?? null,
+    ]);
+
+    return back()->with('success', 'Partido actualizado correctamente.');
 }
 
 
