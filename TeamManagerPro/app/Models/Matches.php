@@ -14,6 +14,8 @@ class Matches extends Model
         'resultado', 'goles_a_favor', 'goles_en_contra', 'actuacion_equipo'
     ];
 
+    // 📌 RELACIONES
+
     public function team()
     {
         return $this->belongsTo(Team::class);
@@ -24,16 +26,35 @@ class Matches extends Model
         return $this->belongsTo(RivalLiga::class, 'rival_liga_id');
     }
 
-    public function players() {
+    public function players()
+    {
         return $this->belongsToMany(Player::class, 'player_match', 'match_id', 'player_id')
                     ->withPivot('convocado', 'valoracion')
                     ->withTimestamps();
     }
 
-    public function convocados()
+    // 📌 Método Scope para convocados
+    public function scopeConvocados($query)
     {
-        return $this->belongsToMany(Player::class, 'player_match', 'match_id', 'player_id')
-                    ->wherePivot('convocado', true)
-                    ->withTimestamps();
+        return $query->whereHas('players', function ($q) {
+            $q->wherePivot('convocado', true);
+        });
+    }
+
+    // 📌 MUTATORS Y ACCESSORS
+
+    public function getResultadoAttribute($value)
+    {
+        return $value ?? 'Pendiente';
+    }
+
+    public function getGolesAFavorAttribute($value)
+    {
+        return $value ?? 0;
+    }
+
+    public function getGolesEnContraAttribute($value)
+    {
+        return $value ?? 0;
     }
 }

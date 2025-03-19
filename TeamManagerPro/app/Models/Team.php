@@ -1,5 +1,4 @@
 <?php
-
 namespace App\Models;
 
 use Illuminate\Database\Eloquent\Factories\HasFactory;
@@ -10,6 +9,8 @@ class Team extends Model
     use HasFactory;
 
     protected $fillable = ['nombre', 'modalidad', 'user_id'];
+
+    // 📌 RELACIONES
 
     public function user()
     {
@@ -25,14 +26,34 @@ class Team extends Model
     {
         return $this->hasMany(Matches::class);
     }
-    
-    public function partidosLiga()
+
+    public function rivalesLiga()
     {
-    return $this->hasMany(Matches::class)->where('tipo', 'liga');
+        return $this->hasMany(RivalLiga::class);
     }
 
-    public function partidosAmistosos()
+    // 📌 SCOPES
+
+    public function scopePartidosLiga($query)
     {
-        return $this->hasMany(Matches::class)->where('tipo', 'amistoso');
+        return $query->whereHas('matches', function ($q) {
+            $q->where('tipo', 'liga');
+        });
+    }
+
+    public function scopePartidosAmistosos($query)
+    {
+        return $query->whereHas('matches', function ($q) {
+            $q->where('tipo', 'amistoso');
+        });
+    }
+
+    // 📌 MUTATORS Y ACCESSORS
+
+    public function getNombreAttribute($value)
+    {
+        return ucfirst($value); // Primera letra en mayúscula
     }
 }
+
+

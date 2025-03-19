@@ -9,7 +9,7 @@ class PlayerTeamStats extends Model
 {
     use HasFactory;
 
-    protected $table = 'player_team_stats'; // Nombre correcto de la tabla
+    protected $table = 'player_team_stats';
 
     protected $fillable = [
         'player_id',
@@ -24,19 +24,59 @@ class PlayerTeamStats extends Model
         'valoracion'
     ];
 
-    /**
-     * Relación con el modelo Player.
-     */
+    protected $casts = [
+        'minutos_jugados' => 'integer',
+        'goles' => 'integer',
+        'asistencias' => 'integer',
+        'tarjetas_amarillas' => 'integer',
+        'tarjetas_rojas' => 'integer',
+        'titular' => 'integer',
+        'suplente' => 'integer',
+        'valoracion' => 'decimal:2',
+    ];
+
+    // 📌 RELACIONES
+
     public function player()
     {
         return $this->belongsTo(Player::class);
     }
 
-    /**
-     * Relación con el modelo Team.
-     */
     public function team()
     {
         return $this->belongsTo(Team::class);
     }
+
+    // 📌 MUTATORS Y ACCESSORS
+
+    public function getMinutosJugadosAttribute($value)
+    {
+        return $value ?? 0;
+    }
+
+    public function getGolesAttribute($value)
+    {
+        return $value ?? 0;
+    }
+
+    public function getAsistenciasAttribute($value)
+    {
+        return $value ?? 0;
+    }
+
+    public function getTarjetasAmarillasAttribute($value)
+    {
+        return min($value ?? 0, 2); // Nunca más de 2 amarillas
+    }
+
+    public function getTarjetasRojasAttribute($value)
+    {
+        return min($value ?? 0, 1); // Nunca más de 1 roja
+    }
+
+    public function getValoracionAttribute($value)
+    {
+        return $value ?? 0.0;
+    }
 }
+

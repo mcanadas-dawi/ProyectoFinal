@@ -1,7 +1,11 @@
 @extends('layouts.dashboard')
 
 @section('content')
-
+@if(session('success'))
+    <div class="bg-green-500 text-white p-3 rounded mb-4 text-center">
+        {{ session('success') }}
+    </div>
+@endif
 <div class="flex justify-between items-center mb-6">
     <h1 class="text-3xl font-bold text-gray-800">
         {{ $team->nombre }} ({{ strtoupper($team->modalidad) }})
@@ -166,7 +170,7 @@
         </table>
     </div>
 
-<!-- Sección de Partidos -->
+<!-- Sección de Partidos Amistosos -->
 <div class="bg-green-200 shadow-lg rounded-lg p-6 mb-6">
     <div class="flex items-center justify-center mb-4">
         <h2 class="text-2xl font-semibold text-gray-900 flex-grow text-left">Partidos Amistosos</h2>
@@ -190,7 +194,8 @@
     </tr>
 </thead>
 <tbody class="text-gray-800">
-    @foreach ($team->matches as $match)
+@if(isset($partidosAmistosos) && count($partidosAmistosos) > 0)
+    @foreach ($partidosAmistosos as $match)
         @php
             // Determinar el color de la fila según el resultado
             $colorClase = match ($match->resultado) {
@@ -264,6 +269,11 @@
 
         </tr>
     @endforeach
+    @else
+    <tr>
+        <td colspan="10" class="text-center text-gray-600 p-2">No hay partidos amistosos registrados.</td>
+    </tr>
+    @endif
 </tbody>
 </table>
 </div>
