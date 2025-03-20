@@ -9,16 +9,16 @@ use App\Http\Controllers\ConvocatoriasController;
 use App\Http\Controllers\AlineacionesController;
 use App\Http\Controllers\MatchPlayerStatController;
 use App\Http\Controllers\RivalesLigaController;
+use App\Http\Controllers\ProfileController;
 
 Route::get('/', function () {
     return view('welcome');
 });
 
-Route::get('/profile', function () {
-    return view('profile.edit');
-})->name('profile.show');
-
 Route::middleware(['auth', 'verified'])->group(function () {
+    Route::get('/profile', [ProfileController::class, 'edit'])->name('profile.edit');
+    Route::patch('/profile', [ProfileController::class, 'update'])->name('profile.update');
+    Route::delete('/profile', [ProfileController::class, 'destroy'])->name('profile.destroy');
     
     // 📌 Dashboard
     Route::get('/dashboard', [TeamsController::class, 'index'])->name('dashboard');
