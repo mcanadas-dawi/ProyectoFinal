@@ -75,9 +75,12 @@
         <button onclick="openModal('addPlayerModal')" class="bg-blue-600 text-white px-4 py-2 rounded-lg hover:bg-blue-700">
             Añadir Nuevo Jugador
         </button>
+        @include('dashboard.player_form')
+
         <button onclick="openModal('existingPlayerModal')" class="bg-purple-600 text-white px-4 py-2 rounded-lg hover:bg-purple-700 ml-4">
             Añadir Jugador de Otra Plantilla
         </button>
+        @include('dashboard.existingPlayer_form')
 
     </div>
         <table class="w-full text-center border-collapse">
@@ -177,6 +180,7 @@
         <button onclick="openModal('amistosoModal')" class="bg-green-600 text-white px-4 py-2 rounded-lg hover:bg-green-700">
             Añadir Partido Amistoso
         </button>
+        @include('dashboard.friendlyMatch_form')
     </div>
 
     <table class="w-full text-center border-collapse bg-white rounded-lg">
@@ -214,26 +218,32 @@
             <td class="p-2 text-center">{{ $match->equipo_rival }}</td>
             
 
-            <td class="p-2 text-center">
-                <span id="goles-favor-{{ $match->id }}">{{ $match->goles_a_favor }}</span>
-                <input type="number" name="goles_a_favor" class="hidden w-16 p-1 border rounded" id="edit-goles-favor-{{ $match->id }}" value="{{ $match->goles_a_favor }}">
-            </td>
+        <!-- Goles a Favor -->
+        <td class="p-2 text-center">
+            <span id="goles-favor-{{ $match->id }}">{{ $match->goles_a_favor }}</span>
+            <input type="number" name="goles_a_favor" class="hidden w-16 p-1 border rounded" 
+                id="edit-goles-favor-{{ $match->id }}" 
+                value="{{ $match->goles_a_favor }}"
+                onchange="updateResultado('{{ $match->id }}')">
+        </td>
 
-            <td class="p-2 text-center">
-                <span id="goles-contra-{{ $match->id }}">{{ $match->goles_en_contra }}</span>
-                <input type="number" name="goles_en_contra" class="hidden w-16 p-1 border rounded" id="edit-goles-contra-{{ $match->id }}" value="{{ $match->goles_en_contra }}">
-            </td>
+        <!-- Goles en Contra -->
+        <td class="p-2 text-center">
+            <span id="goles-contra-{{ $match->id }}">{{ $match->goles_en_contra }}</span>
+            <input type="number" name="goles_en_contra" class="hidden w-16 p-1 border rounded" 
+                id="edit-goles-contra-{{ $match->id }}" 
+                value="{{ $match->goles_en_contra }}"
+                onchange="updateResultado('{{ $match->id }}')">
+        </td>
 
-            <!-- Resultado -->
-            <td class="p-2 text-center">
-                <span id="resultado-{{ $match->id }}">{{ $match->resultado ?? 'N/A' }}</span>
-                <select name="resultado" class="hidden w-full p-1 border rounded" id="edit-resultado-{{ $match->id }}">
-                    <option value="" @selected(is_null($match->resultado))>Seleccionar</option>
-                    <option value="Victoria" @selected($match->resultado == 'Victoria')>Victoria</option>
-                    <option value="Empate" @selected($match->resultado == 'Empate')>Empate</option>
-                    <option value="Derrota" @selected($match->resultado == 'Derrota')>Derrota</option>
-                </select>
-            </td>
+        <!-- Resultado (Solo Mostrar) -->
+        <td class="p-2 text-center">
+            <span id="resultado-{{ $match->id }}">{{ $match->resultado }}</span>
+            <input type="hidden" name="resultado" id="edit-resultado-{{ $match->id }}" value="{{ $match->resultado }}">
+        </td>
+
+
+
 
             <!-- Actuación del Equipo -->
             <td class="p-2 text-center">
@@ -259,14 +269,14 @@
                 <button onclick="editMatch('{{ $match->id }}')" id="edit-btn-match-{{ $match->id }}" class="bg-yellow-500 text-white px-3 py-1 rounded">Editar</button>
                 <button onclick="saveMatch('{{ $match->id }}')" id="save-btn-match-{{ $match->id }}" class="hidden bg-green-500 text-white px-3 py-1 rounded">Guardar</button>
                 <button onclick="cancelEditMatch('{{ $match->id }}')" id="cancel-btn-match-{{ $match->id }}" class="hidden bg-gray-500 text-white px-3 py-1 rounded">Cancelar</button>
-
                 <form action="{{ route('matches.destroy', $match->id) }}" method="POST" onsubmit="return confirm('¿Estás seguro de que deseas eliminar este partido? Esta acción no se puede deshacer.')" id="delete-form-match-{{ $match->id }}" class="inline">
                     @csrf
                     @method('DELETE')
                     <button type="submit" class="bg-red-500 text-white px-3 py-1 rounded">Eliminar</button>
                 </form>
+                <!-- Incluir el formulario desde el archivo parcial -->
+ @include('matches.editFriendlyMatch_form', ['match' => $match])
             </td>
-
         </tr>
     @endforeach
     @else
@@ -286,6 +296,7 @@
         <button onclick="openModal('ligaModal')" class="bg-green-600 text-white px-4 py-2 rounded-lg hover:bg-green-700">
             Añadir Partido de Liga
         </button>
+        @include('dashboard.leagueMatch_form')
         </div>
         <table class="w-full text-center border-collapse bg-white rounded-lg">
         <thead class="bg-blue-500 text-gray-900">
@@ -338,66 +349,6 @@
 </div>
 
 
-
-<!-- Modal para Añadir Jugador -->
-<div id="addPlayerModal" class="hidden fixed inset-0 bg-gray-900 bg-opacity-50 flex justify-center items-center">
-    <div class="bg-white rounded-lg p-6 w-1/3">
-        <h2 class="text-xl font-semibold text-gray-800 mb-4">Añadir Jugador</h2>
-        <form action="{{ route('players.store') }}" method="POST">
-            @csrf
-            <input type="hidden" name="team_id" value="{{ $team->id }}">
-
-            <input type="text" name="nombre" placeholder="Nombre" class="w-full p-2 border rounded mb-2" required>
-            <input type="text" name="apellido" placeholder="Apellido" class="w-full p-2 border rounded mb-2" required>
-            <input type="text" name="dni" placeholder="DNI" class="w-full p-2 border rounded mb-2" required>
-            <input type="number" name="dorsal" placeholder="Dorsal" class="w-full p-2 border rounded mb-2" required>
-
-            <label class="block text-gray-700 font-semibold">Fecha de nacimiento</label>
-            <input type="date" name="fecha_nacimiento" class="w-full p-2 border rounded mb-2" required>
-
-            <label class="block text-gray-700 font-semibold">Posición</label>
-            <select name="posicion" required class="w-full p-2 border rounded-lg mb-2">
-                <option value="Portero">Portero</option>
-                <option value="Defensa">Defensa</option>
-                <option value="Centrocampista">Centrocampista</option>
-                <option value="Delantero">Delantero</option>
-            </select>
-
-            <label class="block text-gray-700 font-semibold">Perfil</label>
-            <select name="perfil" required class="w-full p-2 border rounded-lg mb-2">
-                <option value="Diestro">Diestro</option>
-                <option value="Zurdo">Zurdo</option>
-            </select>
-
-            <div class="flex justify-end space-x-2 mt-4">
-                <button type="submit" class="bg-green-500 text-white px-4 py-2 rounded-lg">Guardar</button>
-                <button type="button" onclick="closeModal('addPlayerModal')" class="bg-gray-500 text-white px-4 py-2 rounded-lg">Cancelar</button>
-            </div>
-        </form>
-    </div>
-</div>
-
-<!-- Modal para Añadir Partido Amistoso -->
-<div id="amistosoModal" class="fixed inset-0 bg-gray-900 bg-opacity-50 flex items-center justify-center hidden">
-    <div class="bg-white p-6 rounded-lg shadow-lg w-96">
-        <h2 class="text-xl font-semibold mb-4 text-gray-800">Añadir Partido Amistoso</h2>
-        <form action="{{ route('matches.store') }}" method="POST">
-            @csrf
-            <label class="block text-gray-700">Equipo Rival:</label>
-            <input type="text" name="equipo_rival" class="w-full border p-2 rounded mb-2" required>
-
-            <label class="block text-gray-700">Fecha:</label>
-            <input type="date" name="fecha_partido" class="w-full border p-2 rounded mb-2" required>
-
-            <input type="hidden" name="tipo" value="amistoso">
-
-            <div class="flex justify-between mt-4">
-                <button type="submit" class="bg-green-500 text-white px-4 py-2 rounded">Guardar</button>
-                <button type="button" onclick="closeModal('amistosoModal')" class="bg-gray-500 text-white px-4 py-2 rounded">Cancelar</button>
-            </div>
-        </form>
-    </div>
-</div>
 
 <!-- 📌 Modal para añadir partido de liga -->
 <div id="ligaModal" class="fixed inset-0 bg-gray-900 bg-opacity-50 flex items-center justify-center hidden">
@@ -540,35 +491,6 @@
         </form>
     </div>
 </div>
-<!-- Modal para Añadir Jugadores de Otras Plantillas -->
-<div id="existingPlayerModal" class="hidden fixed inset-0 bg-gray-900 bg-opacity-50 flex justify-center items-center">
-    <div class="bg-white rounded-lg p-6 w-1/3 shadow-lg">
-        <h2 class="text-2xl font-semibold text-gray-900 mb-4 text-center">Añadir Jugador Existente</h2>
-        <form action="{{ route('players.addToTeam') }}" method="POST">
-            @csrf
-            <input type="hidden" name="team_id" value="{{ $team->id }}">
-
-            <div class="mb-4">
-                <label for="player_id" class="block text-gray-700 font-semibold">Seleccionar jugador:</label>
-                <select name="player_id" id="player_id" class="w-full p-2 border rounded bg-white text-center" required>
-                    <option value="">Seleccionar...</option>
-                    @foreach ($allPlayers as $player)
-                        <option value="{{ $player->id }}">{{ $player->nombre }} {{ $player->apellido }} (DNI: {{ $player->dni }})</option>
-                    @endforeach
-                </select>
-            </div>
-
-            <div class="flex justify-between">
-                <button type="submit" class="bg-green-600 text-white px-4 py-2 rounded-lg hover:bg-green-700">
-                    Añadir Jugador
-                </button>
-                <button type="button" onclick="closeModal('existingPlayerModal')" class="bg-gray-500 text-white px-4 py-2 rounded-lg">
-                    Cancelar
-                </button>
-            </div>
-        </form>
-    </div>
-</div>
 
 <script>
 // 📌 Abrir y cerrar cualquier modal de manera dinámica
@@ -657,20 +579,54 @@ function cancelEditMatch(id) {
 }
 
 function saveMatch(id) {
-    let csrfToken = document.querySelector('meta[name="csrf-token"]').content;
+    const form = document.getElementById(`edit-match-form-${id}`);
+    const csrfToken = form.querySelector('input[name="_token"]').value;
 
-    let data = {
-        _token: csrfToken,
-        _method: 'PATCH',
-        fecha_partido: document.getElementById(`edit-fecha-${id}`).value,
-        goles_a_favor: document.getElementById(`edit-goles-favor-${id}`).value,
-        goles_en_contra: document.getElementById(`edit-goles-contra-${id}`).value,
-        resultado: document.getElementById(`edit-resultado-${id}`).value,
-        actuacion_equipo: document.getElementById(`edit-actuacion-${id}`).value
-    };
+    // Obtener los valores directamente desde los campos editados
+    const golesFavor = document.getElementById(`edit-goles-favor-${id}`).value;
+    const golesContra = document.getElementById(`edit-goles-contra-${id}`).value;
+    const resultado = document.getElementById(`edit-resultado-${id}`).value;
+    const actuacion = document.getElementById(`edit-actuacion-${id}`).value;
 
-    submitForm(`/matches/${id}`, data);
+    // ✅ Actualizar los campos ocultos del formulario
+    form.querySelector(`input[name="goles_a_favor"]`).value = golesFavor;
+    form.querySelector(`input[name="goles_en_contra"]`).value = golesContra;
+    form.querySelector(`input[name="resultado"]`).value = resultado;
+    form.querySelector(`input[name="actuacion_equipo"]`).value = actuacion;
+
+    // Actualizar la interfaz inmediatamente con los valores editados
+    document.getElementById(`goles-favor-${id}`).innerText = golesFavor;
+    document.getElementById(`goles-contra-${id}`).innerText = golesContra;
+    document.getElementById(`resultado-${id}`).innerText = resultado;
+    document.getElementById(`actuacion-${id}`).innerText = actuacion;
+
+    // Actualizar el color de la fila según el resultado
+    actualizarColorFila(id);
+
+    // Cambiar el modo de edición a modo vista
+    toggleMatchEditState(id, false);
+
+    // Enviar el formulario al backend
+    fetch(form.action, {
+        method: 'POST',
+        headers: {
+            'X-CSRF-TOKEN': csrfToken
+        },
+        body: new FormData(form)
+    }).then(response => {
+        if (response.ok) {
+            console.log("Partido actualizado correctamente en el backend");
+        } else {
+            throw new Error("Error en la actualización del partido");
+        }
+    }).catch(error => {
+        console.error("Error al guardar el partido:", error);
+        alert('Ocurrió un error al guardar el partido.');
+    });
 }
+
+
+
 
 // 📌 Función reutilizable para alternar estados de edición
 function toggleEditState(id, editing) {
@@ -704,6 +660,7 @@ function toggleMatchEditState(id, editing) {
     });
 }
 
+
 // 📌 Función reutilizable para enviar formularios
 function submitForm(action, data) {
     let form = document.createElement('form');
@@ -723,29 +680,46 @@ function submitForm(action, data) {
 }
 
 // 📌 Actualizar resultado de partido en base a los goles
-function actualizarResultado(id) {
-    let golesFavor = parseInt(document.getElementById(`edit-goles-favor-${id}`).value) || 0;
-    let golesContra = parseInt(document.getElementById(`edit-goles-contra-${id}`).value) || 0;
-    let resultadoSelect = document.getElementById(`edit-resultado-${id}`);
+function updateResultado(matchId) {
+    // Obtener los valores de los campos de goles
+    const golesFavor = parseInt(document.getElementById(`edit-goles-favor-${matchId}`).value) || 0;
+    const golesContra = parseInt(document.getElementById(`edit-goles-contra-${matchId}`).value) || 0;
 
-    resultadoSelect.value = golesFavor > golesContra ? "Victoria" : (golesFavor < golesContra ? "Derrota" : "Empate");
+    // Calcular el resultado según la lógica proporcionada
+    let resultado = 'Derrota';
+    if (golesFavor > golesContra) {
+        resultado = 'Victoria';
+    } else if (golesFavor === golesContra) {
+        resultado = 'Empate';
+    }
+
+    // Actualizar el resultado en la interfaz
+    document.getElementById(`resultado-${matchId}`).innerText = resultado;
+    document.getElementById(`edit-resultado-${matchId}`).value = resultado;
+
+    // Actualizar el color de la fila
+    actualizarColorFila(matchId);
+
+    // Mostrar los valores actualizados en los campos
+    document.getElementById(`goles-favor-${matchId}`).innerText = golesFavor;
+    document.getElementById(`goles-contra-${matchId}`).innerText = golesContra;
 }
 
-// 📌 Cambiar color de la fila según el resultado
+// 📌 Cambiar el color de la fila según el resultado
 function actualizarColorFila(id) {
-    let resultado = document.getElementById(`edit-resultado-${id}`).value;
-    let fila = document.getElementById(`match-row-${id}`);
+    const resultado = document.getElementById(`edit-resultado-${id}`).value;
+    const fila = document.getElementById(`match-row-${id}`);
 
-    fila.classList.remove("bg-green-300", "bg-yellow-300", "bg-red-300");
+    // Limpiar clases de color anteriores
+    fila.classList.remove("bg-green-700", "bg-yellow-500", "bg-red-300");
 
-    let colores = {
-        "Victoria": "bg-green-300",
-        "Empate": "bg-yellow-300",
-        "Derrota": "bg-red-300"
-    };
-
-    if (colores[resultado]) {
-        fila.classList.add(colores[resultado]);
+    // Asignar el color adecuado según el resultado
+    if (resultado === "Victoria") {
+        fila.classList.add("bg-green-700");
+    } else if (resultado === "Empate") {
+        fila.classList.add("bg-yellow-500");
+    } else if (resultado === "Derrota") {
+        fila.classList.add("bg-red-300");
     }
 }
 </script>

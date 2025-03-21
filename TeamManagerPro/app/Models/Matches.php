@@ -40,21 +40,4 @@ class Matches extends Model
             $q->wherePivot('convocado', true);
         });
     }
-
-    // 📌 MUTATORS Y ACCESSORS
-
-    public function getResultadoAttribute($value)
-    {
-        return $value ?? 'Pendiente';
-    }
-
-    public function getGolesAFavorAttribute($value)
-    {
-        return $value ?? 0;
-    }
-
-    public function getGolesEnContraAttribute($value)
-    {
-        return $value ?? 0;
-    }
 }

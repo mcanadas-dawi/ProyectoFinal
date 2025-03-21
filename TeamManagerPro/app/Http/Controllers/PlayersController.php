@@ -13,20 +13,37 @@ class PlayersController extends Controller
             'team_id' => 'required|exists:teams,id',
             'nombre' => 'required|string|max:255',
             'apellido' => 'required|string|max:255',
+            'dni' => 'required|string|max:50|unique:players,dni', // Validación de DNI único
             'dorsal' => 'required|integer|min:1|max:99',
+            'fecha_nacimiento' => 'required|date',
             'posicion' => 'required|string|max:50',
             'perfil' => 'required|string|max:50',
         ]);
-
+    
         // Verificar si el dorsal ya está ocupado en el equipo
-        if (Player::where('team_id', $request->team_id)->where('dorsal', $request->dorsal)->exists()) {
+        $team = Team::find($request->team_id);
+        if ($team->players()->where('dorsal', $request->dorsal)->exists()) {
             return back()->with('error', 'Este dorsal ya está ocupado en el equipo.');
         }
-
-        Player::create($request->all());
-
+    
+        // Crear el jugador
+        $player = Player::create([
+            'nombre' => $request->nombre,
+            'apellido' => $request->apellido,
+            'dni' => $request->dni,
+            'dorsal' => $request->dorsal,
+            'fecha_nacimiento' => $request->fecha_nacimiento,
+            'posicion' => $request->posicion,
+            'perfil' => $request->perfil,
+        ]);
+    
+        // Asociar el jugador al equipo en la tabla intermedia
+        $player->teams()->attach($request->team_id);
+    
         return back()->with('success', 'Jugador añadido correctamente.');
     }
+    
+    
 
     public function destroy($id)
     {

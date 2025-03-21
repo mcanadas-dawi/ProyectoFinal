@@ -27,6 +27,8 @@ Route::middleware(['auth', 'verified'])->group(function () {
     Route::post('/teams', [TeamsController::class, 'store'])->name('teams.store');
     Route::delete('/teams/{id}', [TeamsController::class, 'destroy'])->name('teams.destroy');
     Route::get('/teams/{id}', [TeamsController::class, 'show'])->name('teams.show');
+    Route::resource('teams', TeamsController::class);
+
 
     // 📌 Jugadores
     Route::post('/players', [PlayersController::class, 'store'])->name('players.store');
@@ -38,6 +40,7 @@ Route::middleware(['auth', 'verified'])->group(function () {
     Route::post('/matches', [MatchesController::class, 'store'])->name('matches.store');
     Route::patch('/matches/{id}', [MatchesController::class, 'update'])->name('matches.update');
     Route::delete('/matches/{id}', [MatchesController::class, 'destroy'])->name('matches.destroy');
+    Route::resource('matches', MatchesController::class);
 
     // 📌 Convocatorias
     Route::post('/matches/convocatoria', [ConvocatoriasController::class, 'store'])->name('matches.convocatoria');
