@@ -184,6 +184,7 @@
         <button onclick="openModal('amistosoModal')" class="bg-green-600 text-white px-4 py-2 rounded-lg hover:bg-green-700">
             Añadir Partido Amistoso
         </button>
+        @include('matches.friendlyMatch_form')
     </div>
 
     <table class="w-full text-center border-collapse bg-white rounded-lg">
@@ -203,7 +204,6 @@
 <tbody class="text-gray-800">
 @if(isset($partidosAmistosos) && count($partidosAmistosos) > 0)
     @foreach ($partidosAmistosos as $match)
-    @include('matches.editFriendlyMatch_form')
         @php
             // Determinar el color de la fila según el resultado
             $colorClase = match ($match->resultado) {
@@ -212,8 +212,7 @@
                 'Derrota' => 'bg-red-300', // Rojo para derrota
                 default => 'bg-green-100', // Color neutro si no hay resultado
             };
-        @endphp
-        
+        @endphp     
         <tr id="match-row-{{ $match->id }}" class="border-b {{ $colorClase }}">
         <td class="p-2 text-center">
                 <span id="fecha-{{ $match->id }}">{{ $match->fecha_partido }}</span>
@@ -664,29 +663,40 @@ function saveMatch(id) {
 
 // 📌 Función reutilizable para alternar estados de edición
 function toggleEditState(id, editing) {
-    let action = editing ? 'add' : 'remove';
+    const action = editing ? 'add' : 'remove';
 
     // Botones de edición y guardado
     document.getElementById(`edit-btn-${id}`).classList[action]('hidden');
     document.getElementById(`save-btn-${id}`).classList[action === 'add' ? 'remove' : 'add']('hidden');
     document.getElementById(`cancel-btn-${id}`).classList[action === 'add' ? 'remove' : 'add']('hidden');
-    document.getElementById(`delete-form-${id}`).classList[action === 'add' ? 'add' : 'remove']('hidden');
+    const deleteForm = document.getElementById(`delete-form-${id}`);
+    if (deleteForm) {
+        deleteForm.classList[action === 'add' ? 'add' : 'remove']('hidden');
+    }
 
-    // Actualizar los campos de posición y perfil
-    let fields = ['pos', 'perfil'];
+    // Actualizar los campos de posición y perfil (para jugadores)
+    const fields = ['pos', 'perfil'];
     fields.forEach(field => {
         const spanElement = document.getElementById(`${field}-${id}`);
         const selectElement = document.getElementById(`edit-${field}-${id}`);
 
-        if (editing) {
-            spanElement.classList.add('hidden');
-            selectElement.classList.remove('hidden');
-        } else {
-            spanElement.classList.remove('hidden');
-            selectElement.classList.add('hidden');
+        if (spanElement && selectElement) {
+            spanElement.classList.toggle('hidden', editing);
+            selectElement.classList.toggle('hidden', !editing);
         }
     });
+
+    // Actualizar los campos de partidos (goles, resultado, actuación, fecha)
+    const campos = ['goles-favor', 'goles-contra', 'resultado', 'actuacion', 'fecha', 'equipo-rival'];
+    campos.forEach(campo => {
+        const span = document.getElementById(`${campo}-${id}`);
+        const input = document.getElementById(`edit-${campo}-${id}`);
+
+        if (span) span.classList.toggle('hidden', editing);
+        if (input) input.classList.toggle('hidden', !editing);
+    });
 }
+
 
 
 
@@ -700,10 +710,15 @@ function toggleMatchEditState(id, editing) {
     document.getElementById(`cancel-btn-match-${id}`).classList[action === 'add' ? 'remove' : 'add']('hidden');
     document.getElementById(`delete-form-match-${id}`).classList[action === 'add' ? 'add' : 'remove']('hidden');
 
+    // Alternar la visibilidad de los campos de edición y los campos normales
     let fields = ['fecha', 'goles-favor', 'goles-contra', 'resultado', 'actuacion'];
     fields.forEach(field => {
-        document.getElementById(`${field}-${id}`).classList[action]('hidden');
-        document.getElementById(`edit-${field}-${id}`).classList[action === 'add' ? 'remove' : 'add']('hidden');
+        const span = document.getElementById(`${field}-${id}`);
+        const input = document.getElementById(`edit-${field}-${id}`);
+        if (span && input) {
+            span.classList[action]('hidden');
+            input.classList[action === 'add' ? 'remove' : 'add']('hidden');
+        }
     });
 }
 
@@ -800,6 +815,5 @@ function calcularEdad(fechaNacimiento) {
         });
     }
     window.onload = actualizarEdades;
-
 </script>
 @endsection
