@@ -69,7 +69,12 @@
 </div>
 
     <!-- Sección de Jugadores -->
-    <div class="bg-blue-200 shadow-lg rounded-lg p-6 mb-6">
+    @if(session('success_player'))
+        <div class="bg-green-500 text-white p-3 rounded mb-4 text-center">
+            {{ session('success_player') }}
+        </div>
+    @endif
+<div class="bg-blue-200 shadow-lg rounded-lg p-6 mb-6">
     <div class="flex items-center justify-center mb-4">
         <h2 class="text-2xl font-semibold text-gray-900 flex-grow text-left">Jugadores</h2>
         <button onclick="openModal('addPlayerModal')" class="bg-blue-600 text-white px-4 py-2 rounded-lg hover:bg-blue-700">
@@ -81,30 +86,30 @@
             Añadir Jugador de Otra Plantilla
         </button>
         @include('dashboard.existingPlayer_form')
-
     </div>
-        <table class="w-full text-center border-collapse">
-            <thead class="bg-blue-300 text-gray-900">
-                <tr class="border-b">
-                    <th class="p-2">Nombre</th>
-                    <th class="p-2">Apellido</th>
-                    <th class="p-2">Dorsal</th>
-                    <th class="p-2">Edad</th>
-                    <th class="p-2">Posición</th>
-                    <th class="p-2">Pie</th>
-                    <th class="p-2">Minutos</th>
-                    <th class="p-2">Goles/Encajados(POR)</th>
-                    <th class="p-2">Asist</th>
-                    <th class="p-2">Tit</th>
-                    <th class="p-2">Supl</th>
-                    <th class="p-2">Valoración</th>
-                    <th class="p-2">Amarillas</th>
-                    <th class="p-2">Rojas</th>
-                    <th class="p-2">Acciones</th>
-                </tr>
-            </thead>
-            <tbody>
-                @foreach ($team->players as $player)
+
+    <table class="w-full text-center border-collapse">
+        <thead class="bg-blue-300 text-gray-900">
+            <tr class="border-b">
+                <th class="p-2">Nombre</th>
+                <th class="p-2">Apellido</th>
+                <th class="p-2">Dorsal</th>
+                <th class="p-2">Edad</th>
+                <th class="p-2">Posición</th>
+                <th class="p-2">Pie</th>
+                <th class="p-2">Minutos</th>
+                <th class="p-2">Goles/Encajados(POR)</th>
+                <th class="p-2">Asist</th>
+                <th class="p-2">Tit</th>
+                <th class="p-2">Supl</th>
+                <th class="p-2">Valoración</th>
+                <th class="p-2">Amarillas</th>
+                <th class="p-2">Rojas</th>
+                <th class="p-2">Acciones</th>
+            </tr>
+        </thead>
+        <tbody>
+            @foreach ($team->players as $player)
                 @php
                     $stats = $player->teamStats($team->id);
                 @endphp
@@ -113,7 +118,7 @@
                     <td class="p-2">{{ $player->apellido }}</td>
                     <td class="p-2">{{ $player->dorsal }}</td>
                     <td class="p-2">
-                        <span id="edad-{{ $player->id }}"></span> <!-- Aquí se mostrará la edad -->
+                        <span id="edad-{{ $player->id }}"></span> 
                         <span class="hidden" id="fecha-nacimiento-{{ $player->id }}">{{ $player->fecha_nacimiento }}</span>
                     </td>
                     <td class="p-2">
@@ -125,29 +130,23 @@
                             <option value="Delantero" @selected($player->posicion == 'Delantero')>Delantero</option>
                         </select>
                     </td>
-
                     <td class="p-2">
-                    <span id="perfil-{{ $player->id }}">
-                        @if($player->perfil == 'Diestro') D @else I @endif
-                    </span>
+                        <span id="perfil-{{ $player->id }}">
+                            @if($player->perfil == 'Diestro') D @else I @endif
+                        </span>
                         <select name="perfil" class="hidden w-full p-1 border rounded" id="edit-perfil-{{ $player->id }}">
                             <option value="Diestro" @selected($player->perfil == 'Diestro')>Diestro</option>
                             <option value="Zurdo" @selected($player->perfil == 'Zurdo')>Zurdo</option>
                         </select>
                     </td>
-
-                    <td class="p-2">{{ $stats->minutos_jugados ?? 0}}</td>
-                    <td class="p-2">{{ $stats->goles ?? 0}}</td>
+                    <td class="p-2">{{ $stats->minutos_jugados ?? 0 }}</td>
+                    <td class="p-2">{{ $stats->goles ?? 0 }}</td>
                     <td class="p-2">{{ $stats->asistencias ?? 0 }}</td>
                     <td class="p-2">{{ $stats->titular ?? 0 }}</td>
                     <td class="p-2">{{ $stats->suplente ?? 0 }}</td>
-                    <td class="p-2 font-bold text-blue-600">{{ number_format($stats->valoracion ?? 0, 2 ) }}</td>
+                    <td class="p-2 font-bold text-blue-600">{{ number_format($stats->valoracion ?? 0, 2) }}</td>
                     <td class="p-2 text-yellow-600 font-bold">{{ $stats->tarjetas_amarillas ?? 0 }}</td>
                     <td class="p-2 text-red-600 font-bold">{{ $stats->tarjetas_rojas ?? 0 }}</td>
-                    
-
-
-
                     <td class="p-2 text-center">
                         <!-- Botón Editar -->
                         <button onclick="editPlayer('{{ $player->id }}')" id="edit-btn-{{ $player->id }}" class="bg-yellow-500 text-white px-3 py-1 rounded">Editar</button>
@@ -158,29 +157,33 @@
                         <!-- Botón Cancelar (oculto inicialmente) -->
                         <button onclick="cancelEditPlayer('{{ $player->id }}')" id="cancel-btn-{{ $player->id }}" class="hidden bg-gray-500 text-white px-3 py-1 rounded">Cancelar</button>
 
-                        <!-- Botón Eliminar (visible inicialmente, oculto en modo edición) -->
-                        <form action="{{ route('players.destroy', $player->id) }}" method="POST" onsubmit="return confirm('¿Estás seguro de que deseas eliminar a este jugador? Esta acción no se puede deshacer.')" id="delete-form-{{ $player->id }}" class="inline">
+                        <!-- Botón Eliminar -->
+                        <form action="{{ route('players.destroy', $player->id) }}" method="POST" onsubmit="return confirm('¿Estás seguro de que deseas eliminar a este jugador de la plantilla? Esta acción no se puede deshacer.')" id="delete-form-{{ $player->id }}" class="inline">
                             @csrf
                             @method('DELETE')
                             <input type="hidden" name="team_id" value="{{ $team->id }}">
                             <button type="submit" class="bg-red-500 text-white px-3 py-1 rounded">Eliminar</button>
                         </form>
                     </td>
-
                 </tr>
-                @endforeach
-            </tbody>
-        </table>
-    </div>
+            @endforeach
+        </tbody>
+    </table>
+</div>
+
 
 <!-- Sección de Partidos Amistosos -->
+@if(session('success_amistoso'))
+    <div class="bg-green-500 text-white p-3 rounded mb-4 text-center">
+        {{ session('success_amistoso') }}
+    </div>
+@endif
 <div class="bg-green-200 shadow-lg rounded-lg p-6 mb-6">
     <div class="flex items-center justify-center mb-4">
         <h2 class="text-2xl font-semibold text-gray-900 flex-grow text-left">Partidos Amistosos</h2>
         <button onclick="openModal('amistosoModal')" class="bg-green-600 text-white px-4 py-2 rounded-lg hover:bg-green-700">
             Añadir Partido Amistoso
         </button>
-        @include('dashboard.friendlyMatch_form')
     </div>
 
     <table class="w-full text-center border-collapse bg-white rounded-lg">
@@ -200,6 +203,7 @@
 <tbody class="text-gray-800">
 @if(isset($partidosAmistosos) && count($partidosAmistosos) > 0)
     @foreach ($partidosAmistosos as $match)
+    @include('matches.editFriendlyMatch_form')
         @php
             // Determinar el color de la fila según el resultado
             $colorClase = match ($match->resultado) {
@@ -275,7 +279,7 @@
                     <button type="submit" class="bg-red-500 text-white px-3 py-1 rounded">Eliminar</button>
                 </form>
                 <!-- Incluir el formulario desde el archivo parcial -->
- @include('matches.editFriendlyMatch_form', ['match' => $match])
+                @include('matches.editFriendlyMatch_form', ['match' => $match])
             </td>
         </tr>
     @endforeach
@@ -289,6 +293,11 @@
 </div>
 
 <!-- 📌 Tabla de Partidos Oficiales (Liga) -->
+@if(session('success_liga'))
+    <div class="bg-green-500 text-white p-3 rounded mb-4 text-center">
+        {{ session('success_liga') }}
+    </div>
+@endif
 <div class="bg-blue-400 shadow-lg rounded-lg p-6 mb-6">
     <div class="flex items-center justify-center mb-4">
         <h2 class="text-2xl font-semibold text-gray-900 flex-grow text-left">Partidos de Liga</h2>
@@ -566,8 +575,32 @@ function savePlayer(id) {
         perfil: document.getElementById(`edit-perfil-${id}`).value
     };
 
-    submitForm(`/players/${id}`, data);
+    fetch(`/players/${id}`, {
+        method: 'POST',  // Usamos POST porque el método PATCH se envía con _method
+        headers: {
+            'Content-Type': 'application/json',
+            'X-CSRF-TOKEN': csrfToken
+        },
+        body: JSON.stringify(data)
+    })
+    .then(response => response.json())
+    .then(data => {
+        if (data.success) {
+            // Recargar la página para mostrar el mensaje flash
+            location.reload();
+        } else {
+            alert('Error al actualizar el jugador');
+        }
+    })
+    .catch(error => {
+        console.error('Error al guardar el jugador:', error);
+        alert('Ocurrió un error al guardar el jugador.');
+    });
 }
+
+
+
+
 
 // 📌 Editar, cancelar y guardar partidos
 function editMatch(id) {
@@ -587,62 +620,76 @@ function saveMatch(id) {
     const golesContra = document.getElementById(`edit-goles-contra-${id}`).value;
     const resultado = document.getElementById(`edit-resultado-${id}`).value;
     const actuacion = document.getElementById(`edit-actuacion-${id}`).value;
+    const fechaPartido = document.getElementById(`edit-fecha-${id}`).value;
+    const equipoRival = document.getElementById(`edit-equipo-rival-${id}`).value;
+    const tipo = "amistoso";
 
-    // ✅ Actualizar los campos ocultos del formulario
+    // Actualizar los campos ocultos del formulario
     form.querySelector(`input[name="goles_a_favor"]`).value = golesFavor;
     form.querySelector(`input[name="goles_en_contra"]`).value = golesContra;
     form.querySelector(`input[name="resultado"]`).value = resultado;
     form.querySelector(`input[name="actuacion_equipo"]`).value = actuacion;
+    form.querySelector(`input[name="fecha_partido"]`).value = fechaPartido;
+    form.querySelector(`input[name="equipo_rival"]`).value = equipoRival;
+    form.querySelector(`input[name="tipo"]`).value = tipo;
 
-    // Actualizar la interfaz inmediatamente con los valores editados
-    document.getElementById(`goles-favor-${id}`).innerText = golesFavor;
-    document.getElementById(`goles-contra-${id}`).innerText = golesContra;
-    document.getElementById(`resultado-${id}`).innerText = resultado;
-    document.getElementById(`actuacion-${id}`).innerText = actuacion;
-
-    // Actualizar el color de la fila según el resultado
-    actualizarColorFila(id);
-
-    // Cambiar el modo de edición a modo vista
-    toggleMatchEditState(id, false);
-
-    // Enviar el formulario al backend
+    // Enviar el formulario al backend usando PATCH
     fetch(form.action, {
         method: 'POST',
         headers: {
-            'X-CSRF-TOKEN': csrfToken
+            'X-CSRF-TOKEN': csrfToken,
+            'Accept': 'application/json'
         },
         body: new FormData(form)
-    }).then(response => {
-        if (response.ok) {
-            console.log("Partido actualizado correctamente en el backend");
-        } else {
-            throw new Error("Error en la actualización del partido");
+    })
+    .then(response => {
+        if (!response.ok) {
+            return response.json().then(errorData => {
+                alert('Error en la actualización: ' + (errorData.message || 'Ocurrió un error en el servidor.'));
+                throw new Error("Error en la actualización del partido");
+            });
         }
-    }).catch(error => {
-        console.error("Error al guardar el partido:", error);
-        alert('Ocurrió un error al guardar el partido.');
+        return response.json();
+    })
+    .then(data => {
+        toggleMatchEditState(id, false);
+        location.reload();
+    })
+    .catch(error => {
+        alert('Ocurrió un error al guardar el partido: ' + error.message);
     });
 }
-
 
 
 
 // 📌 Función reutilizable para alternar estados de edición
 function toggleEditState(id, editing) {
     let action = editing ? 'add' : 'remove';
-    
+
+    // Botones de edición y guardado
     document.getElementById(`edit-btn-${id}`).classList[action]('hidden');
     document.getElementById(`save-btn-${id}`).classList[action === 'add' ? 'remove' : 'add']('hidden');
     document.getElementById(`cancel-btn-${id}`).classList[action === 'add' ? 'remove' : 'add']('hidden');
     document.getElementById(`delete-form-${id}`).classList[action === 'add' ? 'add' : 'remove']('hidden');
 
+    // Actualizar los campos de posición y perfil
     let fields = ['pos', 'perfil'];
     fields.forEach(field => {
-        document.getElementById(`${field}-${id}`).classList[action]('hidden');
-        document.getElementById(`edit-${field}-${id}`).classList[action === 'add' ? 'remove' : 'add']('hidden');
+        const spanElement = document.getElementById(`${field}-${id}`);
+        const selectElement = document.getElementById(`edit-${field}-${id}`);
+
+        if (editing) {
+            spanElement.classList.add('hidden');
+            selectElement.classList.remove('hidden');
+        } else {
+            spanElement.classList.remove('hidden');
+            selectElement.classList.add('hidden');
+        }
     });
 }
+
+
+
 
 // 📌 Función reutilizable para alternar edición de partidos
 function toggleMatchEditState(id, editing) {
@@ -722,5 +769,37 @@ function actualizarColorFila(id) {
         fila.classList.add("bg-red-300");
     }
 }
+function calcularEdad(fechaNacimiento) {
+        const hoy = new Date();
+        const nacimiento = new Date(fechaNacimiento);
+
+        let edad = hoy.getFullYear() - nacimiento.getFullYear();
+        const mes = hoy.getMonth() - nacimiento.getMonth();
+
+        // Ajuste si el mes o el día aún no han pasado este año
+        if (mes < 0 || (mes === 0 && hoy.getDate() < nacimiento.getDate())) {
+            edad--;
+        }
+
+        return edad;
+    }
+
+    // Actualizar todas las edades en la tabla de jugadores
+    function actualizarEdades() {
+        const elementos = document.querySelectorAll('[id^="fecha-nacimiento-"]');
+
+        elementos.forEach(elemento => {
+            const id = elemento.id.replace("fecha-nacimiento-", "edad-");
+            const fechaNacimiento = elemento.textContent.trim();
+            const edad = calcularEdad(fechaNacimiento);
+            const edadElemento = document.getElementById(id);
+
+            if (edadElemento) {
+                edadElemento.innerText = edad;
+            }
+        });
+    }
+    window.onload = actualizarEdades;
+
 </script>
 @endsection

@@ -35,9 +35,6 @@ class TeamsController extends Controller
                         ->where('tipo', 'liga')
                         ->get();
 
-    Log::info('Partidos Amistosos en la vista:', $partidosAmistosos->toArray());
-    Log::info('Partidos Liga en la vista:', $partidosLiga->toArray());
-
     // Forzar la recarga del objeto desde la base de datos
     $allPlayers = Player::whereNotIn('id', $team->players->pluck('id'))->get();
     $stats = $this->getTeamStats($id);

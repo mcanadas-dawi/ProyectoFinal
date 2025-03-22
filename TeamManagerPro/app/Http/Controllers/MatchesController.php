@@ -95,13 +95,12 @@ class MatchesController extends Controller
 
     
 
+
 public function update(Request $request, $id)
 {
-    Log::info('Datos recibidos en update:', $request->all());
-
     $request->validate([
         'tipo' => 'required|in:amistoso,liga',
-        'equipo_rival' => 'nullable|string|max:255',
+        'equipo_rival' => 'required|string|max:255',
         'rival_liga_id' => 'nullable|integer',
         'fecha_partido' => 'required|date',
         'goles_a_favor' => 'nullable|integer',
@@ -120,34 +119,24 @@ public function update(Request $request, $id)
         $resultado = 'Empate';
     }
 
-    Log::info("Resultado calculado: " . $resultado);
-
     // Actualizar el partido explícitamente
-    $match->tipo = $request->tipo;
     $match->equipo_rival = $request->equipo_rival;
-    $match->rival_liga_id = $request->rival_liga_id;
+    $match->tipo = $request->tipo;
     $match->fecha_partido = $request->fecha_partido;
-    $match->goles_a_favor = $request->goles_a_favor;
-    $match->goles_en_contra = $request->goles_en_contra;
+    $match->goles_a_favor = intval($request->goles_a_favor);
+    $match->goles_en_contra = intval($request->goles_en_contra);
     $match->resultado = $resultado;
-    $match->actuacion_equipo = $request->actuacion_equipo;
+    $match->actuacion_equipo = floatval($request->actuacion_equipo);
+    $match->save();
 
-    Log::info("Valores antes de guardar:", $match->toArray());
+    $message = $match->tipo === 'liga' ? 'Partido de liga actualizado correctamente' : 'Partido amistoso actualizado correctamente';
+    $key = $match->tipo === 'liga' ? 'success_liga' : 'success_amistoso';
 
-    // Guardar el modelo de forma explícita
-    if ($match->save()) {
-        Log::info('Partido actualizado correctamente en la base de datos:', $match->toArray());
-    } else {
-        Log::error('Error al guardar el partido en la base de datos.');
-    }
+    // Enviar el mensaje de éxito con una clave personalizada
+    session()->flash($key, $message);
 
-    return response()->json(['success' => true, 'message' => 'Partido actualizado correctamente']);
+    return response()->json(['success' => true, 'message' => $message], 200);
 }
-
-
-
-
-
 
 public function destroy($id)
 {
