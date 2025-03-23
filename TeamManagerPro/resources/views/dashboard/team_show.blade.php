@@ -1,5 +1,10 @@
-@extends('layouts.dashboard')
+<head>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.8.1/font/bootstrap-icons.css" rel="stylesheet">
 
+</head>
+@extends('layouts.dashboard')
 @section('content')
 @if(session('success'))
     <div class="bg-green-500 text-white p-3 rounded mb-4 text-center">
@@ -173,9 +178,9 @@
 
 
 <!-- Sección de Partidos Amistosos -->
-@if(session('success_amistoso'))
+@if(session()->has('success_amistoso') || session()->has('success_convocatoria'))
     <div class="bg-green-500 text-white p-3 rounded mb-4 text-center">
-        {{ session('success_amistoso') }}
+        {{ session('success_amistoso') ?? session('success_convocatoria') }}
     </div>
 @endif
 <div class="bg-green-200 shadow-lg rounded-lg p-6 mb-6">
@@ -260,9 +265,10 @@
                 </button>
             </td>
             <td class="p-2 text-center">
-                <button onclick="openModal('alineadorModal')" class="bg-indigo-500 text-white px-3 py-1 rounded">
-                    Alineador
-                </button>
+            <button onclick="openAlineador('{{ $match->id }}')" class="bg-indigo-500 text-white px-3 py-1 rounded">
+                Alineador
+            </button>
+
             </td>
             <td class="p-2 text-center">
                 <a href="{{ route('matches.ratePlayers', $match->id) }}" class="bg-orange-400 text-white px-3 py-1 rounded block mb-2">
@@ -389,116 +395,9 @@
     </div>
 </div>
 
-<!-- Modal del Alineador -->
-<div id="alineadorModal" class="hidden fixed inset-0 bg-gray-900 bg-opacity-50 flex justify-center items-center">
-    <div class="bg-white rounded-lg p-6 w-3/4 max-h-[90vh] overflow-y-auto flex flex-col">
-        <h2 class="text-2xl font-semibold text-gray-800 mb-4 text-center">Alineador Táctico</h2>
+@include('matches.alineadorModal')
+@include('matches.convocatoriaModal')
 
-        <!-- Seleccionar Formación -->
-        <label class="block text-gray-700 font-semibold">Seleccionar Formación:</label>
-        <select id="formation-selector" class="w-full p-2 border rounded-lg mb-4" onchange="updateFormation()">
-            <option value="" disabled selected>Seleccionar...</option>
-            <option value="libre">Formación personalizada</option>
-            @if ($team->modalidad == 'F5')
-                <option value="1-1-2-1">1-1-2-1</option>
-                <option value="1-2-1-1">1-2-1-1</option>
-            @elseif ($team->modalidad == 'F7')
-                <option value="1-3-2-1">1-3-2-1</option>
-                <option value="1-2-3-1">1-2-3-1</option>
-            @elseif ($team->modalidad == 'F8')
-                <option value="1-3-3-1">1-3-3-1</option>
-                <option value="1-2-4-1">1-2-4-1</option>
-            @elseif ($team->modalidad == 'F11')
-                <option value="1-4-4-2">1-4-4-2</option>
-                <option value="1-4-3-3">1-4-3-3</option>
-                <option value="1-5-3-2">1-5-3-2</option>
-            @endif
-        </select>
-
-        <!-- Lista de Jugadores Convocados -->
-        <h3 class="text-xl font-semibold text-gray-800 mt-4">Jugadores Convocados</h3>
-        <div id="convocados-list" class="bg-gray-100 p-2 rounded-lg min-h-[150px] max-h-[40vh] overflow-y-auto">
-            <div id="convocados-body" class="flex flex-wrap gap-2">
-                <!-- Aquí se inyectarán los jugadores convocados -->
-            </div>
-        </div>
-
-        <!-- Campo de Fútbol -->
-        <div id="field-container" class="relative bg-green-500 h-96 w-4/5 mx-auto flex justify-center items-center mt-4">
-            <img src="{{ asset('Imagenes/campo_futbol.jpg') }}" alt="Campo de Fútbol" class="w-full h-full object-cover">
-            <div id="player-spots" class="absolute inset-0 flex justify-center items-center">
-                <!-- Aquí se inyectarán las posiciones según la formación -->
-            </div>
-        </div>
-
-        <!-- Botones de acción -->
-        <div class="flex justify-center mt-4">
-            <button id="edit-system-btn" class="hidden bg-blue-600 text-white px-4 py-2 rounded-lg hover:bg-blue-700" onclick="enableEditMode()">
-                Editar Formación
-            </button>
-            
-            <button id="save-system-btn" class="hidden bg-green-600 text-white px-4 py-2 rounded-lg hover:bg-green-700" onclick="saveFormationChanges()">
-                Guardar Formación
-            </button>
-        </div>
-
-        <!-- Lista de Suplentes (Ahora sin scroll y con ajuste automático de filas) -->
-        <h3 class="text-xl font-semibold text-gray-800 mt-4">Suplentes</h3>
-        <div id="suplentes-list" class="bg-gray-200 border border-gray-300 p-3 rounded-lg shadow-md">
-            <div id="suplentes-body" class="flex flex-wrap gap-3 justify-center">
-                <!-- Aquí se inyectarán los suplentes -->
-                 <br id="br-placeholder">
-            </div>
-        </div>
-
-
-
-        <!-- Botones de acción (Siempre visibles) -->
-        <div class="mt-4 flex justify-between bg-white p-4 shadow-md">
-            <button onclick="saveAlineacion()" class="bg-green-500 text-white px-4 py-2 rounded-lg">Guardar Alineación</button>
-            <button onclick="closeModal('alineadorModal')" class="bg-red-500 text-white px-4 py-2 rounded-lg">Cerrar</button>
-        </div>
-    </div>
-</div>
-
-<!-- Modal para Convocatoria -->
-<div id="convocatoriaModal" class="hidden fixed inset-0 bg-gray-900 bg-opacity-50 flex justify-center items-center">
-    <div class="bg-white rounded-lg p-6 w-1/3">
-        <h2 class="text-xl font-semibold text-gray-800 mb-4 text-center">Seleccionar Jugadores Convocados</h2>
-        <form id="convocatoriaForm">
-            @csrf
-                @if(isset($match))
-                    <input type="hidden" name="match_id" value="{{ $match->id }}">
-                @endif
-
-
-            <!-- Lista de jugadores con checkboxes -->
-            <div class="max-h-60 overflow-y-auto">
-                <button type="button" onclick="toggleSelectAll()" class="bg-gray-500 text-white px-4 py-2 rounded-lg mb-2">
-                    Seleccionar Todos
-                </button>
-                @foreach ($team->players as $player)
-                    <div class="flex items-center mb-2">
-                        <input type="checkbox" id="player-{{ $player->id }}" name="convocados[]"
-                            value="{{ $player->id }}" class="mr-2"
-                            {{ isset($convocados) && in_array($player->id, $convocados[$match->id] ?? []) ? 'checked' : '' }}>
-                        <label for="player-{{ $player->id }}">{{ $player->nombre }} {{ $player->apellido }}</label>
-                    </div>
-                @endforeach
-            </div>
-
-
-            <div class="mt-4 flex justify-between">
-                <button type="button" onclick="saveConvocatoria()" class="bg-green-500 text-white px-4 py-2 rounded-lg">
-                    Guardar Convocatoria
-                </button>
-                <button type="button" onclick="closeModal('convocatoriaModal')" class="bg-gray-500 text-white px-4 py-2 rounded-lg">
-                    Cancelar
-                </button>
-            </div>
-        </form>
-    </div>
-</div>
 
 <script>
 // 📌 Abrir y cerrar cualquier modal de manera dinámica
@@ -519,20 +418,12 @@ function closeModal(modalId) {
         console.error(`❌ Error: No se encontró el modal con id "${modalId}"`);
     }
 }
-
-// 📌 Alternar selección de todos los jugadores en la convocatoria
-function toggleSelectAll() {
-    let checkboxes = document.querySelectorAll('input[name="convocados[]"]');
-    let allChecked = Array.from(checkboxes).every(checkbox => checkbox.checked);
-
-    checkboxes.forEach(checkbox => checkbox.checked = !allChecked);
-}
-
 // 📌 Guardar convocatoria mediante AJAX
 function saveConvocatoria() {
     let csrfToken = document.querySelector('meta[name="csrf-token"]').content;
     let matchId = document.querySelector('input[name="match_id"]').value;
-    
+
+    // Recoger los jugadores seleccionados
     let seleccionados = Array.from(document.querySelectorAll('input[name="convocados[]"]:checked'))
                              .map(checkbox => checkbox.value);
 
@@ -554,6 +445,7 @@ function saveConvocatoria() {
     })
     .catch(error => console.error('❌ Error en saveConvocatoria():', error));
 }
+
 
 // 📌 Editar, cancelar y guardar jugadores
 function editPlayer(id) {
@@ -596,9 +488,6 @@ function savePlayer(id) {
         alert('Ocurrió un error al guardar el jugador.');
     });
 }
-
-
-
 
 
 // 📌 Editar, cancelar y guardar partidos

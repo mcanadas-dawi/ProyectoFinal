@@ -35,22 +35,51 @@ class ConvocatoriasController extends Controller
         return back()->with('success', 'Convocatoria guardada correctamente.');
     }
 
-    public function updateConvocatoria(Request $request, $matchId)
-{
-    $match = Matches::findOrFail($matchId);
+    public function update(Request $request, $matchId)
+    {
+        // Validar la solicitud
+        $request->validate([
+            'convocados' => 'array',
+            'convocados.*' => 'exists:players,id'
+        ]);
+    
+        // Obtener el partido
+        $match = Matches::findOrFail($matchId);
+    
+        // Obtener los IDs de los jugadores convocados
+        $convocados = $request->input('convocados', []);
+    
+        // Crear un array para sincronizar los convocados con el estado
+        $convocadosConEstado = [];
+        foreach ($convocados as $playerId) {
+            $convocadosConEstado[$playerId] = ['convocado' => true];
+        }
+    
+        // Sincronizar los jugadores convocados con el partido
+        $match->players()->sync($convocadosConEstado);
+        
+        session()->flash('success_convocatoria', 'Convocatoria actualizada correctamente.');
 
-    // Obtener IDs de jugadores seleccionados
-    $convocados = $request->input('convocados', []);
-
-    // Sincronizar los jugadores convocados
-    $convocadosConEstado = [];
-    foreach ($convocados as $playerId) {
-        $convocadosConEstado[$playerId] = ['convocado' => true];
+        return response()->json(['success' => true]);
     }
+    
+    public function getConvocados($matchId)
+{
+    try {
+        $match = Matches::findOrFail($matchId);
 
-    // 📌 **Corregido: Se usa `sync()` para actualizar correctamente**
-    $match->players()->sync($convocadosConEstado);
+        // Obtener jugadores convocados
+        $convocados = $match->players()->wherePivot('convocado', true)->get();
 
-    return response()->json(['success' => true]);
+        // Verificar si hay convocados
+        if ($convocados->isEmpty()) {
+            return response()->json(['convocados' => [], 'message' => 'No hay jugadores convocados.']);
+        }
+
+        return response()->json(['convocados' => $convocados, 'success' => true]);
+    } catch (\Exception $e) {
+        return response()->json(['success' => false, 'message' => $e->getMessage()], 500);
+    }
 }
+
 }

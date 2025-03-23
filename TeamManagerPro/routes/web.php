@@ -45,9 +45,9 @@ Route::middleware(['auth', 'verified'])->group(function () {
     // 📌 Convocatorias
     Route::post('/matches/convocatoria', [ConvocatoriasController::class, 'store'])->name('matches.convocatoria');
     Route::post('/matches/{match}/convocatoria', [ConvocatoriasController::class, 'update'])->name('matches.updateConvocatoria');
+    Route::get('/matches/{matchId}/get-convocados', [ConvocatoriasController::class, 'getConvocados']);
 
     // 📌 Alineaciones
-    Route::post('/matches/{match}/save-alineacion', [AlineacionesController::class, 'save'])->name('matches.saveAlineacion');
     Route::get('/matches/{match}/get-alineacion', [AlineacionesController::class, 'get'])->name('matches.getAlineacion');
 
     // 📌 Estadísticas de Jugadores en Partidos
