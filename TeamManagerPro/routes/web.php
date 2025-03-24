@@ -54,8 +54,8 @@ Route::middleware(['auth', 'verified'])->group(function () {
     Route::post('/matches/{match}/stats', [MatchPlayerStatController::class, 'store'])->name('matches.stats.store');
 
     // 📌 Valoraciones de Jugadores
-    Route::get('/matches/{match}/rate', [MatchPlayerStatController::class, 'ratePlayers'])->name('matches.ratePlayers'); 
-    Route::post('/matches/{match}/rate', [MatchPlayerStatController::class, 'saveRatings'])->name('matches.saveRatings');
+    Route::get('/matches/{match}/rate-players', [MatchPlayerStatController::class, 'ratePlayers'])->name('matches.ratePlayers'); 
+    Route::post('/matches/{match}/save-ratings', [MatchPlayerStatController::class, 'saveRatings'])->name('matches.saveRatings');
 
     // 📌 Rivales de Liga
     Route::resource('rivales_liga', RivalesLigaController::class)->only(['store', 'update', 'destroy']);

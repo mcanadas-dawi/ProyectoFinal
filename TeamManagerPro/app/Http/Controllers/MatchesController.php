@@ -53,7 +53,6 @@ class MatchesController extends Controller
 
     public function store(Request $request)
 {
-    Log::info('🔍 Iniciando la creación de partido', $request->all());
 
     $request->validate([
         'team_id' => 'required|exists:teams,id',
@@ -100,15 +99,14 @@ class MatchesController extends Controller
             return redirect()->back()->with('error', 'Error al crear el partido.');
         }
 
-        Log::info('✅ Partido creado correctamente', ['id' => $match->id]);
-
         // Mensaje de éxito según el tipo de partido
         $message = $request->tipo === 'liga' 
             ? 'Partido de liga añadido correctamente.' 
             : 'Partido amistoso añadido correctamente.';
 
-        // Redirigir a la vista del equipo para mostrar el partido creado
-        return redirect()->route('teams.show', $request->team_id)->with('success', $message);
+        session()->flash('created_match', 'Partido amistoso creado correctamente.');
+
+        return redirect()->back();
     } catch (\Exception $e) {
         Log::error('❌ Error al crear el partido: ' . $e->getMessage());
         return redirect()->back()->with('error', 'Error al crear el partido.');
@@ -169,8 +167,10 @@ public function destroy($id)
 
     // Eliminar el partido
     $match->delete();
+    
+    session()->flash('deleted_match', 'Partido amistoso eliminado correctamente.');
 
-    return back()->with('success', 'Partido eliminado correctamente.');
+    return redirect()->back();
 }
 
 }

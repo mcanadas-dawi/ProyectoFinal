@@ -74,11 +74,11 @@
 </div>
 
     <!-- Sección de Jugadores -->
-    @if(session('success_player'))
-        <div class="bg-green-500 text-white p-3 rounded mb-4 text-center">
-            {{ session('success_player') }}
-        </div>
-    @endif
+    @if(session()->has('created_player') || session()->has('updated_player') || session()->has('added_player') || session()->has('deleted_player'))
+    <div class="bg-green-500 text-white p-3 rounded mb-4 text-center">
+        {{ session('created_player') ?: session('updated_player') ?: session('added_player') ?: session('deleted_player')  }}
+    </div>
+@endif
 <div class="bg-blue-200 shadow-lg rounded-lg p-6 mb-6">
     <div class="flex items-center justify-center mb-4">
         <h2 class="text-2xl font-semibold text-gray-900 flex-grow text-left">Jugadores</h2>
@@ -178,11 +178,12 @@
 
 
 <!-- Sección de Partidos Amistosos -->
-@if(session()->has('success_amistoso') || session()->has('success_convocatoria'))
+@if(session()->has('success_amistoso') || session()->has('success_convocatoria') || session()->has('deleted_match') || session()->has('created_match'))
     <div class="bg-green-500 text-white p-3 rounded mb-4 text-center">
-        {{ session('success_amistoso') ?? session('success_convocatoria') }}
+        {{ session('success_amistoso') ?: session('success_convocatoria') ?: session('deleted_match') ?: session('created_match')  }}
     </div>
 @endif
+
 <div class="bg-green-200 shadow-lg rounded-lg p-6 mb-6">
     <div class="flex items-center justify-center mb-4">
         <h2 class="text-2xl font-semibold text-gray-900 flex-grow text-left">Partidos Amistosos</h2>

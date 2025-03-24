@@ -11,20 +11,23 @@
         <label class="block text-gray-700 font-semibold">Seleccionar Formación:</label>
         <select id="formation-selector" class="w-full p-2 border rounded-lg mb-4" onchange="updateFormation()">
             <option value="" disabled selected>Seleccionar...</option>
-            <option value="libre">Formación personalizada</option>
             @if ($team->modalidad == 'F5')
                 <option value="1-1-2-1">1-1-2-1</option>
                 <option value="1-2-1-1">1-2-1-1</option>
+                <option value="libref5">Formación personalizada</option>
             @elseif ($team->modalidad == 'F7')
                 <option value="1-3-2-1">1-3-2-1</option>
                 <option value="1-2-3-1">1-2-3-1</option>
+                <option value="libref7">Formación personalizada</option>
             @elseif ($team->modalidad == 'F8')
                 <option value="1-3-3-1">1-3-3-1</option>
                 <option value="1-2-4-1">1-2-4-1</option>
+                <option value="libref8">Formación personalizada</option>
             @elseif ($team->modalidad == 'F11')
                 <option value="1-4-4-2">1-4-4-2</option>
                 <option value="1-4-3-3">1-4-3-3</option>
                 <option value="1-5-3-2">1-5-3-2</option>
+                <option value="libref11">Formación personalizada</option>
             @endif
         </select>
 
@@ -116,7 +119,12 @@ function enableEditMode() {
     document.getElementById('edit-system-btn').classList.add('hidden');
     document.getElementById('save-system-btn').classList.remove('hidden');
 
-    document.querySelectorAll('.dropzone').forEach(positionDiv => {
+    document.querySelectorAll('.dropzone').forEach((positionDiv, index) => {
+        if (index === 0) {
+            positionDiv.style.cursor = "not-allowed";
+            positionDiv.onmousedown = null;
+            return; // Saltar el resto de la configuración para el portero
+        }
         positionDiv.style.cursor = "grab";
         positionDiv.ondragstart = null; // Deshabilita el arrastre de jugadores
 
@@ -229,13 +237,16 @@ function updateFormation(formation = null, alineacionGuardada = []) {
         '1-4-4-2': [[10, 45], [30, 80], [30, 55], [30, 35], [30, 10], [50, 80], [50, 55], [50, 35], [50, 10], [70, 55], [70, 35]],
         '1-4-3-3': [[10, 45], [30, 80], [30, 55], [30, 35], [30, 10], [50, 20], [50, 45], [50, 70], [70, 20], [70, 45], [70, 70]],
         '1-5-3-2': [[10, 45], [30, 20], [30, 45], [30, 70], [40, 87], [40, 0], [50, 20], [50, 45], [50, 70], [70, 55], [70, 35]],
-        'libre': [[10, 45], [20, 20], [20, 40], [20, 60], [20, 80], [30, 20], [30, 40], [30, 60], [30, 80], [40, 40], [40, 60]],
         '1-1-2-1': [[10, 45], [30, 45], [50,25 ], [50, 65], [70, 45]],
         '1-2-1-1': [[10, 45], [30, 25], [30, 65], [50, 45], [70, 45]],
         '1-3-2-1': [[10, 45], [30, 20], [30, 45], [30, 70], [50, 30], [50, 60], [70, 45]],
         '1-2-3-1': [[10, 45], [30, 30], [30, 60], [50, 20], [50, 45], [50, 70], [70, 45],],
         '1-2-4-1': [[10, 45], [30, 30], [30, 60], [50, 30], [50, 87], [50, 0], [50, 60], [70, 45],],
-        '1-3-3-1': [[10, 45], [30, 20], [30, 45], [30, 70], [50, 20], [50, 45], [50, 70], [70, 45],]
+        '1-3-3-1': [[10, 45], [30, 20], [30, 45], [30, 70], [50, 20], [50, 45], [50, 70], [70, 45],],
+        'libref5':[[10, 45],[20,45],[30,45],[40,45],[50,45]],
+        'libref7':[[10, 45],[20,45],[30,45],[40,45],[50,45],[60,45],[70,45]],
+        'libref8':[[10, 45],[20,45],[30,45],[40,45],[50,45],[60,45],[70,45],[80,45]],
+        'libref11': [[10, 45], [20, 20], [20, 40], [20, 60], [20, 80], [30, 20], [30, 40], [30, 60], [30, 80], [40, 40], [40, 60]]
 
     };
 
@@ -250,6 +261,7 @@ function updateFormation(formation = null, alineacionGuardada = []) {
         positionDiv.setAttribute("data-index", index);
         positionDiv.setAttribute("draggable", true);
 
+        
         let alineado = alineacionGuardada.find(a => a.posicion == index);
         if (alineado) {
             let player = allPlayers.find(p => p.id == alineado.player_id);

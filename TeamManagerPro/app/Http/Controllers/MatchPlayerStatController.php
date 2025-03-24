@@ -55,9 +55,17 @@ class MatchPlayerStatController extends Controller
     // 📌 Vista para valorar jugadores
     public function ratePlayers($matchId) 
     {
-        $match = Matches::with(['convocados'])->findOrFail($matchId);
-        return view('matches.rate_players', compact('match'));
+        try {
+            $match = Matches::with(['players' => function($query) {
+                $query->wherePivot('convocado', true);
+            }])->findOrFail($matchId);
+    
+            return view('matches.rate_players', compact('match'));
+        } catch (\Exception $e) {
+            return redirect()->back()->with('error', 'No se pudieron cargar los jugadores para valoración.');
+        }
     }
+    
 
     public function saveRatings(Request $request, $matchId) 
     {

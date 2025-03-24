@@ -70,7 +70,7 @@ class PlayersController extends Controller
             }
     
             // Mensaje de éxito
-            session()->flash('success_player', 'Jugador añadido correctamente.');
+            session()->flash('created_player', 'Jugador añadido correctamente.');
             return redirect()->back();
         } catch (\Exception $e) {
             Log::error('❌ Error al crear el jugador: ' . $e->getMessage());
@@ -95,7 +95,7 @@ class PlayersController extends Controller
         $team->players()->detach($player->id);
 
         // Mensaje de éxito
-        session()->flash('success_player', 'Jugador eliminado de la plantilla correctamente');
+        session()->flash('deleted_player', 'Jugador eliminado de la plantilla correctamente');
         return redirect()->back();
     } catch (\Exception $e) {
         return redirect()->back()->with('error', 'Error al eliminar el jugador de la plantilla: ' . $e->getMessage());
@@ -119,7 +119,7 @@ class PlayersController extends Controller
         $player->save();
 
         // Enviar el mensaje de éxito como flash
-        session()->flash('success_player', 'Jugador actualizado correctamente');
+        session()->flash('updated_player', 'Jugador actualizado correctamente');
         return response()->json(['success' => true, 'message' => 'Jugador actualizado correctamente']);
     } catch (\Exception $e) {
         return response()->json(['success' => false, 'message' => 'Error al actualizar el jugador: ' . $e->getMessage()], 500);
@@ -142,7 +142,7 @@ public function addPlayerToTeam(Request $request)
     // Agregar el jugador a la plantilla si no está ya en ella
     if (!$team->players()->where('players.id', $player->id)->exists()) {
         $team->players()->attach($player->id);
-        session()->flash('success_player', 'Jugador agregado correctamente a la plantilla.');
+        session()->flash('added_player', 'Jugador añadido correctamente a la plantilla.');
     }
 
     return redirect()->back();
