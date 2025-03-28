@@ -1,9 +1,3 @@
-<head>
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
-    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.8.1/font/bootstrap-icons.css" rel="stylesheet">
-
-</head>
 @extends('layouts.dashboard')
 @section('content')
 @if(session('success'))
@@ -15,6 +9,10 @@
     <h1 class="text-3xl font-bold text-gray-800">
         {{ $team->nombre }} ({{ strtoupper($team->modalidad) }})
     </h1>
+    <!-- 📌 Botón para añadir los rivales de la liga-->
+        <button onclick="openModal('addLeagueModal')" class="bg-blue-600 text-white px-4 py-2 rounded-lg hover:bg-green-700">
+            Añadir Liga
+        </button>
     <form action="{{ route('teams.destroy', $team->id) }}" method="POST" onsubmit="return confirm('¿Estás seguro de que deseas eliminar este equipo? Esta acción no se puede deshacer.')">
         @csrf
         @method('DELETE')
@@ -57,21 +55,7 @@
         </tbody>
     </table>
 </div>
-
-<!-- 📌 Formulario para añadir competición -->
-<div id="competicion-form" class="hidden bg-white p-4 rounded shadow-lg">
-    <form action="{{ route('rivales_liga.store') }}" method="POST">
-        @csrf
-        <label class="block">Equipo Rival:</label>
-        <input type="text" name="nombre_equipo" class="w-full border p-2 rounded mb-2" required>
-
-        <label class="block">Jornada:</label>
-        <input type="number" name="jornada" class="w-full border p-2 rounded mb-2" required>
-
-        <button type="submit" class="bg-green-500 text-white px-4 py-2 rounded">Guardar</button>
-        <button type="button" onclick="toggleForm('competicion-form')" class="bg-gray-500 text-white px-4 py-2 rounded">Cancelar</button>
-    </form>
-</div>
+@include('teams.league_form')
 
     <!-- Sección de Jugadores -->
     @if(session()->has('created_player') || session()->has('updated_player') || session()->has('added_player') || session()->has('deleted_player'))
@@ -85,12 +69,12 @@
         <button onclick="openModal('addPlayerModal')" class="bg-blue-600 text-white px-4 py-2 rounded-lg hover:bg-blue-700">
             Añadir Nuevo Jugador
         </button>
-        @include('dashboard.player_form')
+        @include('players.player_form')
 
         <button onclick="openModal('existingPlayerModal')" class="bg-purple-600 text-white px-4 py-2 rounded-lg hover:bg-purple-700 ml-4">
             Añadir Jugador de Otra Plantilla
         </button>
-        @include('dashboard.existingPlayer_form')
+        @include('players.existingPlayer_form')
     </div>
 
     <table class="w-full text-center border-collapse">
@@ -311,7 +295,7 @@
         <button onclick="openModal('ligaModal')" class="bg-green-600 text-white px-4 py-2 rounded-lg hover:bg-green-700">
             Añadir Partido de Liga
         </button>
-        @include('dashboard.leagueMatch_form')
+        @include('matches.leagueMatch_form')
         </div>
         <table class="w-full text-center border-collapse bg-white rounded-lg">
         <thead class="bg-blue-500 text-gray-900">
@@ -361,39 +345,6 @@
         </tr>
     @endif
 </tbody>
-</div>
-
-
-
-<!-- 📌 Modal para añadir partido de liga -->
-<div id="ligaModal" class="fixed inset-0 bg-gray-900 bg-opacity-50 flex items-center justify-center hidden">
-    <div class="bg-white p-6 rounded-lg shadow-lg w-96">
-        <h2 class="text-xl font-semibold mb-4 text-gray-800">Añadir Partido de Liga</h2>
-        <form action="{{ route('matches.store') }}" method="POST">
-            @csrf
-            <input type="hidden" name="tipo" value="liga">
-
-            <label class="block text-gray-700">Seleccionar Rival:</label>
-            <select name="rival_liga_id" class="w-full border p-2 rounded mb-2" required>
-                @if(isset($rivales) && count($rivales) > 0)
-                    @foreach ($rivales as $rival)
-                        <option value="{{ $rival->id }}">{{ $rival->nombre_equipo }} - Jornada {{ $rival->jornada }}</option>
-                    @endforeach
-                @else
-                    <option value="" disabled>No hay rivales disponibles</option>
-                @endif
-            </select>
-
-
-            <label class="block text-gray-700">Fecha:</label>
-            <input type="date" name="fecha_partido" class="w-full border p-2 rounded mb-2" required>
-
-            <div class="flex justify-between mt-4">
-                <button type="submit" class="bg-green-500 text-white px-4 py-2 rounded">Guardar</button>
-                <button type="button" onclick="closeModal('ligaModal')" class="bg-gray-500 text-white px-4 py-2 rounded">Cancelar</button>
-            </div>
-        </form>
-    </div>
 </div>
 
 @include('matches.alineadorModal')

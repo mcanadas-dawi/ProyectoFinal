@@ -58,7 +58,11 @@ Route::middleware(['auth', 'verified'])->group(function () {
     Route::post('/matches/{match}/save-ratings', [MatchPlayerStatController::class, 'saveRatings'])->name('matches.saveRatings');
 
     // 📌 Rivales de Liga
-    Route::resource('rivales_liga', RivalesLigaController::class)->only(['store', 'update', 'destroy']);
+    Route::get('/ligas/create', [RivalesLigaController::class, 'create'])->name('ligas.create');
+    Route::post('/ligas/store', [RivalesLigaController::class, 'store'])->name('ligas.store');
+    Route::put('/ligas/{id}', [RivalesLigaController::class, 'update'])->name('ligas.update');
+    Route::delete('/ligas/{id}', [RivalesLigaController::class, 'destroy'])->name('ligas.destroy');
+    Route::get('/ligas', [RivalesLigaController::class, 'index'])->name('ligas.index');
 });
 
 require __DIR__.'/auth.php';
