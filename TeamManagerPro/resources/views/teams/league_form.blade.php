@@ -18,6 +18,17 @@
             </div>
         @endif
 
+        @if ($errors->any())
+            <div class="bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded mb-4">
+                <strong>Errores:</strong>
+                <ul class="list-disc pl-5 mt-2">
+                    @foreach ($errors->all() as $error)
+                        <li>{{ $error }}</li>
+                    @endforeach
+                </ul>
+            </div>
+        @endif
+
         <form action="{{ route('rivales_liga.store') }}" method="POST">
             @csrf
 
@@ -30,13 +41,17 @@
 
             <!-- Número de Rivales -->
             <label class="block mb-1 font-semibold">Número de Rivales:</label>
-            <input type="number" id="numero_rivales" name="numero_rivales" class="w-full border p-2 rounded mb-3" min="1" required onchange="generarJornadas()">
+            <input type="number" id="numero_rivales" name="numero_rivales"
+                   class="w-full border p-2 rounded mb-3"
+                   min="1" required onchange="generarJornadas()">
 
             <!-- Solo Ida -->
             <div class="flex items-center mb-3">
-                <input type="checkbox" id="solo_ida" name="solo_ida" class="mr-2" onchange="generarJornadas()">
+                <input type="hidden" name="solo_ida" value="0">
+                <input type="checkbox" id="solo_ida" name="solo_ida" value="1" class="mr-2" onchange="generarJornadas()">
                 <label for="solo_ida">Solo Ida</label>
             </div>
+
 
             <!-- Jornadas Dinámicas -->
             <div id="jornadasContainer" class="space-y-2"></div>
@@ -46,13 +61,15 @@
                 <button type="submit" class="bg-green-500 text-white px-4 py-2 rounded hover:bg-green-600">
                     Crear Liga
                 </button>
-                <a href="{{ route('dashboard') }}" class="bg-gray-500 text-white px-4 py-2 rounded hover:bg-gray-600">
+                <a href="{{ route('teams.show', ['team' => $team->id]) }}"
+                   class="bg-gray-500 text-white px-4 py-2 rounded hover:bg-gray-600">
                     Cancelar
                 </a>
             </div>
         </form>
     </div>
 </div>
+
 <script>
 function generarJornadas() {
     const numeroRivales = parseInt(document.getElementById('numero_rivales').value) || 0;
@@ -66,7 +83,6 @@ function generarJornadas() {
 
     const soloIda = document.getElementById('solo_ida').checked;
 
-    // Nota sobre marcar como local (solo si es ida y vuelta)
     if (!soloIda) {
         const notaLocal = document.createElement('div');
         notaLocal.className = "bg-blue-100 border-l-4 border-blue-500 text-blue-700 p-4 rounded mb-4 text-sm";
@@ -74,18 +90,15 @@ function generarJornadas() {
         jornadasContainer.appendChild(notaLocal);
     }
 
-    // Generar jornadas (primera vuelta)
     for (let i = 1; i <= numeroRivales; i++) {
         const jornadaDiv = document.createElement('div');
         jornadaDiv.className = "bg-gray-50 border border-gray-200 p-4 rounded-lg shadow-sm mb-3";
 
-        // Label
         const label = document.createElement('label');
         label.className = "block font-medium text-gray-800 mb-2";
         label.textContent = `Jornada ${i}`;
         label.setAttribute('for', `rival_${i}`);
 
-        // Input rival
         const inputRival = document.createElement('input');
         inputRival.type = "text";
         inputRival.name = `rivales[${i}]`;
@@ -97,7 +110,6 @@ function generarJornadas() {
         jornadaDiv.appendChild(label);
         jornadaDiv.appendChild(inputRival);
 
-        // Checkbox "Local" si es ida y vuelta
         if (!soloIda) {
             const checkboxWrapper = document.createElement('div');
             checkboxWrapper.className = "flex items-center";
@@ -121,7 +133,6 @@ function generarJornadas() {
         jornadasContainer.appendChild(jornadaDiv);
     }
 
-    // Nota sobre la segunda vuelta generada automáticamente
     if (!soloIda) {
         const notaVuelta = document.createElement('div');
         notaVuelta.className = "bg-yellow-100 border-l-4 border-yellow-500 text-yellow-700 p-4 rounded mt-4 text-sm";

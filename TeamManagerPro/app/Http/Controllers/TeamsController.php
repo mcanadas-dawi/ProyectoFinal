@@ -39,8 +39,12 @@ class TeamsController extends Controller
 
     $allPlayers = Player::whereNotIn('id', $team->players->pluck('id'))->get();
     $stats = $this->getTeamStats($id);
+    $hayLiga = Matches::where('team_id', $team->id)
+                  ->where('tipo', 'liga')
+                  ->exists();
 
-    return view('dashboard.team_show', compact('team', 'allPlayers', 'stats', 'partidosAmistosos', 'partidosLiga'));
+
+    return view('dashboard.team_show', compact('team', 'allPlayers', 'stats', 'partidosAmistosos', 'partidosLiga','hayLiga'));
 }
 
 

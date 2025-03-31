@@ -10,15 +10,27 @@ class RivalesLigaController extends Controller
 {
     // Mostrar la vista de creación de liga
     public function create()
-    {
-        $teamId = session('current_team_id');
-        if (!$teamId) {
-            return redirect()->route('dashboard')->with('error', 'Selecciona una plantilla primero.');
-        }
-        $team = Team::findOrFail($teamId);
-        
-        return view('teams.league_form', compact('team'));
+{
+    $teamId = session('current_team_id');
+
+    if (!$teamId) {
+        return redirect()->route('dashboard')->with('error', 'Selecciona una plantilla primero.');
     }
+
+    $hayLiga = Matches::where('team_id', $teamId)
+                      ->where('tipo', 'liga')
+                      ->exists();
+
+    if ($hayLiga) {
+        return redirect()->route('teams.show', ['team' => $teamId])
+                         ->with('error', 'Esta plantilla ya tiene una liga.');
+    }
+
+    $team = Team::findOrFail($teamId);
+
+    return view('teams.league_form', compact('team'));
+}
+
        
   
     // Guardar la liga con rivales y jornadas
@@ -27,15 +39,15 @@ class RivalesLigaController extends Controller
     $request->validate([
         'nombre_liga' => 'required|string|max:255',
         'rivales' => 'required|array',
-        'rivales.*' => 'required|string',
+        'rivales.*' => ['required', 'string', 'not_in:'],
         'solo_ida' => 'nullable|boolean',
-        'team_id' => 'required|exists:teams,id', // añade validación de existencia
+        'team_id' => 'required|exists:teams,id', 
     ]);
 
     $nombreLiga = $request->input('nombre_liga');
     $rivales = $request->input('rivales');
-    $soloIda = $request->has('solo_ida');
-    $teamId = $request->input('team_id'); // 👈 Aquí lo obtienes claramente del formulario
+    $soloIda = $request->boolean('solo_ida');
+    $teamId = $request->input('team_id'); 
 
     $jornada = 1;
 
@@ -77,7 +89,7 @@ class RivalesLigaController extends Controller
         }
     }
 
-    return redirect()->route('teams.show', ['id' => $teamId])
+    return redirect()->route('teams.show', ['team' => $teamId])
     ->with('success', 'Liga creada correctamente.');
 }
 
