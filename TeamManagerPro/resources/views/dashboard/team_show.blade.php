@@ -10,9 +10,10 @@
         {{ $team->nombre }} ({{ strtoupper($team->modalidad) }})
     </h1>
     <!-- 📌 Botón para añadir los rivales de la liga-->
-        <button onclick="openModal('addLeagueModal')" class="bg-blue-600 text-white px-4 py-2 rounded-lg hover:bg-green-700">
-            Añadir Liga
-        </button>
+    <a href="{{ route('rivales_liga.create') }}" class="bg-blue-600 text-white px-4 py-2 rounded-lg hover:bg-green-700 inline-block">
+        Añadir Liga
+    </a>
+
     <form action="{{ route('teams.destroy', $team->id) }}" method="POST" onsubmit="return confirm('¿Estás seguro de que deseas eliminar este equipo? Esta acción no se puede deshacer.')">
         @csrf
         @method('DELETE')
@@ -55,7 +56,6 @@
         </tbody>
     </table>
 </div>
-@include('teams.league_form')
 
     <!-- Sección de Jugadores -->
     @if(session()->has('created_player') || session()->has('updated_player') || session()->has('added_player') || session()->has('deleted_player'))
@@ -291,10 +291,21 @@
 <div class="bg-blue-400 shadow-lg rounded-lg p-6 mb-6">
     <div class="flex items-center justify-center mb-4">
         <h2 class="text-2xl font-semibold text-gray-900 flex-grow text-left">Partidos de Liga</h2>
-        <!-- 📌 Botón para añadir partido amistoso -->
+        <!-- 📌 Botón para añadir partido liga -->
         <button onclick="openModal('ligaModal')" class="bg-green-600 text-white px-4 py-2 rounded-lg hover:bg-green-700">
             Añadir Partido de Liga
         </button>
+        <form action="{{ route('rivales_liga.destroy', ['id' => $team->id]) }}" method="POST"
+            onsubmit="return confirm('¿Estás seguro de que deseas eliminar esta liga? Esta acción no se puede deshacer.');"
+            class="ml-3">
+            @csrf
+            @method('DELETE')
+            <button type="submit"
+                    class="bg-red-500 text-white px-4 py-2 rounded-lg hover:bg-red-700">
+                Eliminar Liga
+            </button>
+        </form>
+
         @include('matches.leagueMatch_form')
         </div>
         <table class="w-full text-center border-collapse bg-white rounded-lg">

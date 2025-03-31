@@ -23,24 +23,26 @@ class TeamsController extends Controller
 {
     $team = Team::where('id', $id)
         ->where('user_id', Auth::id())
-        ->with(['players', 'matches']) // Cargar los jugadores y partidos
+        ->with(['players', 'matches'])
         ->firstOrFail();
 
-    // Obtener los partidos directamente de la base de datos
-    $partidosAmistosos = Matches::where('team_id', $id)
-                            ->where('tipo', 'amistoso')
-                            ->get();
+    // Guarda claramente el equipo actual en la sesión
+    session(['current_team_id' => $team->id]);
 
-    $partidosLiga = Matches::where('team_id', $id)
-                        ->where('tipo', 'liga')
+    $partidosAmistosos = Matches::where('team_id', $id)
+                        ->where('tipo', 'amistoso')
                         ->get();
 
-    // Forzar la recarga del objeto desde la base de datos
+    $partidosLiga = Matches::where('team_id', $id)
+                    ->where('tipo', 'liga')
+                    ->get();
+
     $allPlayers = Player::whereNotIn('id', $team->players->pluck('id'))->get();
     $stats = $this->getTeamStats($id);
 
     return view('dashboard.team_show', compact('team', 'allPlayers', 'stats', 'partidosAmistosos', 'partidosLiga'));
 }
+
 
     
 

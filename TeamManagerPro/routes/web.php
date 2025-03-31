@@ -16,19 +16,16 @@ Route::get('/', function () {
 });
 
 Route::middleware(['auth', 'verified'])->group(function () {
+
     Route::get('/profile', [ProfileController::class, 'edit'])->name('profile.edit');
     Route::patch('/profile', [ProfileController::class, 'update'])->name('profile.update');
     Route::delete('/profile', [ProfileController::class, 'destroy'])->name('profile.destroy');
     
-    // 📌 Dashboard
+    // 📌 Dashboard apunta al index de TeamsController
     Route::get('/dashboard', [TeamsController::class, 'index'])->name('dashboard');
 
-    // 📌 Equipos
-    Route::post('/teams', [TeamsController::class, 'store'])->name('teams.store');
-    Route::delete('/teams/{id}', [TeamsController::class, 'destroy'])->name('teams.destroy');
-    Route::get('/teams/{id}', [TeamsController::class, 'show'])->name('teams.show');
-    Route::resource('teams', TeamsController::class);
-
+    // 📌 Equipos (sin index redundante)
+    Route::resource('teams', TeamsController::class)->except(['index']);
 
     // 📌 Jugadores
     Route::post('/players', [PlayersController::class, 'store'])->name('players.store');
@@ -40,7 +37,7 @@ Route::middleware(['auth', 'verified'])->group(function () {
     Route::post('/matches', [MatchesController::class, 'store'])->name('matches.store');
     Route::patch('/matches/{id}', [MatchesController::class, 'update'])->name('matches.update');
     Route::delete('/matches/{id}', [MatchesController::class, 'destroy'])->name('matches.destroy');
-    Route::resource('matches', MatchesController::class);
+    Route::resource('matches', MatchesController::class)->except(['store', 'update', 'destroy']);
 
     // 📌 Convocatorias
     Route::post('/matches/convocatoria', [ConvocatoriasController::class, 'store'])->name('matches.convocatoria');
@@ -58,11 +55,12 @@ Route::middleware(['auth', 'verified'])->group(function () {
     Route::post('/matches/{match}/save-ratings', [MatchPlayerStatController::class, 'saveRatings'])->name('matches.saveRatings');
 
     // 📌 Rivales de Liga
-    Route::get('/ligas/create', [RivalesLigaController::class, 'create'])->name('ligas.create');
-    Route::post('/ligas/store', [RivalesLigaController::class, 'store'])->name('ligas.store');
-    Route::put('/ligas/{id}', [RivalesLigaController::class, 'update'])->name('ligas.update');
-    Route::delete('/ligas/{id}', [RivalesLigaController::class, 'destroy'])->name('ligas.destroy');
-    Route::get('/ligas', [RivalesLigaController::class, 'index'])->name('ligas.index');
+    Route::get('/ligas/create', [RivalesLigaController::class, 'create'])->name('rivales_liga.create');
+    Route::post('/ligas/store', [RivalesLigaController::class, 'store'])->name('rivales_liga.store');
+    Route::put('/ligas/{id}', [RivalesLigaController::class, 'update'])->name('rivales_liga.update');
+    Route::delete('/ligas/{id}', [RivalesLigaController::class, 'destroy'])->name('rivales_liga.destroy');
+    Route::get('/ligas', [RivalesLigaController::class, 'index'])->name('rivales_liga.index');
 });
+
 
 require __DIR__.'/auth.php';
