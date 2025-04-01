@@ -120,7 +120,6 @@ public function update(Request $request, $id)
 {
     $request->validate([
         'tipo' => 'required|in:amistoso,liga',
-        'equipo_rival' => 'required|string|max:255',
         'rival_liga_id' => 'nullable|integer',
         'fecha_partido' => 'required|date',
         'goles_a_favor' => 'nullable|integer',
@@ -131,7 +130,7 @@ public function update(Request $request, $id)
 
     $match = Matches::findOrFail($id);
 
-    // Calcular el resultado explícitamente
+    // Calcular el resultado
     $resultado = 'Derrota';
     if ($request->goles_a_favor > $request->goles_en_contra) {
         $resultado = 'Victoria';
@@ -139,20 +138,21 @@ public function update(Request $request, $id)
         $resultado = 'Empate';
     }
 
-    // Actualizar el partido explícitamente
-    $match->equipo_rival = $request->equipo_rival;
+    // Actualizar el partido
     $match->tipo = $request->tipo;
     $match->fecha_partido = $request->fecha_partido;
-    $match->goles_a_favor = intval($request->goles_a_favor);
-    $match->goles_en_contra = intval($request->goles_en_contra);
+    $match->goles_a_favor = $request->filled('goles_a_favor') ? intval($request->goles_a_favor) : null;
+    $match->goles_en_contra = $request->filled('goles_en_contra') ? intval($request->goles_en_contra) : null;
     $match->resultado = $resultado;
-    $match->actuacion_equipo = floatval($request->actuacion_equipo);
+    $match->actuacion_equipo = $request->filled('actuacion_equipo') ? floatval($request->actuacion_equipo) : null;
     $match->save();
 
-    $message = $match->tipo === 'liga' ? 'Partido de liga actualizado correctamente' : 'Partido amistoso actualizado correctamente';
+    $message = $match->tipo === 'liga'
+        ? 'Partido de liga actualizado correctamente'
+        : 'Partido amistoso actualizado correctamente';
+
     $key = $match->tipo === 'liga' ? 'success_liga' : 'success_amistoso';
 
-    // Enviar el mensaje de éxito con una clave personalizada
     session()->flash($key, $message);
 
     return response()->json(['success' => true, 'message' => $message], 200);

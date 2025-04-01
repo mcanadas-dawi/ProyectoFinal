@@ -271,7 +271,7 @@
                     @method('DELETE')
                     <button type="submit" class="bg-red-500 text-white px-3 py-1 rounded">Eliminar</button>
                 </form>
-                <!-- Incluir el formulario desde el archivo parcial -->
+                <!-- Incluir el formulario para amistosos -->
                 @include('matches.editFriendlyMatch_form', ['match' => $match])
             </td>
         </tr>
@@ -309,6 +309,7 @@
                 <th class="p-2">Convocatoria</th>
                 <th class="p-2">Acciones</th>
             </tr>
+            </tr>
         </thead>
         <tbody>
     @if(isset($partidosLiga) && count($partidosLiga) > 0)
@@ -321,21 +322,87 @@
                     default => 'bg-green-100',
                 };
             @endphp
-            <tr class="border-b {{ $colorClase }}">
-                <td class="p-2">{{ $match->rivalLiga->jornada ?? 'N/A' }}</td>
-                <td class="p-2">{{ $match->rivalLiga->nombre_equipo ?? 'N/A' }}</td>
-                <td class="p-2">{{ $match->fecha_partido ?? 'Sin fecha' }}</td>
-                <td class="p-2">{{ $match->goles_a_favor ?? 0 }}</td>
-                <td class="p-2">{{ $match->goles_en_contra ?? 0 }}</td>
-                <td class="p-2">{{ $match->resultado ?? 'Pendiente' }}</td>
-                <td class="p-2">{{ $match->actuacion_equipo ?? 'N/A' }}</td>
-                <td class="p-2"><button class="bg-indigo-500 text-white px-3 py-1 rounded">Alineador</button></td>
-                <td class="p-2"><button class="bg-blue-500 text-white px-3 py-1 rounded">Convocatoria</button></td>
-                <td class="p-2">
-                    <button class="bg-yellow-500 text-white px-3 py-1 rounded">Editar</button>
-                    <button class="bg-red-500 text-white px-3 py-1 rounded">Eliminar</button>
-                </td>
-            </tr>
+            
+            <tr id="match-row-{{ $match->id }}" class="border-b {{ $colorClase }}">
+                <td class="p-2 text-center">{{ $match->rivalLiga->jornada ?? 'N/A' }}</td>
+                <td class="p-2 text-center">{{ $match->rivalLiga->nombre_equipo ?? 'N/A' }}</td>
+                <td class="p-2 text-center">
+                <span id="fecha-{{ $match->id }}">{{ $match->fecha_partido }}</span>
+                <input type="date" name="fecha_partido" class="hidden w-16 p-1 border rounded" id="edit-fecha-{{ $match->id }}" value="{{ $match->fecha_partido }}">
+            </td>
+        <!-- Goles a Favor -->
+        <td class="p-2 text-center">
+            <span id="goles-favor-{{ $match->id }}">{{ $match->goles_a_favor }}</span>
+            <input type="number" name="goles_a_favor" class="hidden w-16 p-1 border rounded" 
+                id="edit-goles-favor-{{ $match->id }}" 
+                value="{{ $match->goles_a_favor }}"
+                onchange="updateResultado('{{ $match->id }}')">
+        </td>
+
+        <!-- Goles en Contra -->
+        <td class="p-2 text-center">
+            <span id="goles-contra-{{ $match->id }}">{{ $match->goles_en_contra }}</span>
+            <input type="number" name="goles_en_contra" class="hidden w-16 p-1 border rounded" 
+                id="edit-goles-contra-{{ $match->id }}" 
+                value="{{ $match->goles_en_contra }}"
+                onchange="updateResultado('{{ $match->id }}')">
+        </td>
+
+        <!-- Resultado (Solo Mostrar) -->
+        <td class="p-2 text-center">
+            <span id="resultado-{{ $match->id }}">{{ $match->resultado }}</span>
+            <input type="hidden" name="resultado" id="edit-resultado-{{ $match->id }}" value="{{ $match->resultado }}">
+        </td>
+
+    <!-- Actuación -->
+    <td class="p-2 text-center">
+        <span id="actuacion-{{ $match->id }}">{{ $match->actuacion_equipo !== null ? number_format($match->actuacion_equipo, 2) : 'N/A' }}</span>
+        <input type="number" name="actuacion_equipo" step="0.01" min="0" max="10"
+               class="hidden w-16 p-1 border rounded"
+               id="edit-actuacion-{{ $match->id }}"
+               value="{{ $match->actuacion_equipo }}">
+    </td>
+
+    <!-- Convocatoria -->
+    <td class="p-2 text-center">
+        <button onclick="openModal('convocatoriaModal')" class="bg-blue-500 text-white px-3 py-1 rounded">
+            Convocatoria
+        </button>
+    </td>
+
+    <!-- Alineador -->
+    <td class="p-2 text-center">
+        <button onclick="openAlineador('{{ $match->id }}')" class="bg-indigo-500 text-white px-3 py-1 rounded">
+            Alineador
+        </button>
+    </td>
+
+    <!-- Acciones -->
+    <td class="p-2 text-center">
+        <a href="{{ route('matches.ratePlayers', $match->id) }}" class="bg-orange-400 text-white px-3 py-1 rounded block mb-2">
+            Valorar Jugadores 
+        </a>
+
+        <button onclick="editMatch('{{ $match->id }}')" id="edit-btn-match-{{ $match->id }}" class="bg-yellow-500 text-white px-3 py-1 rounded">Editar</button>
+        <button type="button" onclick="saveMatch('{{ $match->id }}')" id="save-btn-match-{{ $match->id }}"
+    class="hidden bg-green-500 text-white px-3 py-1 rounded">
+    Guardar
+</button>
+
+        <button onclick="cancelEditMatch('{{ $match->id }}')" id="cancel-btn-match-{{ $match->id }}" class="hidden bg-gray-500 text-white px-3 py-1 rounded">Cancelar</button>
+
+        <form action="{{ route('matches.destroy', $match->id) }}" method="POST"
+              onsubmit="return confirm('¿Estás seguro de que deseas eliminar este partido? Esta acción no se puede deshacer.')"
+              id="delete-form-match-{{ $match->id }}" class="inline">
+            @csrf
+            @method('DELETE')
+            <button type="submit" class="bg-red-500 text-white px-3 py-1 rounded">Eliminar</button>
+        </form>
+        <!-- Incluir el formulario para amistosos -->
+        @include('matches.editLeagueMatch_form', ['match' => $match])  
+    </td>
+</tr>
+    
         @endforeach
     @else
         <tr>
@@ -343,6 +410,7 @@
         </tr>
     @endif
 </tbody>
+</table>
 </div>
 
 @include('matches.alineadorModal')
@@ -451,27 +519,31 @@ function cancelEditMatch(id) {
 
 function saveMatch(id) {
     const form = document.getElementById(`edit-match-form-${id}`);
+    if (!form) {
+        alert("❌ No se encontró el formulario para el partido ID: " + id);
+        return;
+    }
+
     const csrfToken = form.querySelector('input[name="_token"]').value;
 
-    // Obtener los valores directamente desde los campos editados
+    // Obtener valores de los campos editables
     const golesFavor = document.getElementById(`edit-goles-favor-${id}`).value;
     const golesContra = document.getElementById(`edit-goles-contra-${id}`).value;
     const resultado = document.getElementById(`edit-resultado-${id}`).value;
     const actuacion = document.getElementById(`edit-actuacion-${id}`).value;
     const fechaPartido = document.getElementById(`edit-fecha-${id}`).value;
-    const equipoRival = document.getElementById(`edit-equipo-rival-${id}`).value;
-    const tipo = "amistoso";
 
-    // Actualizar los campos ocultos del formulario
+    // Obtener tipo desde el input oculto (amistoso o liga)
+    const tipo = form.querySelector(`input[name="tipo"]`).value;
+
+    // Rellenar el formulario oculto
     form.querySelector(`input[name="goles_a_favor"]`).value = golesFavor;
     form.querySelector(`input[name="goles_en_contra"]`).value = golesContra;
     form.querySelector(`input[name="resultado"]`).value = resultado;
     form.querySelector(`input[name="actuacion_equipo"]`).value = actuacion;
     form.querySelector(`input[name="fecha_partido"]`).value = fechaPartido;
-    form.querySelector(`input[name="equipo_rival"]`).value = equipoRival;
-    form.querySelector(`input[name="tipo"]`).value = tipo;
 
-    // Enviar el formulario al backend usando PATCH
+    // Enviar mediante fetch
     fetch(form.action, {
         method: 'POST',
         headers: {
@@ -491,12 +563,13 @@ function saveMatch(id) {
     })
     .then(data => {
         toggleMatchEditState(id, false);
-        location.reload();
+        location.reload(); // Recarga para actualizar tabla + estadísticas
     })
     .catch(error => {
         alert('Ocurrió un error al guardar el partido: ' + error.message);
     });
 }
+
 
 
 
