@@ -60,7 +60,7 @@ class MatchPlayerStatController extends Controller
                 $query->wherePivot('convocado', true);
             }])->findOrFail($matchId);
     
-            return view('matches.rate_players', compact('match'));
+            return view('players.rate_players', compact('match'));
         } catch (\Exception $e) {
             return redirect()->back()->with('error', 'No se pudieron cargar los jugadores para valoración.');
         }
