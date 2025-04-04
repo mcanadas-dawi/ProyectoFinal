@@ -4,10 +4,6 @@
         <h2 class="text-xl font-semibold text-gray-800 mb-4 text-center">Seleccionar Jugadores Convocados</h2>
         <form id="convocatoriaForm">
             @csrf
-                @if(isset($match))
-                    <input type="hidden" name="match_id" value="{{ $match->id }}">
-                @endif
-
             <!-- Lista de jugadores con checkboxes -->
             <div class="max-h-60 overflow-y-auto">
                 <button type="button" onclick="toggleSelectAll()" class="bg-gray-500 text-white px-4 py-2 rounded-lg mb-2">
@@ -43,5 +39,18 @@ function toggleSelectAll() {
     checkboxes.forEach(checkbox => {
         checkbox.checked = !allSelected;
     });
+}
+function openConvocatoriaModal(matchId) {
+    // Asegúrate de que exista el input hidden, o créalo si no
+    let input = document.querySelector('#convocatoriaForm input[name="match_id"]');
+    if (!input) {
+        input = document.createElement('input');
+        input.type = 'hidden';
+        input.name = 'match_id';
+        document.getElementById('convocatoriaForm').appendChild(input);
+    }
+    input.value = matchId;
+
+    openModal('convocatoriaModal');
 }
 </script>

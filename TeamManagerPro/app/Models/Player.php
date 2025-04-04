@@ -67,6 +67,37 @@ class Player extends Model
                     ->firstOrNew();
     }
 
+    //Obtengo las estadisticas de un jugador SOLO EN LA LIGA
+    public function leagueStats($teamId)
+    {
+        // Partidos jugados por este jugador en este equipo y solo en liga
+        $stats = \App\Models\MatchPlayerStat::where('player_id', $this->id)
+            ->whereHas('match', function ($q) use ($teamId) {
+                $q->where('team_id', $teamId)
+                  ->where('tipo', 'liga');
+            });
+    
+        // Clonar la query para contar cuántos partidos tiene este jugador
+        $partidosJugados = (clone $stats)->count();
+    
+        $resumen = $stats->selectRaw('
+            SUM(minutos_jugados) as minutos_jugados,
+            SUM(goles) as goles,
+            SUM(asistencias) as asistencias,
+            SUM(tarjetas_amarillas) as tarjetas_amarillas,
+            SUM(tarjetas_rojas) as tarjetas_rojas,
+            SUM(titular) as titular,
+            AVG(valoracion) as valoracion
+        ')->first();
+    
+        // Calcular suplente virtualmente
+        $resumen->suplente = $partidosJugados - ($resumen->titular ?? 0);
+    
+        return $resumen;
+    }
+    
+
+
     // 📌 MUTATORS Y ACCESSORS
 
     public function getMinutosJugadosAttribute($value)

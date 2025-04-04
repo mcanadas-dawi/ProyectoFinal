@@ -6,6 +6,7 @@ use App\Models\Team;
 use App\Models\Player;
 use App\Models\Matches;
 use App\Models\RivalLiga;
+use App\Models\MatchPlayerStat;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Log;
 
@@ -26,25 +27,58 @@ class TeamsController extends Controller
         ->with(['players', 'matches'])
         ->firstOrFail();
 
-    // Guarda claramente el equipo actual en la sesión
     session(['current_team_id' => $team->id]);
 
-    $partidosAmistosos = Matches::where('team_id', $id)
-                        ->where('tipo', 'amistoso')
-                        ->get();
+    $partidosAmistosos = $team->matches()->where('tipo', 'amistoso')->get();
+    $partidosLiga = $team->matches()->where('tipo', 'liga')->get();
 
-    $partidosLiga = Matches::where('team_id', $id)
-                    ->where('tipo', 'liga')
-                    ->get();
+    $hayLiga = $partidosLiga->isNotEmpty();
 
     $allPlayers = Player::whereNotIn('id', $team->players->pluck('id'))->get();
-    $stats = $this->getTeamStats($id);
-    $hayLiga = Matches::where('team_id', $team->id)
-                  ->where('tipo', 'liga')
-                  ->exists();
 
+    // 📊 Cálculo de estadísticas
+    $victorias = $partidosLiga->where('resultado', 'Victoria')->count();
+    $empates = $partidosLiga->where('resultado', 'Empate')->count();
+    $derrotas = $partidosLiga->where('resultado', 'Derrota')->count();
+    $puntos = ($victorias * 3) + $empates;
 
-    return view('dashboard.team_show', compact('team', 'allPlayers', 'stats', 'partidosAmistosos', 'partidosLiga','hayLiga'));
+    $golesFavor = $partidosLiga->sum('goles_a_favor');
+    $golesContra = $partidosLiga->sum('goles_en_contra');
+
+    $valoracionMedia = $partidosLiga->pluck('actuacion_equipo')->filter()->avg() ?? 0;
+    $valoracionMedia = round($valoracionMedia, 2);
+
+    // Tarjetas (desde match_player_stats)
+    $tarjetasAmarillas = 0;
+    $tarjetasRojas = 0;
+
+    foreach ($team->players as $player) {
+        $statsJugador = MatchPlayerStat::where('player_id', $player->id)
+            ->whereHas('match', function ($q) use ($team) {
+                $q->where('team_id', $team->id)
+                  ->where('tipo', 'liga');
+            })
+            ->get();
+
+        $tarjetasAmarillas += $statsJugador->sum('tarjetas_amarillas');
+        $tarjetasRojas += $statsJugador->sum('tarjetas_rojas');
+    }
+
+    $stats = [
+        'victorias' => $victorias,
+        'empates' => $empates,
+        'derrotas' => $derrotas,
+        'puntos' => $puntos,
+        'goles_favor' => $golesFavor,
+        'goles_contra' => $golesContra,
+        'valoracion_media' => $valoracionMedia,
+        'tarjetas_amarillas' => $tarjetasAmarillas,
+        'tarjetas_rojas' => $tarjetasRojas,
+    ];
+
+    return view('dashboard.team_show', compact(
+        'team', 'allPlayers', 'stats', 'partidosAmistosos', 'partidosLiga', 'hayLiga'
+    ));
 }
 
 
