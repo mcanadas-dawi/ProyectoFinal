@@ -70,14 +70,12 @@ class Player extends Model
     //Obtengo las estadisticas de un jugador SOLO EN LA LIGA
     public function leagueStats($teamId)
     {
-        // Partidos jugados por este jugador en este equipo y solo en liga
         $stats = \App\Models\MatchPlayerStat::where('player_id', $this->id)
             ->whereHas('match', function ($q) use ($teamId) {
                 $q->where('team_id', $teamId)
                   ->where('tipo', 'liga');
             });
     
-        // Clonar la query para contar cuántos partidos tiene este jugador
         $partidosJugados = (clone $stats)->count();
     
         $resumen = $stats->selectRaw('
@@ -90,11 +88,15 @@ class Player extends Model
             AVG(valoracion) as valoracion
         ')->first();
     
-        // Calcular suplente virtualmente
+        $resumen->partidos = $partidosJugados;
         $resumen->suplente = $partidosJugados - ($resumen->titular ?? 0);
+        $resumen->minutos_por_partido = $partidosJugados > 0
+            ? round(($resumen->minutos_jugados ?? 0) / $partidosJugados)
+            : 0;
     
         return $resumen;
     }
+    
     
 
 

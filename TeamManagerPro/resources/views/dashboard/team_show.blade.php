@@ -421,10 +421,10 @@
                 <th class="p-2">Nombre</th>
                 <th class="p-2">Apellido</th>
                 <th class="p-2">Dorsal</th>
-                <th class="p-2">Edad</th>
                 <th class="p-2">Posición</th>
-                <th class="p-2">Pie</th>
+                <th class="p-2">Partidos</th>
                 <th class="p-2">Minutos</th>
+                <th class="p-2">Min/Partido</th>
                 <th class="p-2">Goles/Encajados(POR)</th>
                 <th class="p-2">Asist</th>
                 <th class="p-2">Tit</th>
@@ -432,7 +432,6 @@
                 <th class="p-2">Valoración</th>
                 <th class="p-2">Amarillas</th>
                 <th class="p-2">Rojas</th>
-                <th class="p-2">Acciones</th>
             </tr>
         </thead>
         <tbody>
@@ -445,10 +444,6 @@
                     <td class="p-2">{{ $player->apellido }}</td>
                     <td class="p-2">{{ $player->dorsal }}</td>
                     <td class="p-2">
-                        <span id="edad-{{ $player->id }}"></span> 
-                        <span class="hidden" id="fecha-nacimiento-{{ $player->id }}">{{ $player->fecha_nacimiento }}</span>
-                    </td>
-                    <td class="p-2">
                         <span id="pos-{{ $player->id }}">{{ $player->posicion }}</span>
                         <select name="posicion" class="hidden w-full p-1 border rounded" id="edit-pos-{{ $player->id }}">
                             <option value="Portero" @selected($player->posicion == 'Portero')>Portero</option>
@@ -457,16 +452,9 @@
                             <option value="Delantero" @selected($player->posicion == 'Delantero')>Delantero</option>
                         </select>
                     </td>
-                    <td class="p-2">
-                        <span id="perfil-{{ $player->id }}">
-                            @if($player->perfil == 'Diestro') D @else I @endif
-                        </span>
-                        <select name="perfil" class="hidden w-full p-1 border rounded" id="edit-perfil-{{ $player->id }}">
-                            <option value="Diestro" @selected($player->perfil == 'Diestro')>Diestro</option>
-                            <option value="Zurdo" @selected($player->perfil == 'Zurdo')>Zurdo</option>
-                        </select>
-                    </td>
+                    <td class="p-2">{{ $stats->partidos ?? 0 }}</td>
                     <td class="p-2">{{ $stats->minutos_jugados ?? 0 }}</td>
+                    <td class="p-2">{{ $stats->minutos_por_partido ?? 0 }}</td>
                     <td class="p-2">{{ $stats->goles ?? 0 }}</td>
                     <td class="p-2">{{ $stats->asistencias ?? 0 }}</td>
                     <td class="p-2">{{ $stats->titular ?? 0 }}</td>
@@ -474,24 +462,6 @@
                     <td class="p-2 font-bold text-blue-600">{{ number_format($stats->valoracion ?? 0, 2) }}</td>
                     <td class="p-2 text-yellow-600 font-bold">{{ $stats->tarjetas_amarillas ?? 0 }}</td>
                     <td class="p-2 text-red-600 font-bold">{{ $stats->tarjetas_rojas ?? 0 }}</td>
-                    <td class="p-2 text-center">
-                        <!-- Botón Editar -->
-                        <button onclick="editPlayer('{{ $player->id }}')" id="edit-btn-{{ $player->id }}" class="bg-yellow-500 text-white px-3 py-1 rounded">Editar</button>
-
-                        <!-- Botón Guardar (oculto inicialmente) -->
-                        <button onclick="savePlayer('{{ $player->id }}')" id="save-btn-{{ $player->id }}" class="hidden bg-green-500 text-white px-3 py-1 rounded">Guardar</button>
-
-                        <!-- Botón Cancelar (oculto inicialmente) -->
-                        <button onclick="cancelEditPlayer('{{ $player->id }}')" id="cancel-btn-{{ $player->id }}" class="hidden bg-gray-500 text-white px-3 py-1 rounded">Cancelar</button>
-
-                        <!-- Botón Eliminar -->
-                        <form action="{{ route('players.destroy', $player->id) }}" method="POST" onsubmit="return confirm('¿Estás seguro de que deseas eliminar a este jugador de la plantilla? Esta acción no se puede deshacer.')" id="delete-form-{{ $player->id }}" class="inline">
-                            @csrf
-                            @method('DELETE')
-                            <input type="hidden" name="team_id" value="{{ $team->id }}">
-                            <button type="submit" class="bg-red-500 text-white px-3 py-1 rounded">Eliminar</button>
-                        </form>
-                    </td>
                 </tr>
             @endforeach
         </tbody>
