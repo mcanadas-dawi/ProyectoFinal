@@ -29,7 +29,7 @@ class Matches extends Model
     public function players()
     {
         return $this->belongsToMany(Player::class, 'player_match', 'match_id', 'player_id')
-                    ->withPivot('convocado', 'valoracion')
+                    ->withPivot('convocado', 'posicion')
                     ->withTimestamps();
     }
 

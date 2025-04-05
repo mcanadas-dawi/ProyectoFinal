@@ -19,7 +19,7 @@ class PlayersController extends Controller
             'dni' => 'required|string|max:50|unique:players,dni',
             'dorsal' => 'required|integer|min:1|max:99',
             'fecha_nacimiento' => 'required|date',
-            'posicion' => 'required|string|max:50',
+            'posicion' => 'required|string|in:Portero,Defensa,Centrocampista,Delantero',
             'perfil' => 'required|string|max:50',
         ]);
     
@@ -109,7 +109,7 @@ class PlayersController extends Controller
         $player = Player::findOrFail($id);
 
         $request->validate([
-            'posicion' => 'required|string|max:50',
+            'posicion' => 'required|string|in:Portero,Defensa,Centrocampista,Delantero',
             'perfil' => 'required|string|max:50',
         ]);
 
