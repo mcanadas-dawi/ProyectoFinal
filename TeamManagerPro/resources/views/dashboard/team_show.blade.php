@@ -55,8 +55,8 @@
         <td class="p-2">{{ $stats['goles_favor'] ?? 0 }}</td>
         <td class="p-2">{{ $stats['goles_contra'] ?? 0 }}</td>
         <td class="p-2 text-yellow-600 font-bold">{{ $stats['tarjetas_amarillas'] ?? 0 }}</td>
-        <td class="p-2 text-red-600 font-bold">{{ $stats['tarjetas_rojas'] ?? 0 }}</td>
-        <td class="p-2 text-green-600 font-bold">{{ number_format($stats['valoracion_media'] ?? 0, 2) }}</td>
+        <td class="p-2 text-[#DC2626] font-bold">{{ $stats['tarjetas_rojas'] ?? 0 }}</td>
+        <td class="p-2 text-[#00B140] font-bold">{{ number_format($stats['valoracion_media'] ?? 0, 2) }}</td>
 
             </tr>
         </tbody>
@@ -145,8 +145,8 @@
                         <td class="p-2">{{ $stats->titular ?? 0 }}</td>
                         <td class="p-2">{{ $stats->suplente ?? 0 }}</td>
                         <td class="p-2 font-bold text-[#00B140]">{{ number_format($stats->valoracion ?? 0, 2) }}</td>
-                        <td class="p-2 text-yellow-400 font-bold">{{ $stats->tarjetas_amarillas ?? 0 }}</td>
-                        <td class="p-2 text-red-500 font-bold">{{ $stats->tarjetas_rojas ?? 0 }}</td>
+                        <td class="p-2 text-[#FACC15] font-bold">{{ $stats->tarjetas_amarillas ?? 0 }}</td>
+                        <td class="p-2 text-[#DC2626] font-bold">{{ $stats->tarjetas_rojas ?? 0 }}</td>
                         <td class="p-2 flex flex-wrap justify-center gap-2">
                             <button onclick="editPlayer('{{ $player->id }}')" id="edit-btn-{{ $player->id }}" class="bg-[#FACC15] text-black  px-3 py-1 rounded hover:brightness-110">
                                 Editar
@@ -330,7 +330,7 @@
                         $colorClase = match ($match->resultado ?? '') {
                             'Victoria' => 'bg-[#00B140] text-white',
                             'Empate'   => 'bg-[#FACC15] text-black',
-                            'Derrota'  => 'bg-red-500 text-white',
+                            'Derrota'  => 'bg-[#DC2626] text-white',
                             default    => 'bg-[#334155] text-white',
                         };
                     @endphp
@@ -479,8 +479,8 @@
                     <td class="p-2">{{ $stats->titular ?? 0 }}</td>
                     <td class="p-2">{{ $stats->suplente ?? 0 }}</td>
                     <td class="p-2 font-bold text-[#3B82F6]">{{ number_format($stats->valoracion ?? 0, 2) }}</td>
-                    <td class="p-2 text-yellow-500 font-bold">{{ $stats->tarjetas_amarillas ?? 0 }}</td>
-                    <td class="p-2 text-red-500 font-bold">{{ $stats->tarjetas_rojas ?? 0 }}</td>
+                    <td class="p-2 text-[#FACC15] font-bold">{{ $stats->tarjetas_amarillas ?? 0 }}</td>
+                    <td class="p-2 text-[#DC2626] font-bold">{{ $stats->tarjetas_rojas ?? 0 }}</td>
                 </tr>
             @endforeach
         </tbody>
@@ -760,7 +760,7 @@ function actualizarColorFila(id) {
     const fila = document.getElementById(`match-row-${id}`);
 
     // Limpiar clases de color anteriores
-    fila.classList.remove("bg-[#00B140]", "bg-[#FACC15] text-black", "bg-red-300");
+    fila.classList.remove("bg-[#00B140]", "bg-[#FACC15] text-black", "bg-[#DC2626]");
 
     // Asignar el color adecuado según el resultado
     if (resultado === "Victoria") {
@@ -768,7 +768,7 @@ function actualizarColorFila(id) {
     } else if (resultado === "Empate") {
         fila.classList.add("bg-[#FACC15] text-black");
     } else if (resultado === "Derrota") {
-        fila.classList.add("bg-red-300");
+        fila.classList.add("bg-[#DC2626]");
     }
 }
 function calcularEdad(fechaNacimiento) {
