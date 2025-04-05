@@ -209,20 +209,21 @@
 @if(isset($partidosAmistosos) && count($partidosAmistosos) > 0)
     @foreach ($partidosAmistosos as $match)
         @php
-            // Determinar el color de la fila según el resultado
-            $colorClase = match ($match->resultado) {
-                'Victoria' => 'bg-[#00B140] text-white',
-                'Empate'   => 'bg-[#FACC15] text-black text-black',
-                'Derrota'  => 'bg-[#DC2626] text-white',
-                default    => 'bg-[#334155] text-white',
+            $colorTexto = match ($match->resultado) {
+                'Victoria' => 'text-[#00B140]',
+                'Empate'   => 'text-[#FACC15]',
+                'Derrota'  => 'text-[#DC2626]',
+                default    => 'text-gray-600',
             };
         @endphp     
-        <tr id="match-row-{{ $match->id }}" class="border-b {{ $colorClase }}">
+        <tr id="match-row-{{ $match->id }}" class="border-b hover:bg-gray-100 transition {{ $colorTexto }}">
         <td class="p-2 text-center">
                 <span id="fecha-{{ $match->id }}">{{ $match->fecha_partido }}</span>
-                <input type="date" name="fecha_partido" class="hidden w-16 p-1 border rounded bg-white text-black" id="edit-fecha-{{ $match->id }}" value="{{ $match->fecha_partido }}" >
+                <input type="date" name="fecha_partido" class="hidden w-16 p-1 border rounded bg-white text-black" id="edit-fecha-{{ $match->id }}" value="{{ $match->fecha_partido }}">
             </td>
             <td class="p-2 text-center">{{ $match->equipo_rival }}</td>
+            <td class="p-2 text-center font-semibold {{ $colorTexto }}" id="resultado-{{ $match->id }}">{{ $match->resultado }}</td>
+
             
 
         <!-- Goles a Favor -->
@@ -325,17 +326,16 @@
         </thead>
         <tbody>
             @if(isset($partidosLiga) && count($partidosLiga) > 0)
-                @foreach ($partidosLiga as $match)
-                    @php
-                        $colorClase = match ($match->resultado ?? '') {
-                            'Victoria' => 'bg-[#00B140] text-white',
-                            'Empate'   => 'bg-[#FACC15] text-black',
-                            'Derrota'  => 'bg-[#DC2626] text-white',
-                            default    => 'bg-[#334155] text-white',
-                        };
-                    @endphp
-
-                    <tr id="match-row-{{ $match->id }}" class="border-b {{ $colorClase }}">
+                @foreach ($partidosAmistosos as $match)
+            @php
+                $colorTexto = match ($match->resultado) {
+                    'Victoria' => 'text-[#00B140]',
+                    'Empate'   => 'text-[#FACC15]',
+                    'Derrota'  => 'text-[#DC2626]',
+                    default    => 'text-gray-600',
+                };
+            @endphp     
+            <tr id="match-row-{{ $match->id }}" class="border-b hover:bg-gray-100 transition {{ $colorTexto }}">
                         <td class="p-2 text-center">{{ $match->rivalLiga->jornada ?? 'N/A' }}</td>
                         <td class="p-2 text-center">{{ $match->rivalLiga->nombre_equipo ?? 'N/A' }}</td>
                         <td class="p-2 text-center">
@@ -757,20 +757,22 @@ function updateResultado(matchId) {
 // 📌 Cambiar el color de la fila según el resultado
 function actualizarColorFila(id) {
     const resultado = document.getElementById(`edit-resultado-${id}`).value;
-    const fila = document.getElementById(`match-row-${id}`);
+    const resultadoCelda = document.getElementById(`resultado-${id}`);
 
-    // Limpiar clases de color anteriores
-    fila.classList.remove("bg-[#00B140]", "bg-[#FACC15] text-black", "bg-[#DC2626]");
+    // Limpiar clases anteriores
+    resultadoCelda.classList.remove("text-[#00B140]", "text-[#FACC15]", "text-[#DC2626]");
 
-    // Asignar el color adecuado según el resultado
+    // Aplicar nuevo color
     if (resultado === "Victoria") {
-        fila.classList.add("bg-[#00B140]");
+        resultadoCelda.classList.add("text-[#00B140]");
     } else if (resultado === "Empate") {
-        fila.classList.add("bg-[#FACC15] text-black");
+        resultadoCelda.classList.add("text-[#FACC15]");
     } else if (resultado === "Derrota") {
-        fila.classList.add("bg-[#DC2626]");
+        resultadoCelda.classList.add("text-[#DC2626]");
     }
 }
+
+
 function calcularEdad(fechaNacimiento) {
         const hoy = new Date();
         const nacimiento = new Date(fechaNacimiento);
