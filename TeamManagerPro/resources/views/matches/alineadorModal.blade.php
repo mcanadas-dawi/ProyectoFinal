@@ -1,15 +1,15 @@
 <!-- Modal del Alineador -->
-<div id="alineadorModal" class="hidden fixed inset-0 bg-gray-900 bg-opacity-50 flex justify-center items-center">
-    <div class="bg-white rounded-lg p-6 w-3/4 max-h-[90vh] overflow-y-auto flex flex-col">
-        <h2 class="text-2xl font-semibold text-gray-800 mb-4 text-center">Alineador Táctico</h2>
-        <button type="button" class="btn btn-danger p-1 position-absolute" aria-label="Close" onclick="closeAlineador()" style="top: 25px; left: 200px; z-index: 1051;">
-    <i class="bi bi-x-octagon-fill text-white"></i>
-</button>
+<div id="alineadorModal" class="hidden fixed inset-0 bg-[#1E293B]/80 flex justify-center items-center z-50">
+    <div class="bg-[#1E3A8A] rounded-lg p-6 w-3/4 max-h-[90vh] overflow-y-auto flex flex-col text-white font-sans">
+        <h2 class="text-2xl font-title text-[#FACC15] mb-4 text-center uppercase">Alineador Táctico</h2>
 
+        <button type="button" class="absolute top-4 left-4 bg-[#EF4444] p-2 rounded-full shadow-lg" aria-label="Close" onclick="closeAlineador()"  style="top: 25px; left: 200px; z-index: 1051;">
+            <i class="bi bi-x-octagon-fill text-white"></i>
+        </button>
 
         <!-- Seleccionar Formación -->
-        <label class="block text-gray-700 font-semibold">Seleccionar Formación:</label>
-        <select id="formation-selector" class="w-full p-2 border rounded-lg mb-4" onchange="updateFormation()">
+        <label class="block font-semibold mb-1 text-[#FACC15]">Seleccionar Formación:</label>
+        <select id="formation-selector" class="w-full p-2 border rounded-lg mb-4 bg-white text-black" onchange="updateFormation()">
             <option value="" disabled selected>Seleccionar...</option>
             @if ($team->modalidad == 'F5')
                 <option value="1-1-2-1">1-1-2-1</option>
@@ -32,42 +32,43 @@
         </select>
 
         <!-- Lista de Jugadores Convocados -->
-        <h3 class="text-xl font-semibold text-gray-800 mt-4">Jugadores Convocados</h3>
-        <div id="convocados-list" class="bg-gray-100 p-2 rounded-lg min-h-[150px] max-h-[40vh] overflow-y-auto">
+        <h3 class="text-xl font-title text-[#FACC15] mt-4 uppercase">Jugadores Convocados</h3>
+        <div id="convocados-list" class="bg-[#1E293B] p-2 rounded-lg min-h-[150px] max-h-[40vh] overflow-y-auto shadow-inner">
             <div id="convocados-body" class="flex flex-wrap gap-2">
-                <!-- Aquí se inyectarán los jugadores convocados -->
+                <!-- Jugadores convocados aquí -->
             </div>
         </div>
 
         <!-- Campo de Fútbol -->
-        <div id="field-container" class="relative bg-green-500 h-96 w-4/5 mx-auto flex justify-center items-center mt-4">
-            <img src="{{ asset('Imagenes/campo_futbol.jpg') }}" alt="Campo de Fútbol" class="w-full h-full object-cover">
+        <div id="field-container" class="relative bg-green-600 h-96 w-4/5 mx-auto flex justify-center items-center mt-4 border border-white rounded-lg shadow">
+            <img src="{{ asset('Imagenes/campo_futbol.jpg') }}" alt="Campo de Fútbol" class="w-full h-full object-cover rounded-lg">
             <div id="player-spots" class="absolute inset-0 flex justify-center items-center">
-                <!-- Aquí se inyectarán las posiciones según la formación -->
+                <!-- Posiciones de los jugadores -->
             </div>
         </div>
 
         <!-- Botones de acción -->
-        <div class="flex justify-center mt-4">
-            <button id="edit-system-btn" class="hidden bg-blue-600 text-white px-4 py-2 rounded-lg hover:bg-blue-700" onclick="enableEditMode()">
+        <div class="flex justify-center gap-4 mt-4">
+            <button id="edit-system-btn" class="hidden bg-[#1E3A8A] text-white px-4 py-2 rounded-lg hover:brightness-110 border border-white" onclick="enableEditMode()">
                 Editar Formación
             </button>
             
-            <button id="save-system-btn" class="hidden bg-green-600 text-white px-4 py-2 rounded-lg hover:bg-green-700" onclick="saveFormationChanges()">
+            <button id="save-system-btn" class="hidden bg-[#00B140] text-white px-4 py-2 rounded-lg hover:brightness-110" onclick="saveFormationChanges()">
                 Guardar Formación
             </button>
         </div>
 
-        <!-- Lista de Suplentes (Ahora sin scroll y con ajuste automático de filas) -->
-        <h3 class="text-xl font-semibold text-gray-800 mt-4">Suplentes</h3>
-        <div id="suplentes-list" class="bg-gray-200 border border-gray-300 p-3 rounded-lg shadow-md">
+        <!-- Suplentes -->
+        <h3 class="text-xl font-title text-[#FACC15] mt-4 uppercase">Suplentes</h3>
+        <div id="suplentes-list" class="bg-[#1E293B] border border-white p-3 rounded-lg shadow-inner">
             <div id="suplentes-body" class="flex flex-wrap gap-3 justify-center">
-                <!-- Aquí se inyectarán los suplentes -->
-                 <br id="br-placeholder">
+                <!-- Jugadores suplentes aquí -->
+                <br id="br-placeholder">
             </div>
         </div>
     </div>
 </div>
+
 <script>
  // ALINEADOR 
  let alineadorData = document.getElementById("alineador-data");
