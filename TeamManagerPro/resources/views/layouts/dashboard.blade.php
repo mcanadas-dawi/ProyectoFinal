@@ -19,6 +19,8 @@
     <div class="container mx-auto px-4 py-6">
         @yield('content')  {{-- Aquí se insertará el contenido de cada vista --}}
     </div>
+
+    @include('partials.footer')
  <!-- Bootstrap JS -->
  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
 </body>

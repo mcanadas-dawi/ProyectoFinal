@@ -14,17 +14,21 @@
         <!-- Scripts -->
         @vite(['resources/css/app.css', 'resources/js/app.js'])
     </head>
-    <<body class="bg-[#1A2238] text-white min-h-screen">
+    <body class="bg-[#1A2238] text-white min-h-screen">
         <div class="min-h-screen flex flex-col sm:justify-center items-center pt-6 sm:pt-0 bg-gray-100 dark:bg-gray-900">
-            <div>
-                <a href="/">
-                    <x-application-logo class="w-20 h-20 fill-current text-gray-500" />
-                </a>
-            </div>
+            @props(['showLogo' => true])
+
+            @if ($showLogo)
+                <div class="flex justify-center mt-6">
+                    <img src="{{ asset('imagenes/TeamManagerPro_Logo.png') }}" alt="Logo TeamManagerPro" class="w-16 h-auto">
+                </div>
+            @endif
 
             <div class="w-full sm:max-w-md mt-6 px-6 py-4 bg-white dark:bg-gray-800 shadow-md overflow-hidden sm:rounded-lg">
                 {{ $slot }}
             </div>
         </div>
+
+        @include('partials.footer')
     </body>
 </html>
