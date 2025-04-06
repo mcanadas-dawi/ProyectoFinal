@@ -16,8 +16,8 @@
 
     @include('layouts.navigation') {{-- Usa la navegación de Breeze si existe --}}
 
-    <div class="container mx-auto px-4 py-6">
-        @yield('content')  {{-- Aquí se insertará el contenido de cada vista --}}
+    <div class="w-full px-4 sm:px-6 lg:px-8 py-6">
+    @yield('content')  {{-- Aquí se insertará el contenido de cada vista --}}
     </div>
 
     @include('partials.footer')

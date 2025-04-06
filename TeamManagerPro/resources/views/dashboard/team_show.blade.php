@@ -1,17 +1,18 @@
 @extends('layouts.dashboard')
 @section('content')
 
-<div class="min-h-screen bg-[#1E293B] text-white font-sans p-6">
+<div class=" bg-[#1E293B] text-white font-sans p-4 sm:p-6">
     @if(session('success'))
         <div class="bg-[#00B140] text-white p-3 rounded mb-4 text-center">
             {{ session('success') }}
         </div>
     @endif
 
-    <div class="flex flex-col sm:flex-row sm:justify-between sm:items-center gap-4 mb-6">
-    <h1 class="text-2xl sm:text-3xl font-title text-[#FACC15] uppercase tracking-wide text-center sm:text-left">
-        {{ $team->nombre }} ({{ strtoupper($team->modalidad) }})
-    </h1>
+    <div class="min-h-screen bg-[#1E293B] text-white font-sans px-4 sm:px-6 lg:px-8 py-6">
+    <div class="flex flex-col md:flex-row md:justify-between md:items-center gap-4 mb-6">
+        <h1 class="text-2xl md:text-3xl font-title text-[#FACC15] uppercase tracking-wide">
+            {{ $team->nombre }} ({{ strtoupper($team->modalidad) }})
+        </h1>
 
     <div class="flex flex-col sm:flex-row gap-3 sm:items-center justify-center sm:justify-end">
         @if (!$hayLiga)
@@ -24,7 +25,7 @@
               onsubmit="return confirm('¿Estás seguro de que deseas eliminar este equipo? Esta acción no se puede deshacer.')" class="text-center sm:text-right">
             @csrf
             @method('DELETE')
-            <button type="submit" class="bg-[#EF4444] text-white px-4 py-2 rounded-lg hover:brightness-110 w-full sm:w-auto">
+            <button type="submit" class="bg-[#EF4444] text-white px-4 py-2 rounded-lg hover:brightness-110 w-full sm:w-auto text-center sm:text-right">
                 Eliminar Equipo
             </button>
         </form>
@@ -34,47 +35,48 @@
 
 
 <!-- Sección de Estadísticas -->
-<div class="bg-[#1E3A8A] shadow-lg rounded-lg p-6 mb-6">
+<div class="bg-[#1E3A8A] shadow-lg rounded-lg p-4 sm:p-6 mb-6 overflow-x-auto">
     <h2 class="text-2xl font-title text-[#FACC15] uppercase mb-4">Estadísticas de la plantilla</h2>
+    <div class="w-full overflow-x-auto sm:rounded-lg">
+        <table class="min-w-[700px] w-full text-center border-collapse bg-white rounded-lg">
+            <thead class="bg-[#15803D] text-white uppercase text-sm">
+                <tr class="border-b">
+                    <th class="p-2">Victorias</th>
+                    <th class="p-2">Empates</th>
+                    <th class="p-2">Derrotas</th>
+                    <th class="p-2">Puntos</th>
+                    <th class="p-2">Goles a Favor</th>
+                    <th class="p-2">Goles en Contra</th>
+                    <th class="p-2">Tarjetas Amarillas</th>
+                    <th class="p-2">Tarjetas Rojas</th>
+                    <th class="p-2">Valoración Media</th>
+                </tr>
+            </thead>
+            <tbody class="text-black">
+            <td class="p-2">{{ $stats['victorias'] ?? 0 }}</td>
+            <td class="p-2">{{ $stats['empates'] ?? 0 }}</td>
+            <td class="p-2">{{ $stats['derrotas'] ?? 0 }}</td>
+            <td class="p-2 font-bold">{{ $stats['puntos'] ?? 0 }}</td>
+            <td class="p-2">{{ $stats['goles_favor'] ?? 0 }}</td>
+            <td class="p-2">{{ $stats['goles_contra'] ?? 0 }}</td>
+            <td class="p-2 text-yellow-600 font-bold">{{ $stats['tarjetas_amarillas'] ?? 0 }}</td>
+            <td class="p-2 text-[#DC2626] font-bold">{{ $stats['tarjetas_rojas'] ?? 0 }}</td>
+            <td class="p-2 text-[#00B140] font-bold">{{ number_format($stats['valoracion_media'] ?? 0, 2) }}</td>
 
-    <table class="w-full text-center border-collapse bg-white rounded-lg">
-        <thead class="bg-[#15803D] text-white uppercase text-sm">
-            <tr class="border-b">
-                <th class="p-2">Victorias</th>
-                <th class="p-2">Empates</th>
-                <th class="p-2">Derrotas</th>
-                <th class="p-2">Puntos</th>
-                <th class="p-2">Goles a Favor</th>
-                <th class="p-2">Goles en Contra</th>
-                <th class="p-2">Tarjetas Amarillas</th>
-                <th class="p-2">Tarjetas Rojas</th>
-                <th class="p-2">Valoración Media</th>
-            </tr>
-        </thead>
-        <tbody class="text-black">
-        <td class="p-2">{{ $stats['victorias'] ?? 0 }}</td>
-        <td class="p-2">{{ $stats['empates'] ?? 0 }}</td>
-        <td class="p-2">{{ $stats['derrotas'] ?? 0 }}</td>
-        <td class="p-2 font-bold">{{ $stats['puntos'] ?? 0 }}</td>
-        <td class="p-2">{{ $stats['goles_favor'] ?? 0 }}</td>
-        <td class="p-2">{{ $stats['goles_contra'] ?? 0 }}</td>
-        <td class="p-2 text-yellow-600 font-bold">{{ $stats['tarjetas_amarillas'] ?? 0 }}</td>
-        <td class="p-2 text-[#DC2626] font-bold">{{ $stats['tarjetas_rojas'] ?? 0 }}</td>
-        <td class="p-2 text-[#00B140] font-bold">{{ number_format($stats['valoracion_media'] ?? 0, 2) }}</td>
-
-            </tr>
-        </tbody>
-    </table>
+                </tr>
+            </tbody>
+        </table>
+    </div>
 </div>
 
     <!-- Sección de Jugadores -->
     @if(session()->has('created_player') || session()->has('updated_player') || session()->has('added_player') || session()->has('deleted_player'))
-    <div class="bg-[#00B140] text-white p-3 rounded mb-6 text-center font-semibold shadow-md">
+    <div class="bg-[#1E3A8A] shadow-lg rounded-lg p-4 sm:p-6 mb-10 text-white font-sans w-full overflow-x-auto">
         {{ session('created_player') ?: session('updated_player') ?: session('added_player') ?: session('deleted_player')  }}
     </div>
 @endif
 
-<div class="bg-[#1E3A8A] shadow-lg rounded-lg p-6 mb-10 text-white font-sans w-full">
+<div class="bg-[#1E3A8A] shadow-lg rounded-lg p-4 sm:p-6 mb-10 text-white font-sans w-full">
     <div class="flex items-center justify-between mb-6 flex-wrap gap-4">
         <h2 class="text-2xl font-title text-[#FACC15] uppercase">Jugadores</h2>
         <div class="flex gap-4 flex-wrap">
@@ -91,8 +93,8 @@
     @include('players.player_form')
     @include('players.existingPlayer_form')
 
-    <div class="overflow-x-auto">
-        <table class="w-full text-center border-collapse bg-[#1E293B] rounded-lg overflow-hidden shadow-md">
+    <div class="w-full overflow-x-auto sm:rounded-lg">
+        <table class="min-w-[800px] w-full text-center border-collapse bg-[#1E293B] rounded-lg overflow-hidden shadow-md">
             <thead class="bg-[#15803D] text-white uppercase text-sm">
                 <tr class="border-b bg-[#15803D] text-white">
                     <th class="p-2">Nombre</th>
@@ -151,24 +153,27 @@
                         <td class="p-2 font-bold text-[#00B140]">{{ number_format($stats->valoracion ?? 0, 2) }}</td>
                         <td class="p-2 text-[#FACC15] font-bold">{{ $stats->tarjetas_amarillas ?? 0 }}</td>
                         <td class="p-2 text-[#DC2626] font-bold">{{ $stats->tarjetas_rojas ?? 0 }}</td>
-                        <td class="p-2 flex flex-wrap justify-center gap-2">
-                            <button onclick="editPlayer('{{ $player->id }}')" id="edit-btn-{{ $player->id }}" class="bg-[#FACC15] text-black  px-3 py-1 rounded hover:brightness-110">
-                                Editar
-                            </button>
-                            <button onclick="savePlayer('{{ $player->id }}')" id="save-btn-{{ $player->id }}" class="hidden bg-[#00B140] text-white px-3 py-1 rounded hover:brightness-110">
-                                Guardar
-                            </button>
-                            <button onclick="cancelEditPlayer('{{ $player->id }}')" id="cancel-btn-{{ $player->id }}" class="hidden bg-gray-600 text-white px-3 py-1 rounded hover:brightness-110">
-                                Cancelar
-                            </button>
-                            <form action="{{ route('players.destroy', $player->id) }}" method="POST" onsubmit="return confirm('¿Estás seguro de que deseas eliminar a este jugador de la plantilla?')" id="delete-form-{{ $player->id }}" class="inline">
-                                @csrf
-                                @method('DELETE')
-                                <input type="hidden" name="team_id" value="{{ $team->id }}">
-                                <button type="submit" class="bg-[#DC2626] text-white px-3 py-1 rounded hover:brightness-110">
-                                    Eliminar
+                        <td class="p-2">
+                            <div class="flex flex-wrap justify-center gap-2">
+                                <button onclick="editPlayer('{{ $player->id }}')" id="edit-btn-{{ $player->id }}" class="bg-[#FACC15] text-black px-3 py-1 rounded hover:brightness-110">
+                                    Editar
                                 </button>
-                            </form>
+                                <button onclick="savePlayer('{{ $player->id }}')" id="save-btn-{{ $player->id }}" class="hidden bg-[#00B140] text-white px-3 py-1 rounded hover:brightness-110">
+                                    Guardar
+                                </button>
+                                <button onclick="cancelEditPlayer('{{ $player->id }}')" id="cancel-btn-{{ $player->id }}" class="hidden bg-gray-600 text-white px-3 py-1 rounded hover:brightness-110">
+                                    Cancelar
+                                </button>
+
+                                <form action="{{ route('players.destroy', $player->id) }}" method="POST" onsubmit="return confirm('¿Estás seguro de que deseas eliminar a este jugador de la plantilla?')" id="delete-form-{{ $player->id }}">
+                                    @csrf
+                                    @method('DELETE')
+                                    <input type="hidden" name="team_id" value="{{ $team->id }}">
+                                    <button type="submit" class="bg-[#DC2626] text-white px-3 py-1 rounded hover:brightness-110">
+                                        Eliminar
+                                    </button>
+                                </form>
+                            </div>
                         </td>
                     </tr>
                 @endforeach
@@ -181,12 +186,12 @@
 
 <!-- Sección de Partidos Amistosos -->
 @if(session()->has('success_amistoso') || session()->has('success_convocatoria') || session()->has('deleted_match') || session()->has('created_match'))
-<div class="bg-[#00B140] shadow-lg rounded-lg p-6 mb-6 text-white">
+<div class="bg-[#1E3A8A] shadow-lg rounded-lg p-4 sm:p-6 mb-10 text-white font-sans w-full overflow-x-auto">
         {{ session('success_amistoso') ?: session('success_convocatoria') ?: session('deleted_match') ?: session('created_match')  }}
     </div>
 @endif
 
-<div class="bg-[#1E3A8A] shadow-lg rounded-lg p-6 mb-10 text-white font-sans w-full">
+<div class="bg-[#1E3A8A] shadow-lg rounded-lg p-4 sm:p-6 mb-10 text-white font-sans w-full">
     <div class="flex items-center justify-center mb-4">
     <h2 class="text-2xl font-title text-[#FACC15] flex-grow text-left uppercase">Partidos Amistosos</h2>
         <button onclick="openModal('amistosoModal')" class="bg-[#00B140] text-white px-4 py-2 rounded-lg hover:brightness-110">
@@ -194,140 +199,24 @@
         </button>
         @include('matches.friendlyMatch_form')
     </div>
-
-    <table class="w-full text-center border-collapse bg-[#1E293B] rounded-lg text-white">
-    <thead class="bg-[#15803D] text-white uppercase text-sm">
-    <tr class="border-b">
-        <th class="p-2">Fecha</th>
-        <th class="p-2">Equipo Rival</th>
-        <th class="p-2">Goles a Favor</th>
-        <th class="p-2">Goles en Contra</th>
-        <th class="p-2">Resultado</th>
-        <th class="p-2">Actuación del Equipo</th>
-        <th class="p-2">Convocatoria</th>
-        <th class="p-2">Alineación</th>
-        <th class="p-2">Acciones</th>
-    </tr>
-</thead>
-<tbody class="text-gray-800">
-@if(isset($partidosAmistosos) && count($partidosAmistosos) > 0)
-    @foreach ($partidosAmistosos as $match)
-        @php
-            $colorTexto = match ($match->resultado) {
-                'Victoria' => 'text-[#00B140]',
-                'Empate'   => 'text-[#FACC15]',
-                'Derrota'  => 'text-[#DC2626]',
-                default    => 'text-gray-600',
-            };
-        @endphp     
-        <tr id="match-row-{{ $match->id }}" class="border-b hover:bg-[#334155]/60 transition-colors duration-200 {{ $colorTexto }}">
-        <td class="p-2 text-center">
-                <span id="fecha-{{ $match->id }}">{{ $match->fecha_partido }}</span>
-                <input type="date" name="fecha_partido" class="hidden w-16 p-1 border rounded bg-white text-black" id="edit-fecha-{{ $match->id }}" value="{{ $match->fecha_partido }}">
-            </td>
-            <td class="p-2 text-center">{{ $match->equipo_rival }}</td>  
-
-        <!-- Goles a Favor -->
-        <td class="p-2 text-center">
-            <span id="goles-favor-{{ $match->id }}">{{ $match->goles_a_favor }}</span>
-            <input type="number" name="goles_a_favor" class="hidden w-16 p-1 border rounded bg-white text-black" 
-                id="edit-goles-favor-{{ $match->id }}" 
-                value="{{ $match->goles_a_favor }}"
-                onchange="updateResultado('{{ $match->id }}')">
-        </td>
-
-        <!-- Goles en Contra -->
-        <td class="p-2 text-center">
-            <span id="goles-contra-{{ $match->id }}">{{ $match->goles_en_contra }}</span>
-            <input type="number" name="goles_en_contra" class="hidden w-16 p-1 border rounded bg-white text-black" 
-                id="edit-goles-contra-{{ $match->id }}" 
-                value="{{ $match->goles_en_contra }}"
-                onchange="updateResultado('{{ $match->id }}')">
-        </td>
-
-        <!-- Resultado (Solo Mostrar) -->
-        <td class="p-2 text-center">
-            <span id="resultado-{{ $match->id }}">{{ $match->resultado }}</span>
-            <input type="hidden" name="resultado" id="edit-resultado-{{ $match->id }}" value="{{ $match->resultado }}">
-        </td>
-
-
-
-
-            <!-- Actuación del Equipo -->
-            <td class="p-2 text-center">
-                <span id="actuacion-{{ $match->id }}">{{ $match->actuacion_equipo !== null ? number_format($match->actuacion_equipo, 2) : 'N/A' }}</span>
-                <input type="number" name="actuacion_equipo" step="0.01" min="0" max="10" class="hidden w-16 p-1 border rounded bg-white text-black" id="edit-actuacion-{{ $match->id }}" value="{{ $match->actuacion_equipo }}">
-            </td>
-
-            <td class="p-2 text-center">
-                <button onclick="openConvocatoriaModal('{{ $match->id }}')" class="bg-[#6366F1] text-white px-3 py-1 rounded hover:brightness-110">
-                    Convocatoria
-                </button>
-            </td>
-            <td class="p-2 text-center">
-            <button onclick="openAlineador('{{ $match->id }}')" class="bg-[#3B82F6] text-white px-3 py-1 rounded hover:brightness-110">
-                Alineador
-            </button>
-
-            </td>
-            <td class="p-2 text-center">
-                <a href="{{ route('matches.ratePlayers', $match->id) }}" class="bg-[#FF8C42] text-white px-3 py-1 rounded block mb-2 hover:brightness-110">
-                    Valorar Jugadores 
-                </a>
-
-                <button onclick="editMatch('{{ $match->id }}')" id="edit-btn-match-{{ $match->id }}" class="bg-[#FACC15] text-black  px-3 py-1 rounded hover:brightness-110">Editar</button>
-                <button onclick="saveMatch('{{ $match->id }}')" id="save-btn-match-{{ $match->id }}" class="hidden bg-[#00B140] text-white px-3 py-1 rounded hover:brightness-110">Guardar</button>
-                <button onclick="cancelEditMatch('{{ $match->id }}')" id="cancel-btn-match-{{ $match->id }}" class="hidden bg-[#4B5563] text-white px-3 py-1 rounded hover:brightness-110">Cancelar</button>
-                <form action="{{ route('matches.destroy', $match->id) }}" method="POST" onsubmit="return confirm('¿Estás seguro de que deseas eliminar este partido? Esta acción no se puede deshacer.')" id="delete-form-match-{{ $match->id }}" class="inline">
-                    @csrf
-                    @method('DELETE')
-                    <button type="submit" class="bg-[#DC2626] text-white px-3 py-1 rounded hover:brightness-110">Eliminar</button>
-                </form>
-                <!-- Incluir el formulario para amistosos -->
-                @include('matches.editFriendlyMatch_form', ['match' => $match])
-            </td>
-        </tr>
-    @endforeach
-    @else
-    <tr>
-        <td colspan="10" class="text-center text-gray-600 p-2">No hay partidos amistosos registrados.</td>
-    </tr>
-    @endif
-</tbody>
-</table>
-</div>
-
-<!-- 📌 Tabla de Partidos Oficiales (Liga) -->
-@if(session('success_liga'))
-    <div class="bg-[#00B140] text-white p-3 rounded mb-4 text-center">
-        {{ session('success_liga') }}
-    </div>
-@endif
-
-<div class="bg-[#1E3A8A] shadow-lg rounded-lg p-6 mb-6 text-white">
-    <div class="flex items-center justify-center mb-4">
-        <h2 class="text-2xl font-title text-[#FACC15] flex-grow text-left uppercase">Partidos de Liga</h2>
-    </div>
-
-    <table class="w-full text-center border-collapse bg-[#1E293B] rounded-lg">
-        <thead class="bg-[#15803D] text-white uppercase text-sm">
-            <tr class="border-b border-[#15803D]">
-                <th class="p-2">Jornada</th>
-                <th class="p-2">Equipo Rival</th>
-                <th class="p-2">Fecha</th>
-                <th class="p-2">Goles a Favor</th>
-                <th class="p-2">Goles en Contra</th>
-                <th class="p-2">Resultado</th>
-                <th class="p-2">Actuación del Equipo</th>
-                <th class="p-2">Convocatoria</th>
-                <th class="p-2">Alineación</th>
-                <th class="p-2">Acciones</th>
-            </tr>
-        </thead>
-        <tbody>
-            @if(isset($partidosLiga) && count($partidosLiga) > 0)
-                @foreach ($partidosLiga as $match)
+    <div class="w-full overflow-x-auto sm:rounded-lg">
+        <table class="min-w-[800px] w-full text-center border-collapse bg-[#1E293B] rounded-lg text-white">
+            <thead class="bg-[#15803D] text-white uppercase text-sm">
+                <tr class="border-b">
+                    <th class="p-2">Fecha</th>
+                    <th class="p-2">Equipo Rival</th>
+                    <th class="p-2">Goles a Favor</th>
+                    <th class="p-2">Goles en Contra</th>
+                    <th class="p-2">Resultado</th>
+                    <th class="p-2">Actuación del Equipo</th>
+                    <th class="p-2">Convocatoria</th>
+                    <th class="p-2">Alineación</th>
+                    <th class="p-2">Acciones</th>
+                </tr>
+            </thead>
+    <tbody class="text-gray-800">
+    @if(isset($partidosAmistosos) && count($partidosAmistosos) > 0)
+        @foreach ($partidosAmistosos as $match)
             @php
                 $colorTexto = match ($match->resultado) {
                     'Victoria' => 'text-[#00B140]',
@@ -337,155 +226,280 @@
                 };
             @endphp     
             <tr id="match-row-{{ $match->id }}" class="border-b hover:bg-[#334155]/60 transition-colors duration-200 {{ $colorTexto }}">
-                <td class="p-2 text-center">{{ $match->rivalLiga->jornada ?? 'N/A' }}</td>
-                <td class="p-2 text-center">{{ $match->rivalLiga->nombre_equipo ?? 'N/A' }}</td>
-                        <td class="p-2 text-center">
-                            <span id="fecha-{{ $match->id }}">{{ $match->fecha_partido }}</span>
-                            <input type="date" name="fecha_partido"
-                                   class="hidden w-16 p-1 border rounded bg-white text-black"
-                                   id="edit-fecha-{{ $match->id }}" value="{{ $match->fecha_partido }}">
-                        </td>
-                        <td class="p-2 text-center">
-                            <span id="goles-favor-{{ $match->id }}">{{ $match->goles_a_favor }}</span>
-                            <input type="number" name="goles_a_favor"
-                                   class="hidden w-16 p-1 border rounded bg-white text-black"
-                                   id="edit-goles-favor-{{ $match->id }}"
-                                   value="{{ $match->goles_a_favor }}"
-                                   onchange="updateResultado('{{ $match->id }}')">
-                        </td>
-                        <td class="p-2 text-center">
-                            <span id="goles-contra-{{ $match->id }}">{{ $match->goles_en_contra }}</span>
-                            <input type="number" name="goles_en_contra"
-                                   class="hidden w-16 p-1 border rounded bg-white text-black"
-                                   id="edit-goles-contra-{{ $match->id }}"
-                                   value="{{ $match->goles_en_contra }}"
-                                   onchange="updateResultado('{{ $match->id }}')">
-                        </td>
-                        <td class="p-2 text-center">
-                            <span id="resultado-{{ $match->id }}">{{ $match->resultado }}</span>
-                            <input type="hidden" name="resultado" id="edit-resultado-{{ $match->id }}" value="{{ $match->resultado }}">
-                        </td>
-                        <td class="p-2 text-center">
-                            <span id="actuacion-{{ $match->id }}">{{ $match->actuacion_equipo !== null ? number_format($match->actuacion_equipo, 2) : 'N/A' }}</span>
-                            <input type="number" name="actuacion_equipo" step="0.01" min="0" max="10"
-                                   class="hidden w-16 p-1 border rounded bg-white text-black"
-                                   id="edit-actuacion-{{ $match->id }}" value="{{ $match->actuacion_equipo }}">
-                        </td>
-                        <td class="p-2 text-center">
-                            <button onclick="openConvocatoriaModal('{{ $match->id }}')"
-                                    class="bg-[#6366F1] text-white px-3 py-1 rounded hover:brightness-110">
-                                Convocatoria
-                            </button>
-                        </td>
-                        <td class="p-2 text-center">
-                            <button onclick="openAlineador('{{ $match->id }}')"
-                                    class="bg-[#3B82F6] text-white px-3 py-1 rounded hover:brightness-110">
-                                Alineador
-                            </button>
-                        </td>
-                        <td class="p-2 text-center space-y-1">
-                            <a href="{{ route('matches.ratePlayers', $match->id) }}"
-                               class="bg-[#FF8C42] text-white px-3 py-1 rounded block hover:brightness-110">
-                                Valorar Jugadores
-                            </a>
+                <td class="p-2 text-center">
+                        <span id="fecha-{{ $match->id }}">{{ $match->fecha_partido }}</span>
+                        <input type="date" name="fecha_partido" class="hidden w-16 p-1 border rounded bg-white text-black" id="edit-fecha-{{ $match->id }}" value="{{ $match->fecha_partido }}">
+                    </td>
+                    <td class="p-2 text-center">{{ $match->equipo_rival }}</td>  
 
-                            <button onclick="editMatch('{{ $match->id }}')"
-                                    id="edit-btn-match-{{ $match->id }}"
-                                    class="bg-[#FACC15] text-black px-3 py-1 rounded hover:brightness-110">
-                                Editar
+                <!-- Goles a Favor -->
+                <td class="p-2 text-center">
+                    <span id="goles-favor-{{ $match->id }}">{{ $match->goles_a_favor }}</span>
+                    <input type="number" name="goles_a_favor" class="hidden w-16 p-1 border rounded bg-white text-black" 
+                        id="edit-goles-favor-{{ $match->id }}" 
+                        value="{{ $match->goles_a_favor }}"
+                        onchange="updateResultado('{{ $match->id }}')">
+                </td>
+
+                <!-- Goles en Contra -->
+                <td class="p-2 text-center">
+                    <span id="goles-contra-{{ $match->id }}">{{ $match->goles_en_contra }}</span>
+                    <input type="number" name="goles_en_contra" class="hidden w-16 p-1 border rounded bg-white text-black" 
+                        id="edit-goles-contra-{{ $match->id }}" 
+                        value="{{ $match->goles_en_contra }}"
+                        onchange="updateResultado('{{ $match->id }}')">
+                </td>
+
+                <!-- Resultado (Solo Mostrar) -->
+                <td class="p-2 text-center">
+                    <span id="resultado-{{ $match->id }}">{{ $match->resultado }}</span>
+                    <input type="hidden" name="resultado" id="edit-resultado-{{ $match->id }}" value="{{ $match->resultado }}">
+                </td>
+
+                    <!-- Actuación del Equipo -->
+                    <td class="p-2 text-center">
+                        <span id="actuacion-{{ $match->id }}">{{ $match->actuacion_equipo !== null ? number_format($match->actuacion_equipo, 2) : 'N/A' }}</span>
+                        <input type="number" name="actuacion_equipo" step="0.01" min="0" max="10" class="hidden w-16 p-1 border rounded bg-white text-black" id="edit-actuacion-{{ $match->id }}" value="{{ $match->actuacion_equipo }}">
+                    </td>
+
+                    <td class="p-2 text-center">
+                        <button onclick="openConvocatoriaModal('{{ $match->id }}')" class="bg-[#6366F1] text-white px-3 py-1 rounded hover:brightness-110">
+                            Convocatoria
+                        </button>
+                    </td>
+                    <td class="p-2 text-center">
+                    <button onclick="openAlineador('{{ $match->id }}')" class="bg-[#3B82F6] text-white px-3 py-1 rounded hover:brightness-110">
+                        Alineador
+                    </button>
+
+                    </td>
+                    <td class="p-2 text-center">
+                    <div class="flex flex-wrap justify-center gap-2">
+                        <a href="{{ route('matches.ratePlayers', $match->id) }}" class="bg-[#FF8C42] text-white px-3 py-1 rounded hover:brightness-110">
+                            Valorar Jugadores 
+                        </a>
+                        <button onclick="editMatch('{{ $match->id }}')" id="edit-btn-match-{{ $match->id }}" class="bg-[#FACC15] text-black px-3 py-1 rounded hover:brightness-110">
+                            Editar
+                        </button>
+                        <button onclick="saveMatch('{{ $match->id }}')" id="save-btn-match-{{ $match->id }}" class="hidden bg-[#00B140] text-white px-3 py-1 rounded hover:brightness-110">
+                            Guardar
+                        </button>
+                        <button onclick="cancelEditMatch('{{ $match->id }}')" id="cancel-btn-match-{{ $match->id }}" class="hidden bg-[#4B5563] text-white px-3 py-1 rounded hover:brightness-110">
+                            Cancelar
+                        </button>
+                        <form action="{{ route('matches.destroy', $match->id) }}" method="POST" onsubmit="return confirm('¿Estás seguro de que deseas eliminar este partido? Esta acción no se puede deshacer.')" id="delete-form-match-{{ $match->id }}">
+                            @csrf
+                            @method('DELETE')
+                            <button type="submit" class="bg-[#DC2626] text-white px-3 py-1 rounded hover:brightness-110">
+                                Eliminar
                             </button>
-
-                            <button type="button" onclick="saveMatch('{{ $match->id }}')"
-                                    id="save-btn-match-{{ $match->id }}"
-                                    class="hidden bg-[#00B140] text-white px-3 py-1 rounded hover:brightness-110">
-                                Guardar
-                            </button>
-
-                            <button onclick="cancelEditMatch('{{ $match->id }}')"
-                                    id="cancel-btn-match-{{ $match->id }}"
-                                    class="hidden bg-[#4B5563] text-white px-3 py-1 rounded hover:brightness-110">
-                                Cancelar
-                            </button>
-
-                            <form action="{{ route('matches.destroy', $match->id) }}" method="POST"
-                                  onsubmit="return confirm('¿Estás seguro de que deseas eliminar este partido? Esta acción no se puede deshacer.')"
-                                  id="delete-form-match-{{ $match->id }}" class="inline">
-                                @csrf
-                                @method('DELETE')
-                                <button type="submit"
-                                        class="bg-[#DC2626] text-white px-3 py-1 rounded hover:brightness-110">
-                                    Eliminar
-                                </button>
-                            </form>
-
-                            @include('matches.editLeagueMatch_form', ['match' => $match])
-                        </td>
-                    </tr>
-                @endforeach
-            @else
-                <tr>
-                    <td colspan="10" class="text-center text-gray-400 p-4">No hay partidos de liga registrados.</td>
-                </tr>
-            @endif
-        </tbody>
+                        </form>
+                    </div>
+                    @include('matches.editFriendlyMatch_form', ['match' => $match])
+                </td>
+            </tr>
+        @endforeach
+        @else
+        <tr>
+            <td colspan="10" class="text-center text-gray-600 p-2">No hay partidos amistosos registrados.</td>
+        </tr>
+        @endif
+    </tbody>
     </table>
+    </div>
+</div>
+
+<!-- 📌 Tabla de Partidos Oficiales (Liga) -->
+@if(session('success_liga'))
+    <div class="bg-[#00B140] text-white p-3 rounded mb-4 text-center">
+        {{ session('success_liga') }}
+    </div>
+@endif
+
+<div class="bg-[#1E3A8A] shadow-lg rounded-lg p-4 sm:p-6 mb-6 text-white">
+    <div class="flex items-center justify-center mb-4">
+        <h2 class="text-2xl font-title text-[#FACC15] flex-grow text-left uppercase">Partidos de Liga</h2>
+    </div>
+    
+    <div class="w-full overflow-x-auto sm:rounded-lg">
+        <table class="min-w-[900px] w-full text-center border-collapse bg-[#1E293B] rounded-lg">
+            <thead class="bg-[#15803D] text-white uppercase text-sm">
+                <tr class="border-b border-[#15803D]">
+                    <th class="p-2">Jornada</th>
+                    <th class="p-2">Equipo Rival</th>
+                    <th class="p-2">Fecha</th>
+                    <th class="p-2">Goles a Favor</th>
+                    <th class="p-2">Goles en Contra</th>
+                    <th class="p-2">Resultado</th>
+                    <th class="p-2">Actuación del Equipo</th>
+                    <th class="p-2">Convocatoria</th>
+                    <th class="p-2">Alineación</th>
+                    <th class="p-2">Acciones</th>
+                </tr>
+            </thead>
+            <tbody>
+                @if(isset($partidosLiga) && count($partidosLiga) > 0)
+                    @foreach ($partidosLiga as $match)
+                @php
+                    $colorTexto = match ($match->resultado) {
+                        'Victoria' => 'text-[#00B140]',
+                        'Empate'   => 'text-[#FACC15]',
+                        'Derrota'  => 'text-[#DC2626]',
+                        default    => 'text-gray-600',
+                    };
+                @endphp     
+                <tr id="match-row-{{ $match->id }}" class="border-b hover:bg-[#334155]/60 transition-colors duration-200 {{ $colorTexto }}">
+                    <td class="p-2 text-center">{{ $match->rivalLiga->jornada ?? 'N/A' }}</td>
+                    <td class="p-2 text-center">{{ $match->rivalLiga->nombre_equipo ?? 'N/A' }}</td>
+                            <td class="p-2 text-center">
+                                <span id="fecha-{{ $match->id }}">{{ $match->fecha_partido }}</span>
+                                <input type="date" name="fecha_partido"
+                                    class="hidden w-16 p-1 border rounded bg-white text-black"
+                                    id="edit-fecha-{{ $match->id }}" value="{{ $match->fecha_partido }}">
+                            </td>
+                            <td class="p-2 text-center">
+                                <span id="goles-favor-{{ $match->id }}">{{ $match->goles_a_favor }}</span>
+                                <input type="number" name="goles_a_favor"
+                                    class="hidden w-16 p-1 border rounded bg-white text-black"
+                                    id="edit-goles-favor-{{ $match->id }}"
+                                    value="{{ $match->goles_a_favor }}"
+                                    onchange="updateResultado('{{ $match->id }}')">
+                            </td>
+                            <td class="p-2 text-center">
+                                <span id="goles-contra-{{ $match->id }}">{{ $match->goles_en_contra }}</span>
+                                <input type="number" name="goles_en_contra"
+                                    class="hidden w-16 p-1 border rounded bg-white text-black"
+                                    id="edit-goles-contra-{{ $match->id }}"
+                                    value="{{ $match->goles_en_contra }}"
+                                    onchange="updateResultado('{{ $match->id }}')">
+                            </td>
+                            <td class="p-2 text-center">
+                                <span id="resultado-{{ $match->id }}">{{ $match->resultado }}</span>
+                                <input type="hidden" name="resultado" id="edit-resultado-{{ $match->id }}" value="{{ $match->resultado }}">
+                            </td>
+                            <td class="p-2 text-center">
+                                <span id="actuacion-{{ $match->id }}">{{ $match->actuacion_equipo !== null ? number_format($match->actuacion_equipo, 2) : 'N/A' }}</span>
+                                <input type="number" name="actuacion_equipo" step="0.01" min="0" max="10"
+                                    class="hidden w-16 p-1 border rounded bg-white text-black"
+                                    id="edit-actuacion-{{ $match->id }}" value="{{ $match->actuacion_equipo }}">
+                            </td>
+                            <td class="p-2 text-center">
+                                <button onclick="openConvocatoriaModal('{{ $match->id }}')"
+                                        class="bg-[#6366F1] text-white px-3 py-1 rounded hover:brightness-110">
+                                    Convocatoria
+                                </button>
+                            </td>
+                            <td class="p-2 text-center">
+                                <button onclick="openAlineador('{{ $match->id }}')"
+                                        class="bg-[#3B82F6] text-white px-3 py-1 rounded hover:brightness-110">
+                                    Alineador
+                                </button>
+                            </td>
+                            <td class="p-2 text-center">                            <div class="flex flex-wrap justify-center gap-2">
+                                <a href="{{ route('matches.ratePlayers', $match->id) }}"
+                                class="bg-[#FF8C42] text-white px-3 py-1 rounded block hover:brightness-110">
+                                    Valorar Jugadores
+                                </a>
+
+                                <button onclick="editMatch('{{ $match->id }}')"
+                                        id="edit-btn-match-{{ $match->id }}"
+                                        class="bg-[#FACC15] text-black px-3 py-1 rounded hover:brightness-110">
+                                    Editar
+                                </button>
+
+                                <button type="button" onclick="saveMatch('{{ $match->id }}')"
+                                        id="save-btn-match-{{ $match->id }}"
+                                        class="hidden bg-[#00B140] text-white px-3 py-1 rounded hover:brightness-110">
+                                    Guardar
+                                </button>
+
+                                <button onclick="cancelEditMatch('{{ $match->id }}')"
+                                        id="cancel-btn-match-{{ $match->id }}"
+                                        class="hidden bg-[#4B5563] text-white px-3 py-1 rounded hover:brightness-110">
+                                    Cancelar
+                                </button>
+
+                                <form action="{{ route('matches.destroy', $match->id) }}" method="POST"
+                                    onsubmit="return confirm('¿Estás seguro de que deseas eliminar este partido? Esta acción no se puede deshacer.')"
+                                    id="delete-form-match-{{ $match->id }}" class="inline">
+                                    @csrf
+                                    @method('DELETE')
+                                    <button type="submit"
+                                            class="bg-[#DC2626] text-white px-3 py-1 rounded hover:brightness-110">
+                                        Eliminar
+                                    </button>
+                                </form>
+                            </div>
+                                @include('matches.editLeagueMatch_form', ['match' => $match])
+                            </td>
+                        </tr>
+                    @endforeach
+                @else
+                    <tr>
+                        <td colspan="10" class="text-center text-gray-400 p-4">No hay partidos de liga registrados.</td>
+                    </tr>
+                @endif
+            </tbody>
+        </table>
+    </div>
 </div>
 
 <!-- 📊 Tabla de estadísticas individuales en liga -->
-<div class="bg-[#1E3A8A] shadow-lg rounded-lg p-6 mb-6 text-white">
+<div class="bg-[#1E3A8A] shadow-lg rounded-lg p-4 sm:p-6 mb-6 text-white">
     <h2 class="text-2xl font-title text-[#FACC15] mb-4 uppercase">Estadísticas Liga</h2>
-
-    <table class="w-full text-center border-collapse bg-[#1E293B] rounded-lg">
-        <thead class="bg-[#15803D] text-white uppercase text-sm">
-            <tr class="border-b border-[#15803D]">
-                <th class="p-2">Nombre</th>
-                <th class="p-2">Apellido</th>
-                <th class="p-2">Dorsal</th>
-                <th class="p-2">Posición</th>
-                <th class="p-2">Partidos</th>
-                <th class="p-2">Minutos</th>
-                <th class="p-2">Min/Partido</th>
-                <th class="p-2">Goles/Encajados(POR)</th>
-                <th class="p-2">Asist</th>
-                <th class="p-2">Tit</th>
-                <th class="p-2">Supl</th>
-                <th class="p-2">Valoración</th>
-                <th class="p-2">Amarillas</th>
-                <th class="p-2">Rojas</th>
-            </tr>
-        </thead>
-        <tbody>
-            @foreach ($team->players as $player)
-                @php
-                    $stats = $player->leagueStats($team->id);
-                @endphp
-                <tr class="border-b bg-[#334155]" id="player-row-{{ $player->id }}">
-                    <td class="p-2">{{ $player->nombre }}</td>
-                    <td class="p-2">{{ $player->apellido }}</td>
-                    <td class="p-2">{{ $player->dorsal }}</td>
-                    <td class="p-2">
-                        <span id="pos-{{ $player->id }}">{{ $player->posicion }}</span>
-                        <select name="posicion" class="hidden w-full p-1 border rounded bg-white text-black" id="edit-pos-{{ $player->id }}">
-                            <option value="Portero" @selected($player->posicion == 'Portero')>Portero</option>
-                            <option value="Defensa" @selected($player->posicion == 'Defensa')>Defensa</option>
-                            <option value="Centrocampista" @selected($player->posicion == 'Centrocampista')>Centrocampista</option>
-                            <option value="Delantero" @selected($player->posicion == 'Delantero')>Delantero</option>
-                        </select>
-                    </td>
-                    <td class="p-2">{{ $stats->partidos ?? 0 }}</td>
-                    <td class="p-2">{{ $stats->minutos_jugados ?? 0 }}</td>
-                    <td class="p-2">{{ $stats->minutos_por_partido ?? 0 }}</td>
-                    <td class="p-2">{{ $stats->goles ?? 0 }}</td>
-                    <td class="p-2">{{ $stats->asistencias ?? 0 }}</td>
-                    <td class="p-2">{{ $stats->titular ?? 0 }}</td>
-                    <td class="p-2">{{ $stats->suplente ?? 0 }}</td>
-                    <td class="p-2 font-bold text-[#3B82F6]">{{ number_format($stats->valoracion ?? 0, 2) }}</td>
-                    <td class="p-2 text-[#FACC15] font-bold">{{ $stats->tarjetas_amarillas ?? 0 }}</td>
-                    <td class="p-2 text-[#DC2626] font-bold">{{ $stats->tarjetas_rojas ?? 0 }}</td>
+    <div class="w-full overflow-x-auto sm:rounded-lg">
+        <table class="min-w-[1000px] w-full text-center border-collapse bg-[#1E293B] rounded-lg">
+            <thead class="bg-[#15803D] text-white uppercase text-sm">
+                <tr class="border-b border-[#15803D]">
+                    <th class="p-2">Nombre</th>
+                    <th class="p-2">Apellido</th>
+                    <th class="p-2">Dorsal</th>
+                    <th class="p-2">Posición</th>
+                    <th class="p-2">Partidos</th>
+                    <th class="p-2">Minutos</th>
+                    <th class="p-2">Min/Partido</th>
+                    <th class="p-2">Goles/Encajados(POR)</th>
+                    <th class="p-2">Asist</th>
+                    <th class="p-2">Tit</th>
+                    <th class="p-2">Supl</th>
+                    <th class="p-2">Valoración</th>
+                    <th class="p-2">Amarillas</th>
+                    <th class="p-2">Rojas</th>
                 </tr>
-            @endforeach
-        </tbody>
-    </table>
+            </thead>
+            <tbody>
+                @foreach ($team->players as $player)
+                    @php
+                        $stats = $player->leagueStats($team->id);
+                    @endphp
+                    <tr class="border-b bg-[#334155]" id="player-row-{{ $player->id }}">
+                        <td class="p-2">{{ $player->nombre }}</td>
+                        <td class="p-2">{{ $player->apellido }}</td>
+                        <td class="p-2">{{ $player->dorsal }}</td>
+                        <td class="p-2">
+                            <span id="pos-{{ $player->id }}">{{ $player->posicion }}</span>
+                            <select name="posicion" class="hidden w-full p-1 border rounded bg-white text-black" id="edit-pos-{{ $player->id }}">
+                                <option value="Portero" @selected($player->posicion == 'Portero')>Portero</option>
+                                <option value="Defensa" @selected($player->posicion == 'Defensa')>Defensa</option>
+                                <option value="Centrocampista" @selected($player->posicion == 'Centrocampista')>Centrocampista</option>
+                                <option value="Delantero" @selected($player->posicion == 'Delantero')>Delantero</option>
+                            </select>
+                        </td>
+                        <td class="p-2">{{ $stats->partidos ?? 0 }}</td>
+                        <td class="p-2">{{ $stats->minutos_jugados ?? 0 }}</td>
+                        <td class="p-2">{{ $stats->minutos_por_partido ?? 0 }}</td>
+                        <td class="p-2">{{ $stats->goles ?? 0 }}</td>
+                        <td class="p-2">{{ $stats->asistencias ?? 0 }}</td>
+                        <td class="p-2">{{ $stats->titular ?? 0 }}</td>
+                        <td class="p-2">{{ $stats->suplente ?? 0 }}</td>
+                        <td class="p-2 font-bold text-[#3B82F6]">{{ number_format($stats->valoracion ?? 0, 2) }}</td>
+                        <td class="p-2 text-[#FACC15] font-bold">{{ $stats->tarjetas_amarillas ?? 0 }}</td>
+                        <td class="p-2 text-[#DC2626] font-bold">{{ $stats->tarjetas_rojas ?? 0 }}</td>
+                    </tr>
+                @endforeach
+            </tbody>
+        </table>
+    </div>
 </div>
 
 
