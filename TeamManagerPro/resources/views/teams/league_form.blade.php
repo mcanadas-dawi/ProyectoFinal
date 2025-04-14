@@ -110,7 +110,7 @@ function generarJornadas() {
         inputRival.id = `rival_${i}`;
         inputRival.placeholder = "Nombre del rival";
         inputRival.required = true;
-        inputRival.className = "w-full border border-gray-300 p-2 rounded mb-2";
+        inputRival.className = "text-gray-800 dark:text-white";
 
         jornadaDiv.appendChild(label);
         jornadaDiv.appendChild(inputRival);
@@ -128,7 +128,7 @@ function generarJornadas() {
             const localLabel = document.createElement('label');
             localLabel.setAttribute('for', `local_${i}`);
             localLabel.textContent = "Local";
-
+            localLabel.className = "text-gray-800 dark:text-white";
             checkboxWrapper.appendChild(localCheckbox);
             checkboxWrapper.appendChild(localLabel);
 

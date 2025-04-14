@@ -27,6 +27,8 @@ Route::middleware(['auth', 'verified'])->group(function () {
     // 📌 Equipos (sin index redundante)
     Route::resource('teams', TeamsController::class)->except(['index']);
     Route::get('/teams/{team}', [TeamsController::class, 'show'])->name('teams.show');
+    Route::get('/teams', [TeamsController::class, 'index'])->name('teams.index');
+
 
     // 📌 Jugadores
     Route::post('/players', [PlayersController::class, 'store'])->name('players.store');
