@@ -13,7 +13,8 @@ class RivalLiga extends Model
 
     protected $fillable = [
         'nombre_equipo',
-        'jornada'
+        'jornada',
+        'team_id'
     ];
 
     // 📌 RELACIONES

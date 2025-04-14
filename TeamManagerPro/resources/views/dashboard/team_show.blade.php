@@ -395,11 +395,13 @@
                                     Alineador
                                 </button>
                             </td>
-                            <td class="p-2 text-center">                            <div class="flex flex-wrap justify-center gap-2">
-                                <a href="{{ route('matches.ratePlayers', $match->id) }}"
-                                class="bg-[#FF8C42] text-white px-3 py-1 rounded block hover:brightness-110">
-                                    Valorar Jugadores
-                                </a>
+                            <td class="p-2 text-center">                            
+                                <div class="flex flex-wrap justify-center gap-2">
+                                    <a href="{{ route('matches.ratePlayers', ['match' => $match->id]) }}"
+                                    class="bg-[#FF8C42] text-white px-3 py-1 rounded block hover:brightness-110">
+                                        Valorar Jugadores
+                                    </a>
+                               
 
                                 <button onclick="editMatch('{{ $match->id }}')"
                                         id="edit-btn-match-{{ $match->id }}"
@@ -418,7 +420,7 @@
                                         class="hidden bg-[#4B5563] text-white px-3 py-1 rounded hover:brightness-110">
                                     Cancelar
                                 </button>
-
+                                @if(isset($match->id))
                                 <form action="{{ route('matches.destroy', $match->id) }}" method="POST"
                                     onsubmit="return confirm('¿Estás seguro de que deseas eliminar este partido? Esta acción no se puede deshacer.')"
                                     id="delete-form-match-{{ $match->id }}" class="inline">
@@ -429,6 +431,7 @@
                                         Eliminar
                                     </button>
                                 </form>
+                                @endif
                             </div>
                                 @include('matches.editLeagueMatch_form', ['match' => $match])
                             </td>

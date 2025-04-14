@@ -55,6 +55,7 @@ class RivalesLigaController extends Controller
         $rival = RivalLiga::create([
             'nombre_equipo' => $rivalNombre,
             'jornada' => $jornada,
+            'team_id' => $teamId,
         ]);
 
         Matches::create([
@@ -74,6 +75,7 @@ class RivalesLigaController extends Controller
             $rivalVuelta = RivalLiga::create([
                 'nombre_equipo' => $rivalNombre,
                 'jornada' => $jornada,
+                'team_id' => $teamId,
             ]);
 
             Matches::create([
