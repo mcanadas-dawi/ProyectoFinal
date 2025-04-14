@@ -256,6 +256,7 @@ function updateFormation(formation = null, alineacionGuardada = []) {
     formations[selectedFormation].forEach((pos, index) => {
         let positionDiv = document.createElement('div');
         positionDiv.className = "dropzone w-12 h-12 bg-white border border-gray-800 rounded-full flex items-center justify-center cursor-pointer";
+        positionDiv.classList.add("text-black", "font-bold");
         positionDiv.style.position = "absolute";
         positionDiv.style.top = `${pos[1]}%`;
         positionDiv.style.left = `${pos[0]}%`;
