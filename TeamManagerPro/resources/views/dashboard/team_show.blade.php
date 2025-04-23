@@ -128,8 +128,8 @@
                             <span class="hidden" id="fecha-nacimiento-{{ $player->id }}">{{ $player->fecha_nacimiento }}</span>
                         </td>
                         <td class="p-2">
-                            <span id="pos-{{ $player->id }}">{{ $player->posicion }}</span>
-                            <select name="posicion" class="hidden w-full p-1 border rounded text-black" id="edit-pos-{{ $player->id }}">
+                            <span id="modal-pos-{{ $player->id }}">{{ $player->posicion }}</span>
+                            <select name="posicion" class="hidden w-full p-1 border rounded text-black" id="modal-edit-pos-{{ $player->id }}">
                                 <option value="Portero" @selected($player->posicion == 'Portero')>Portero</option>
                                 <option value="Defensa" @selected($player->posicion == 'Defensa')>Defensa</option>
                                 <option value="Centrocampista" @selected($player->posicion == 'Centrocampista')>Centrocampista</option>
@@ -140,7 +140,7 @@
                             <span id="perfil-{{ $player->id }}">
                                 @if($player->perfil == 'Diestro') D @else I @endif
                             </span>
-                            <select name="perfil" class="hidden w-full p-1 border rounded text-black" id="edit-perfil-{{ $player->id }}">
+                            <select name="perfil" class="hidden w-full p-1 border rounded text-black" id="modal-edit-perfil-{{ $player->id }}">
                                 <option value="Diestro" @selected($player->perfil == 'Diestro')>Diestro</option>
                                 <option value="Zurdo" @selected($player->perfil == 'Zurdo')>Zurdo</option>
                             </select>
@@ -155,24 +155,22 @@
                         <td class="p-2 text-[#DC2626] font-bold">{{ $stats->tarjetas_rojas ?? 0 }}</td>
                         <td class="p-2">
                             <div class="flex flex-wrap justify-center gap-2">
-                                <button onclick="editPlayer('{{ $player->id }}')" id="edit-btn-{{ $player->id }}" class="bg-[#FACC15] text-black px-3 py-1 rounded hover:brightness-110">
-                                    Editar
-                                </button>
-                                <button onclick="savePlayer('{{ $player->id }}')" id="save-btn-{{ $player->id }}" class="hidden bg-[#00B140] text-white px-3 py-1 rounded hover:brightness-110">
-                                    Guardar
-                                </button>
-                                <button onclick="cancelEditPlayer('{{ $player->id }}')" id="cancel-btn-{{ $player->id }}" class="hidden bg-gray-600 text-white px-3 py-1 rounded hover:brightness-110">
-                                    Cancelar
-                                </button>
+                            <!-- Botón Editar -->
+                            <button id="modal-edit-btn-{{ $player->id }}" onclick="toggleModalEditPosicion('{{ $player->id }}', true)" class="bg-[#FACC15] text-black px-3 py-1 rounded">Editar</button>
 
-                                <form action="{{ route('players.destroy', $player->id) }}" method="POST" onsubmit="return confirm('¿Estás seguro de que deseas eliminar a este jugador de la plantilla?')" id="delete-form-{{ $player->id }}">
-                                    @csrf
-                                    @method('DELETE')
-                                    <input type="hidden" name="team_id" value="{{ $team->id }}">
-                                    <button type="submit" class="bg-[#DC2626] text-white px-3 py-1 rounded hover:brightness-110">
-                                        Eliminar
-                                    </button>
-                                </form>
+                            <!-- Botón Guardar -->
+                            <button id="modal-save-btn-{{ $player->id }}" onclick="savePlayer('{{ $player->id }}', true)" class="hidden bg-[#00B140] text-white px-3 py-1 rounded">Guardar</button>
+
+                            <!-- Botón Cancelar -->
+                            <button id="modal-cancel-btn-{{ $player->id }}" onclick="toggleModalEditPosicion('{{ $player->id }}', false)" class="hidden bg-gray-600 text-white px-3 py-1 rounded">Cancelar</button>
+
+                            <!-- Botón Eliminar (opcional) -->
+                            <form id="modal-delete-form-{{ $player->id }}" method="POST" action="{{ route('players.destroy', $player->id) }}">
+                                @csrf
+                                @method('DELETE')
+                                <button type="submit" class="bg-[#DC2626] text-white px-3 py-1 rounded">Eliminar</button>
+                            </form>
+
                             </div>
                         </td>
                     </tr>
@@ -497,21 +495,22 @@
         </table>
     </div>
 </div>
+
 <!-- 📊 Tabla TOP 5 en liga -->
 <div class="bg-[#1E3A8A] shadow-lg rounded-lg p-4 sm:p-6 mb-6">
     <h2 class="text-2xl font-title text-[#FACC15] uppercase mb-6">Top 5 Liga</h2>
 
     <!-- Fila 1: Goleadores, Asistencias, Minutos -->
-    <div class="flex justify-between flex-wrap gap-y-6">
+    <div class="grid sm:grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
         <!-- Goleadores -->
-        <div class="w-[30%] min-w-[220px]">
+        <div class="min-w-[320px]">
             <h3 class="text-[#FACC15] text-lg font-bold mb-2 text-center">GOLEADORES</h3>
-            <table class="w-full text-white bg-[#1E293B] rounded overflow-hidden">
+            <table class="w-full min-w-[320px] table-fixed text-white bg-[#1E293B] rounded overflow-hidden">
                 <thead class="bg-[#15803D]">
                     <tr>
-                        <th class="px-2 py-1 text-center">Top</th>
-                        <th class="px-2 py-1 text-center">Jugador</th>
-                        <th class="px-2 py-1 text-center">Goles</th>
+                        <th class="px-2 py-1 text-center" style="width: 20%;">Top</th>
+                        <th class="px-2 py-1 text-center" style="width: 50%;">Jugador</th>
+                        <th class="px-2 py-1 text-center" style="width: 30%;">Goles</th>
                     </tr>
                 </thead>
                 <tbody>
@@ -527,14 +526,14 @@
         </div>
 
         <!-- Asistencias -->
-        <div class="w-[30%] min-w-[220px]">
+        <div class="min-w-[320px]">
             <h3 class="text-[#FACC15] text-lg font-bold mb-2 text-center">ASISTENCIAS</h3>
-            <table class="w-full text-white bg-[#1E293B] rounded overflow-hidden">
+            <table class="w-full min-w-[320px] table-fixed text-white bg-[#1E293B] rounded overflow-hidden">
                 <thead class="bg-[#15803D]">
                     <tr>
-                        <th class="px-2 py-1 text-center">Top</th>
-                        <th class="px-2 py-1 text-center">Jugador</th>
-                        <th class="px-2 py-1 text-center">Asistencias</th>
+                        <th class="px-2 py-1 text-center" style="width: 20%;">Top</th>
+                        <th class="px-2 py-1 text-center" style="width: 50%;">Jugador</th>
+                        <th class="px-2 py-1 text-center" style="width: 30%;">Asistencias</th>
                     </tr>
                 </thead>
                 <tbody>
@@ -550,14 +549,14 @@
         </div>
 
         <!-- Minutos jugados -->
-        <div class="w-[30%] min-w-[220px]">
+        <div class="min-w-[320px]">
             <h3 class="text-[#FACC15] text-lg font-bold mb-2 text-center">MINUTOS JUGADOS</h3>
-            <table class="w-full text-white bg-[#1E293B] rounded overflow-hidden">
+            <table class="w-full min-w-[320px] table-fixed text-white bg-[#1E293B] rounded overflow-hidden">
                 <thead class="bg-[#15803D]">
                     <tr>
-                        <th class="px-2 py-1 text-center">Top</th>
-                        <th class="px-2 py-1 text-center">Jugador</th>
-                        <th class="px-2 py-1 text-center">Minutos</th>
+                        <th class="px-2 py-1 text-center" style="width: 20%;">Top</th>
+                        <th class="px-2 py-1 text-center" style="width: 50%;">Jugador</th>
+                        <th class="px-2 py-1 text-center" style="width: 30%;">Minutos</th>
                     </tr>
                 </thead>
                 <tbody>
@@ -572,18 +571,18 @@
             </table>
         </div>
     </div>
-    <br>                
+
     <!-- Fila 2: Valoración media, Tarjetas -->
-    <div class="flex justify-center gap-x-40 flex-wrap">
-    <!-- Valoración media -->
-        <div class="w-[30%] min-w-[220px]">
-            <h3 class="text-[#FACC15] text-lg font-bold mb-2 text-center">VALORACION MEDIA</h3>
-            <table class="w-full text-white bg-[#1E293B] rounded overflow-hidden">
+    <div class="grid sm:grid-cols-1 md:grid-cols-2 gap-6 mt-6 justify-center">
+        <!-- Valoración media -->
+        <div class="min-w-[320px]">
+            <h3 class="text-[#FACC15] text-lg font-bold mb-2 text-center">VALORACIÓN MEDIA</h3>
+            <table class="w-full min-w-[320px] table-fixed text-white bg-[#1E293B] rounded overflow-hidden">
                 <thead class="bg-[#15803D]">
                     <tr>
-                        <th class="px-2 py-1 text-center">Top</th>
-                        <th class="px-2 py-1 text-center">Jugador</th>
-                        <th class="px-2 py-1 text-center">Media</th>
+                        <th class="px-2 py-1 text-center" style="width: 20%;">Top</th>
+                        <th class="px-2 py-1 text-center" style="width: 50%;">Jugador</th>
+                        <th class="px-2 py-1 text-center" style="width: 30%;">Media</th>
                     </tr>
                 </thead>
                 <tbody>
@@ -599,16 +598,16 @@
         </div>
 
         <!-- Tarjetas -->
-        <div class="w-[30%] min-w-[260px]">
+        <div class="min-w-[320px]">
             <h3 class="text-[#FACC15] text-lg font-bold mb-2 text-center">TARJETAS</h3>
-            <table class="w-full text-white bg-[#1E293B] rounded overflow-hidden">
+            <table class="w-full min-w-[320px] table-fixed text-white bg-[#1E293B] rounded overflow-hidden">
                 <thead class="bg-[#15803D]">
                     <tr>
-                        <th class="px-2 py-1 text-center">Top</th>
-                        <th class="px-2 py-1 text-center">Jugador</th>
-                        <th class="px-2 py-1 text-center">Amarillas</th>
-                        <th class="px-2 py-1 text-center">Rojas</th>
-                        <th class="px-2 py-1 text-center">Total</th>
+                        <th class="px-2 py-1 text-center" style="width: 12%;">Top</th>
+                        <th class="px-2 py-1 text-center" style="width: 30%;">Jugador</th>
+                        <th class="px-2 py-1 text-center" style="width: 18%;">Amarillas</th>
+                        <th class="px-2 py-1 text-center" style="width: 18%;">Rojas</th>
+                        <th class="px-2 py-1 text-center" style="width: 22%;">Total</th>
                     </tr>
                 </thead>
                 <tbody>
@@ -689,38 +688,52 @@ function cancelEditPlayer(id) {
     toggleEditState(id, false);
 }
 
-function savePlayer(id) {
-    let csrfToken = document.querySelector('meta[name="csrf-token"]').content;
+function savePlayer(id, isModal = false) {
+    const csrfToken = document.querySelector('meta[name="csrf-token"]').content;
 
-    let data = {
+    const posId = isModal ? `modal-edit-pos-${id}` : `edit-pos-${id}`;
+    const perfilId = isModal ? `modal-edit-perfil-${id}` : `edit-perfil-${id}`;
+
+    const posicionEl = document.getElementById(posId);
+    const perfilEl = document.getElementById(perfilId);
+
+    if (!posicionEl || !perfilEl) {
+        alert('No se encontraron los campos de edición.');
+        return;
+    }
+
+    const data = {
         _token: csrfToken,
         _method: 'PATCH',
-        posicion: document.getElementById(`edit-pos-${id}`).value,
-        perfil: document.getElementById(`edit-perfil-${id}`).value
+        posicion: posicionEl.value,
+        perfil: perfilEl.value
     };
 
     fetch(`/players/${id}`, {
-        method: 'POST',  // Usamos POST porque el método PATCH se envía con _method
+        method: 'POST',
         headers: {
             'Content-Type': 'application/json',
             'X-CSRF-TOKEN': csrfToken
         },
         body: JSON.stringify(data)
     })
-    .then(response => response.json())
+    .then(response => {
+        if (!response.ok) throw new Error('Fallo al guardar');
+        return response.json();
+    })
     .then(data => {
         if (data.success) {
-            // Recargar la página para mostrar el mensaje flash
-            location.reload();
+            location.reload(); // o cierra modal + actualiza tabla dinámicamente
         } else {
             alert('Error al actualizar el jugador');
         }
     })
     .catch(error => {
-        console.error('Error al guardar el jugador:', error);
+        console.error('❌ Error:', error);
         alert('Ocurrió un error al guardar el jugador.');
     });
 }
+
 
 
 // 📌 Editar, cancelar y guardar partidos
@@ -824,8 +837,23 @@ function toggleEditState(id, editing) {
     });
 }
 
+function toggleModalEditPosicion(playerId, editing) {
+    const span = document.getElementById(`modal-pos-${playerId}`);
+    const select = document.getElementById(`modal-edit-pos-${playerId}`);
 
+    const editBtn = document.getElementById(`modal-edit-btn-${playerId}`);
+    const saveBtn = document.getElementById(`modal-save-btn-${playerId}`);
+    const cancelBtn = document.getElementById(`modal-cancel-btn-${playerId}`);
+    const deleteForm = document.getElementById(`modal-delete-form-${playerId}`);
 
+    if (span) span.classList.toggle('hidden', editing);
+    if (select) select.classList.toggle('hidden', !editing);
+
+    if (editBtn) editBtn.classList.toggle('hidden', editing);
+    if (saveBtn) saveBtn.classList.toggle('hidden', !editing);
+    if (cancelBtn) cancelBtn.classList.toggle('hidden', !editing);
+    if (deleteForm) deleteForm.classList.toggle('hidden', editing);
+}
 
 
 // 📌 Función reutilizable para alternar edición de partidos
