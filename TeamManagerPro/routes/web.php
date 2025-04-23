@@ -61,7 +61,7 @@ Route::middleware(['auth', 'verified'])->group(function () {
     Route::get('/ligas/create', [RivalesLigaController::class, 'create'])->name('rivales_liga.create');
     Route::post('/ligas/store', [RivalesLigaController::class, 'store'])->name('rivales_liga.store');
     Route::put('/ligas/{id}', [RivalesLigaController::class, 'update'])->name('rivales_liga.update');
-    Route::delete('/ligas/{id}', [RivalesLigaController::class, 'destroy'])->name('rivales_liga.destroy');
+    Route::delete('/liga/{team}/delete', [RivalesLigaController::class, 'destroyLiga'])->name('liga.delete');
     Route::get('/ligas', [RivalesLigaController::class, 'index'])->name('rivales_liga.index');
 });
 

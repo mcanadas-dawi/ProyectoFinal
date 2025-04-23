@@ -112,17 +112,20 @@ class RivalesLigaController extends Controller
         return back()->with('success', 'Rival de liga actualizado correctamente.');
     }
 
-    public function destroy($id)
-{
-    $team = Team::findOrFail($id);
-
-    // Eliminar partidos de liga asociados claramente
-    Matches::where('team_id', $team->id)->where('tipo', 'liga')->delete();
-
-    // Eliminar los rivales relacionados claramente
-    RivalLiga::where('team_id', $team->id)->delete();
-
-    return redirect()->back()->with('success', 'Liga eliminada correctamente.');
-}
+    public function destroyLiga($id)
+    {
+        $team = Team::findOrFail($id);
+    
+        // Elimina partidos tipo 'liga' de ese equipo
+        Matches::where('team_id', $team->id)
+            ->where('tipo', 'liga')
+            ->delete();
+    
+        // Elimina los rivales asociados
+        RivalLiga::where('team_id', $team->id)->delete();
+    
+        return redirect()->back()->with('success_liga', 'La liga y todos sus partidos han sido eliminados correctamente.');
+    }
+    
 
 }

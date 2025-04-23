@@ -222,7 +222,7 @@
                     'Victoria' => 'text-[#00B140]',
                     'Empate'   => 'text-[#FACC15]',
                     'Derrota'  => 'text-[#DC2626]',
-                    default    => 'text-gray-600',
+                    default    => 'text-white',
                 };
             @endphp     
             <tr id="match-row-{{ $match->id }}" class="border-b hover:bg-[#334155]/60 transition-colors duration-200 {{ $colorTexto }}">
@@ -319,8 +319,14 @@
 <div class="bg-[#1E3A8A] shadow-lg rounded-lg p-4 sm:p-6 mb-6 text-white">
     <div class="flex items-center justify-center mb-4">
         <h2 class="text-2xl font-title text-[#FACC15] flex-grow text-left uppercase">Partidos de Liga</h2>
+        <form action="{{ route('liga.delete', ['team' => $team->id]) }}" method="POST" onsubmit="return confirm('¿Seguro que deseas eliminar esta liga y todos sus partidos?');" class="text-center sm:text-right">
+            @csrf
+            @method('DELETE')
+            <button class="bg-[#DC2626] text-white px-4 py-2 rounded hover:brightness-110">
+                Eliminar Liga
+            </button>
+        </form>
     </div>
-    
     <div class="w-full overflow-x-auto sm:rounded-lg">
         <table class="min-w-[900px] w-full text-center border-collapse bg-[#1E293B] rounded-lg">
             <thead class="bg-[#15803D] text-white uppercase text-sm">
@@ -345,7 +351,7 @@
                         'Victoria' => 'text-[#00B140]',
                         'Empate'   => 'text-[#FACC15]',
                         'Derrota'  => 'text-[#DC2626]',
-                        default    => 'text-gray-600',
+                        default    => 'text-white',
                     };
                 @endphp     
                 <tr id="match-row-{{ $match->id }}" class="border-b hover:bg-[#334155]/60 transition-colors duration-200 {{ $colorTexto }}">
@@ -420,18 +426,6 @@
                                         class="hidden bg-[#4B5563] text-white px-3 py-1 rounded hover:brightness-110">
                                     Cancelar
                                 </button>
-                                @if(isset($match->id))
-                                <form action="{{ route('matches.destroy', $match->id) }}" method="POST"
-                                    onsubmit="return confirm('¿Estás seguro de que deseas eliminar este partido? Esta acción no se puede deshacer.')"
-                                    id="delete-form-match-{{ $match->id }}" class="inline">
-                                    @csrf
-                                    @method('DELETE')
-                                    <button type="submit"
-                                            class="bg-[#DC2626] text-white px-3 py-1 rounded hover:brightness-110">
-                                        Eliminar
-                                    </button>
-                                </form>
-                                @endif
                             </div>
                                 @include('matches.editLeagueMatch_form', ['match' => $match])
                             </td>
