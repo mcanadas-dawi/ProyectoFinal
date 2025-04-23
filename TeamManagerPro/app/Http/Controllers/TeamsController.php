@@ -21,65 +21,76 @@ class TeamsController extends Controller
     }
 
     public function show($id)
-{
-    $team = Team::where('id', $id)
-        ->where('user_id', Auth::id())
-        ->with(['players', 'matches'])
-        ->firstOrFail();
-
-    session(['current_team_id' => $team->id]);
-
-    $partidosAmistosos = $team->matches()->where('tipo', 'amistoso')->get();
-    $partidosLiga = $team->matches()->where('tipo', 'liga')->get();
-
-    $hayLiga = $partidosLiga->isNotEmpty();
-
-    $allPlayers = Player::whereNotIn('id', $team->players->pluck('id'))->get();
-
-    // 📊 Cálculo de estadísticas
-    $victorias = $partidosLiga->where('resultado', 'Victoria')->count();
-    $empates = $partidosLiga->where('resultado', 'Empate')->count();
-    $derrotas = $partidosLiga->where('resultado', 'Derrota')->count();
-    $puntos = ($victorias * 3) + $empates;
-
-    $golesFavor = $partidosLiga->sum('goles_a_favor');
-    $golesContra = $partidosLiga->sum('goles_en_contra');
-
-    $valoracionMedia = $partidosLiga->pluck('actuacion_equipo')->filter()->avg() ?? 0;
-    $valoracionMedia = round($valoracionMedia, 2);
-
-    // Tarjetas (desde match_player_stats)
-    $tarjetasAmarillas = 0;
-    $tarjetasRojas = 0;
-
-    foreach ($team->players as $player) {
-        $statsJugador = MatchPlayerStat::where('player_id', $player->id)
-            ->whereHas('match', function ($q) use ($team) {
-                $q->where('team_id', $team->id)
-                  ->where('tipo', 'liga');
-            })
-            ->get();
-
-        $tarjetasAmarillas += $statsJugador->sum('tarjetas_amarillas');
-        $tarjetasRojas += $statsJugador->sum('tarjetas_rojas');
+    {
+        $team = Team::where('id', $id)
+            ->where('user_id', Auth::id())
+            ->with(['players', 'matches'])
+            ->firstOrFail();
+    
+        session(['current_team_id' => $team->id]);
+    
+        $partidosAmistosos = $team->matches()->where('tipo', 'amistoso')->get();
+        $partidosLiga = $team->matches()->where('tipo', 'liga')->get();
+        $hayLiga = $partidosLiga->isNotEmpty();
+    
+        $allPlayers = Player::whereNotIn('id', $team->players->pluck('id'))->get();
+    
+        // 📊 Estadísticas generales
+        $victorias = $partidosLiga->where('resultado', 'Victoria')->count();
+        $empates = $partidosLiga->where('resultado', 'Empate')->count();
+        $derrotas = $partidosLiga->where('resultado', 'Derrota')->count();
+        $puntos = ($victorias * 3) + $empates;
+        $golesFavor = $partidosLiga->sum('goles_a_favor');
+        $golesContra = $partidosLiga->sum('goles_en_contra');
+        $valoracionMedia = round($partidosLiga->pluck('actuacion_equipo')->filter()->avg() ?? 0, 2);
+    
+        // 📊 Estadísticas individuales (para el Top 5)
+        $topStats = [];
+    
+        foreach ($team->players as $player) {
+            $statsJugador = MatchPlayerStat::where('player_id', $player->id)
+                ->whereHas('match', function ($q) use ($team) {
+                    $q->where('team_id', $team->id)->where('tipo', 'liga');
+                })
+                ->get();
+    
+            $topStats[] = [
+                'jugador' => $player,
+                'goles' => $statsJugador->sum('goles'),
+                'asistencias' => $statsJugador->sum('asistencias'),
+                'minutos' => $statsJugador->sum('minutos_jugados'),
+                'valoracion' => round($statsJugador->avg('valoracion') ?? 0, 2),
+                'amarillas' => $statsJugador->sum('tarjetas_amarillas'),
+                'rojas' => $statsJugador->sum('tarjetas_rojas'),
+            ];
+        }
+    
+        // Top 5 por cada categoría
+        $topGoles = collect($topStats)->sortByDesc('goles')->take(5);
+        $topAsistencias = collect($topStats)->sortByDesc('asistencias')->take(5);
+        $topMinutos = collect($topStats)->sortByDesc('minutos')->take(5);
+        $topValoracion = collect($topStats)->sortByDesc('valoracion')->take(5);
+        $topTarjetas = collect($topStats)->sortByDesc(fn($s) => $s['amarillas'] + $s['rojas'])->take(5);
+    
+        $stats = [
+            'victorias' => $victorias,
+            'empates' => $empates,
+            'derrotas' => $derrotas,
+            'puntos' => $puntos,
+            'goles_favor' => $golesFavor,
+            'goles_contra' => $golesContra,
+            'valoracion_media' => $valoracionMedia,
+            'tarjetas_amarillas' => $topStats ? array_sum(array_column($topStats, 'amarillas')) : 0,
+            'tarjetas_rojas' => $topStats ? array_sum(array_column($topStats, 'rojas')) : 0,
+        ];
+    
+        return view('dashboard.team_show', compact(
+            'team', 'allPlayers', 'stats',
+            'partidosAmistosos', 'partidosLiga', 'hayLiga',
+            'topGoles', 'topAsistencias', 'topMinutos', 'topValoracion', 'topTarjetas'
+        ));
     }
-
-    $stats = [
-        'victorias' => $victorias,
-        'empates' => $empates,
-        'derrotas' => $derrotas,
-        'puntos' => $puntos,
-        'goles_favor' => $golesFavor,
-        'goles_contra' => $golesContra,
-        'valoracion_media' => $valoracionMedia,
-        'tarjetas_amarillas' => $tarjetasAmarillas,
-        'tarjetas_rojas' => $tarjetasRojas,
-    ];
-
-    return view('dashboard.team_show', compact(
-        'team', 'allPlayers', 'stats', 'partidosAmistosos', 'partidosLiga', 'hayLiga'
-    ));
-}
+    
 
 
     

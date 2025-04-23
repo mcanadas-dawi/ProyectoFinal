@@ -504,6 +504,135 @@
         </table>
     </div>
 </div>
+<!-- 📊 Tabla TOP 5 en liga -->
+<div class="bg-[#1E3A8A] shadow-lg rounded-lg p-4 sm:p-6 mb-6">
+    <h2 class="text-2xl font-title text-[#FACC15] uppercase mb-6">Top 5 Liga</h2>
+
+    <!-- Fila 1: Goleadores, Asistencias, Minutos -->
+    <div class="flex justify-between flex-wrap gap-y-6 text-sm mb-6">
+        <!-- Goleadores -->
+        <div class="w-[30%] min-w-[220px]">
+            <h3 class="text-[#FACC15] text-lg font-bold mb-2 text-center">Goleadores</h3>
+            <table class="w-full text-white bg-[#1E293B] rounded overflow-hidden">
+                <thead class="bg-[#15803D]">
+                    <tr>
+                        <th class="px-2 py-1 text-center">Top</th>
+                        <th class="px-2 py-1 text-center">Jugador</th>
+                        <th class="px-2 py-1 text-center">Goles</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @foreach ($topGoles as $item)
+                    <tr class="border-t border-gray-700">
+                        <td class="px-2 py-1 text-center">{{ $loop->iteration }}</td>
+                        <td class="px-2 py-1 text-center">{{ $item['jugador']->nombre }}</td>
+                        <td class="px-2 py-1 text-center">{{ $item['goles'] }}</td>
+                    </tr>
+                    @endforeach
+                </tbody>
+            </table>
+        </div>
+
+        <!-- Asistencias -->
+        <div class="w-[30%] min-w-[220px]">
+            <h3 class="text-[#FACC15] text-lg font-bold mb-2 text-center">Asistencias</h3>
+            <table class="w-full text-white bg-[#1E293B] rounded overflow-hidden">
+                <thead class="bg-[#15803D]">
+                    <tr>
+                        <th class="px-2 py-1 text-center">Top</th>
+                        <th class="px-2 py-1 text-center">Jugador</th>
+                        <th class="px-2 py-1 text-center">Asistencias</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @foreach ($topAsistencias as $item)
+                    <tr class="border-t border-gray-700">
+                        <td class="px-2 py-1 text-center">{{ $loop->iteration }}</td>
+                        <td class="px-2 py-1 text-center">{{ $item['jugador']->nombre }}</td>
+                        <td class="px-2 py-1 text-center">{{ $item['asistencias'] }}</td>
+                    </tr>
+                    @endforeach
+                </tbody>
+            </table>
+        </div>
+
+        <!-- Minutos jugados -->
+        <div class="w-[30%] min-w-[220px]">
+            <h3 class="text-[#FACC15] text-lg font-bold mb-2 text-center">Minutos jugados</h3>
+            <table class="w-full text-white bg-[#1E293B] rounded overflow-hidden">
+                <thead class="bg-[#15803D]">
+                    <tr>
+                        <th class="px-2 py-1 text-center">Top</th>
+                        <th class="px-2 py-1 text-center">Jugador</th>
+                        <th class="px-2 py-1 text-center">Minutos</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @foreach ($topMinutos as $item)
+                    <tr class="border-t border-gray-700">
+                        <td class="px-2 py-1 text-center">{{ $loop->iteration }}</td>
+                        <td class="px-2 py-1 text-center">{{ $item['jugador']->nombre }}</td>
+                        <td class="px-2 py-1 text-center">{{ $item['minutos'] }}</td>
+                    </tr>
+                    @endforeach
+                </tbody>
+            </table>
+        </div>
+    </div>
+
+    <!-- Fila 2: Valoración media, Tarjetas -->
+    <div class="flex justify-center gap-x-40 flex-wrap">
+    <!-- Valoración media -->
+        <div class="w-[30%] min-w-[220px]">
+            <h3 class="text-[#FACC15] text-lg font-bold mb-2 text-center">Valoración media</h3>
+            <table class="w-full text-white bg-[#1E293B] rounded overflow-hidden">
+                <thead class="bg-[#15803D]">
+                    <tr>
+                        <th class="px-2 py-1 text-center">Top</th>
+                        <th class="px-2 py-1 text-center">Jugador</th>
+                        <th class="px-2 py-1 text-center">Media</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @foreach ($topValoracion as $item)
+                    <tr class="border-t border-gray-700">
+                        <td class="px-2 py-1 text-center">{{ $loop->iteration }}</td>
+                        <td class="px-2 py-1 text-center">{{ $item['jugador']->nombre }}</td>
+                        <td class="px-2 py-1 text-center">{{ number_format($item['valoracion'], 2) }}</td>
+                    </tr>
+                    @endforeach
+                </tbody>
+            </table>
+        </div>
+
+        <!-- Tarjetas -->
+        <div class="w-[30%] min-w-[260px]">
+            <h3 class="text-[#FACC15] text-lg font-bold mb-2 text-center">Tarjetas</h3>
+            <table class="w-full text-white bg-[#1E293B] rounded overflow-hidden">
+                <thead class="bg-[#15803D]">
+                    <tr>
+                        <th class="px-2 py-1 text-center">Top</th>
+                        <th class="px-2 py-1 text-center">Jugador</th>
+                        <th class="px-2 py-1 text-center">Amarillas</th>
+                        <th class="px-2 py-1 text-center">Rojas</th>
+                        <th class="px-2 py-1 text-center">Total</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @foreach ($topTarjetas as $item)
+                    <tr class="border-t border-gray-700">
+                        <td class="px-2 py-1 text-center">{{ $loop->iteration }}</td>
+                        <td class="px-2 py-1 text-center">{{ $item['jugador']->nombre }}</td>
+                        <td class="px-2 py-1 text-center">{{ $item['amarillas'] }}</td>
+                        <td class="px-2 py-1 text-center">{{ $item['rojas'] }}</td>
+                        <td class="px-2 py-1 text-center">{{ $item['amarillas'] + $item['rojas'] }}</td>
+                    </tr>
+                    @endforeach
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
 
 
 @include('matches.alineadorModal')
