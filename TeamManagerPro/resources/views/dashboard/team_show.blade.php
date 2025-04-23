@@ -240,7 +240,7 @@
                         value="{{ $match->goles_a_favor }}"
                         onchange="updateResultado('{{ $match->id }}')">
                 </td>
-
+                
                 <!-- Goles en Contra -->
                 <td class="p-2 text-center">
                     <span id="goles-contra-{{ $match->id }}">{{ $match->goles_en_contra }}</span>
@@ -366,7 +366,7 @@
                             <td class="p-2 text-center">
                                 <span id="goles-favor-{{ $match->id }}">{{ $match->goles_a_favor }}</span>
                                 <input type="number" name="goles_a_favor"
-                                    class="hidden w-16 p-1 border rounded bg-white text-black"
+                                    class="hidden w-16 p-1 border rounded bg-white text-black" 
                                     id="edit-goles-favor-{{ $match->id }}"
                                     value="{{ $match->goles_a_favor }}"
                                     onchange="updateResultado('{{ $match->id }}')">
@@ -407,8 +407,7 @@
                                     class="bg-[#FF8C42] text-white px-3 py-1 rounded block hover:brightness-110">
                                         Valorar Jugadores
                                     </a>
-                               
-
+                                    @include('matches.editLeagueMatch_form', ['match' => $match])
                                 <button onclick="editMatch('{{ $match->id }}')"
                                         id="edit-btn-match-{{ $match->id }}"
                                         class="bg-[#FACC15] text-black px-3 py-1 rounded hover:brightness-110">
@@ -427,7 +426,7 @@
                                     Cancelar
                                 </button>
                             </div>
-                                @include('matches.editLeagueMatch_form', ['match' => $match])
+                            
                             </td>
                         </tr>
                     @endforeach
@@ -836,7 +835,11 @@ function toggleMatchEditState(id, editing) {
     document.getElementById(`edit-btn-match-${id}`).classList[action]('hidden');
     document.getElementById(`save-btn-match-${id}`).classList[action === 'add' ? 'remove' : 'add']('hidden');
     document.getElementById(`cancel-btn-match-${id}`).classList[action === 'add' ? 'remove' : 'add']('hidden');
-    document.getElementById(`delete-form-match-${id}`).classList[action === 'add' ? 'add' : 'remove']('hidden');
+    const deleteForm = document.getElementById(`delete-form-match-${id}`);
+if (deleteForm) {
+    deleteForm.classList[action === 'add' ? 'add' : 'remove']('hidden');
+}
+
 
     // Alternar la visibilidad de los campos de edición y los campos normales
     let fields = ['fecha', 'goles-favor', 'goles-contra', 'resultado', 'actuacion'];
