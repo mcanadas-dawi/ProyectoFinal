@@ -502,10 +502,10 @@
     <h2 class="text-2xl font-title text-[#FACC15] uppercase mb-6">Top 5 Liga</h2>
 
     <!-- Fila 1: Goleadores, Asistencias, Minutos -->
-    <div class="flex justify-between flex-wrap gap-y-6 text-sm mb-6">
+    <div class="flex justify-between flex-wrap gap-y-6">
         <!-- Goleadores -->
         <div class="w-[30%] min-w-[220px]">
-            <h3 class="text-[#FACC15] text-lg font-bold mb-2 text-center">Goleadores</h3>
+            <h3 class="text-[#FACC15] text-lg font-bold mb-2 text-center">GOLEADORES</h3>
             <table class="w-full text-white bg-[#1E293B] rounded overflow-hidden">
                 <thead class="bg-[#15803D]">
                     <tr>
@@ -528,7 +528,7 @@
 
         <!-- Asistencias -->
         <div class="w-[30%] min-w-[220px]">
-            <h3 class="text-[#FACC15] text-lg font-bold mb-2 text-center">Asistencias</h3>
+            <h3 class="text-[#FACC15] text-lg font-bold mb-2 text-center">ASISTENCIAS</h3>
             <table class="w-full text-white bg-[#1E293B] rounded overflow-hidden">
                 <thead class="bg-[#15803D]">
                     <tr>
@@ -551,7 +551,7 @@
 
         <!-- Minutos jugados -->
         <div class="w-[30%] min-w-[220px]">
-            <h3 class="text-[#FACC15] text-lg font-bold mb-2 text-center">Minutos jugados</h3>
+            <h3 class="text-[#FACC15] text-lg font-bold mb-2 text-center">MINUTOS JUGADOS</h3>
             <table class="w-full text-white bg-[#1E293B] rounded overflow-hidden">
                 <thead class="bg-[#15803D]">
                     <tr>
@@ -572,12 +572,12 @@
             </table>
         </div>
     </div>
-
+    <br>                
     <!-- Fila 2: Valoración media, Tarjetas -->
     <div class="flex justify-center gap-x-40 flex-wrap">
     <!-- Valoración media -->
         <div class="w-[30%] min-w-[220px]">
-            <h3 class="text-[#FACC15] text-lg font-bold mb-2 text-center">Valoración media</h3>
+            <h3 class="text-[#FACC15] text-lg font-bold mb-2 text-center">VALORACION MEDIA</h3>
             <table class="w-full text-white bg-[#1E293B] rounded overflow-hidden">
                 <thead class="bg-[#15803D]">
                     <tr>
@@ -600,7 +600,7 @@
 
         <!-- Tarjetas -->
         <div class="w-[30%] min-w-[260px]">
-            <h3 class="text-[#FACC15] text-lg font-bold mb-2 text-center">Tarjetas</h3>
+            <h3 class="text-[#FACC15] text-lg font-bold mb-2 text-center">TARJETAS</h3>
             <table class="w-full text-white bg-[#1E293B] rounded overflow-hidden">
                 <thead class="bg-[#15803D]">
                     <tr>
