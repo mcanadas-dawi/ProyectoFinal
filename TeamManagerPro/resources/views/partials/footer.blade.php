@@ -1,14 +1,14 @@
 <footer class="bg-[#1A2238] text-white py-6 mt-12 shadow-inner">
     <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
         <p class="text-sm">&copy; {{ date('Y') }} TeamManagerPro. Todos los derechos reservados.</p>
-        <p class="text-xs mt-2">Desarrollado como proyecto final del ciclo DAW</p>
+        <p class="text-xs mt-2">Desarrollado por Marc Cañadas Suau</p>
 
         <div class="flex justify-center mt-4 space-x-6">
             <a href="https://github.com/mcanadas-dawi" target="_blank" class="hover:text-[#00B140] transition">
             <i class="bi bi-github"></i>
                 GitHub
             </a>
-            <a href="https://www.linkedin.com/in/mcanadas-dawi/" target="_blank" class="hover:text-[#00B140] transition">
+            <a href="https://www.linkedin.com/in/marc-ca%C3%B1adas-suau-3911b7261/" target="_blank" class="hover:text-[#00B140] transition">
             <i class="bi bi-linkedin"></i>
                 LinkedIn
             </a>
