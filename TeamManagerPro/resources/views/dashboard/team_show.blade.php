@@ -3,7 +3,7 @@
 
 <div class=" bg-[#1E293B] text-white font-sans p-4 sm:p-6">
     @if(session('success'))
-        <div class="bg-[#00B140] text-white p-3 rounded mb-4 text-center">
+        <div class="alert-success bg-[#00B140] text-white p-3 rounded mb-4 text-center transition-opacity duration-300">
             {{ session('success') }}
         </div>
     @endif
@@ -71,7 +71,7 @@
 
     <!-- Sección de Jugadores -->
     @if(session()->has('created_player') || session()->has('updated_player') || session()->has('added_player') || session()->has('deleted_player'))
-    <div class="bg-[#1E3A8A] shadow-lg rounded-lg p-4 sm:p-6 mb-10 text-white font-sans w-full overflow-x-auto">
+    <div class="bg-[#00B140] shadow-lg rounded-lg p-4 sm:p-6 mb-10 text-white font-sans w-full overflow-x-auto">
         {{ session('created_player') ?: session('updated_player') ?: session('added_player') ?: session('deleted_player')  }}
     </div>
 @endif
@@ -164,11 +164,14 @@
                             <!-- Botón Cancelar -->
                             <button id="modal-cancel-btn-{{ $player->id }}" onclick="toggleModalEditPosicion('{{ $player->id }}', false)" class="hidden bg-gray-600 text-white px-3 py-1 rounded">Cancelar</button>
 
-                            <!-- Botón Eliminar (opcional) -->
-                            <form id="modal-delete-form-{{ $player->id }}" method="POST" action="{{ route('players.destroy', $player->id) }}">
+                            <!-- Botón Eliminar -->
+                            <form action="{{ route('players.destroy', $player->id) }}" method="POST" onsubmit="return confirm('¿Estás seguro de que deseas eliminar a este jugador de la plantilla?')" id="delete-form-{{ $player->id }}">
                                 @csrf
                                 @method('DELETE')
-                                <button type="submit" class="bg-[#DC2626] text-white px-3 py-1 rounded">Eliminar</button>
+                                <input type="hidden" name="team_id" value="{{ $team->id }}">
+                                <button type="submit" class="bg-[#DC2626] text-white px-3 py-1 rounded hover:brightness-110">
+                                    Eliminar
+                                </button>
                             </form>
 
                             </div>
@@ -184,7 +187,7 @@
 
 <!-- Sección de Partidos Amistosos -->
 @if(session()->has('success_amistoso') || session()->has('success_convocatoria') || session()->has('deleted_match') || session()->has('created_match'))
-<div class="bg-[#1E3A8A] shadow-lg rounded-lg p-4 sm:p-6 mb-10 text-white font-sans w-full overflow-x-auto">
+<div class="alert-success bg-[#00B140] shadow-lg rounded-lg p-4 sm:p-6 mb-10 text-white font-sans w-full overflow-x-auto  transition-opacity duration-300">
         {{ session('success_amistoso') ?: session('success_convocatoria') ?: session('deleted_match') ?: session('created_match')  }}
     </div>
 @endif
@@ -309,7 +312,7 @@
 
 <!-- 📌 Tabla de Partidos Oficiales (Liga) -->
 @if(session('success_liga'))
-    <div class="bg-[#00B140] text-white p-3 rounded mb-4 text-center">
+    <div class="alert-success bg-[#00B140] text-white p-3 rounded mb-4 text-center transition-opacity duration-300">
         {{ session('success_liga') }}
     </div>
 @endif
@@ -974,5 +977,16 @@ function calcularEdad(fechaNacimiento) {
         });
     }
     window.onload = actualizarEdades;
+    //DESAPARECER ALERTAS
+    document.addEventListener('DOMContentLoaded', () => {
+        const alerts = document.querySelectorAll('.alert-success');
+        alerts.forEach(alert => {
+            setTimeout(() => {
+                alert.classList.add('opacity-0');
+                setTimeout(() => alert.remove(), 300); // se elimina tras el fade out
+            }, 5000); // espera 5 segundos
+        });
+    });
+
 </script>
 @endsection
