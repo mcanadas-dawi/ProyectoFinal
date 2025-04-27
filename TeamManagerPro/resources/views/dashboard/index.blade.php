@@ -15,7 +15,7 @@
     </div>
 
     <!-- Formulario para crear plantilla (oculto inicialmente) -->
-    <div id="new-team-form" class="hidden transition-all duration-500 ease-in-out overflow-hidden">
+    <div id="new-team-form" class="hidden transition-opacity duration-300">
         @include('teams.team_form')
     </div>
 
