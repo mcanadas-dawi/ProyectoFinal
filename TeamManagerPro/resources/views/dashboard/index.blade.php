@@ -57,5 +57,15 @@ function confirmDelete(event, teamName) {
         event.target.submit();
     }
 }
+
+document.addEventListener('DOMContentLoaded', () => {
+        const alerts = document.querySelectorAll('.alert-success');
+        alerts.forEach(alert => {
+            setTimeout(() => {
+                alert.classList.add('opacity-0');
+                setTimeout(() => alert.remove(), 300); // se elimina tras el fade out
+            }, 3000); 
+        });
+    });
 </script>
 @endsection

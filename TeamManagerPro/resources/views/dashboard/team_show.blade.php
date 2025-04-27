@@ -984,7 +984,7 @@ function calcularEdad(fechaNacimiento) {
             setTimeout(() => {
                 alert.classList.add('opacity-0');
                 setTimeout(() => alert.remove(), 300); // se elimina tras el fade out
-            }, 5000); // espera 5 segundos
+            }, 3000); 
         });
     });
 
