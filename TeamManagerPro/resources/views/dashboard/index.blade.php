@@ -7,9 +7,22 @@
         Gestión de Plantillas
     </h1>
 
-    @include('components.alert')
-    @include('teams.team_form')
+    <!-- Botón para mostrar/ocultar formulario -->
+    <div class="mb-6">
+        <button id="toggle-form-btn" onclick="toggleNewTeamForm()" class="bg-[#00B140] text-white px-4 py-2 rounded-lg hover:brightness-110">
+            Añadir Nueva Plantilla
+        </button>
+    </div>
 
+    <!-- Formulario para crear plantilla (oculto inicialmente) -->
+    <div id="new-team-form" class="hidden transition-all duration-500 ease-in-out overflow-hidden">
+        @include('teams.team_form')
+    </div>
+
+    <!-- Mensajes de alerta -->
+    @include('components.alert')
+
+    <!-- Listado de equipos -->
     <div class="mt-6">
         @foreach ($teams as $team)
             <div class="bg-[#1E3A8A] rounded-lg p-6 mb-6 shadow-lg">
@@ -30,7 +43,7 @@
                     </form>
                 </div>
 
-                <!-- Formulario oculto -->
+                <!-- Formulario oculto de competición -->
                 <div id="competicion-form-{{ $team->id }}" class="hidden mt-4 bg-[#111827] p-4 rounded-lg">
                     <h3 class="text-lg font-title text-[#FACC15] uppercase tracking-wide mb-2">Añadir Partido de Liga</h3>
                     <form action="{{ route('rivales_liga.store') }}" method="POST">
@@ -67,5 +80,10 @@ document.addEventListener('DOMContentLoaded', () => {
             }, 3000); 
         });
     });
+
+    function toggleNewTeamForm() {
+        const form = document.getElementById('new-team-form');
+        form.classList.toggle('hidden');
+    }
 </script>
 @endsection
