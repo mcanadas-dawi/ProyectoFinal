@@ -71,7 +71,7 @@
 
     <!-- Sección de Jugadores -->
     @if(session()->has('created_player') || session()->has('updated_player') || session()->has('added_player') || session()->has('deleted_player'))
-    <div class="bg-[#00B140] shadow-lg rounded-lg p-4 sm:p-6 mb-10 text-white font-sans w-full overflow-x-auto">
+    <div class="alert-success bg-[#00B140] shadow-lg rounded-lg p-4 sm:p-6 mb-10 text-white font-sans w-full overflow-x-auto transition-opacity duration-300">
         {{ session('created_player') ?: session('updated_player') ?: session('added_player') ?: session('deleted_player')  }}
     </div>
 @endif
