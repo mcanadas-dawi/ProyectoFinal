@@ -7,17 +7,24 @@
         Gestión de Plantillas
     </h1>
 
-    <!-- Botón para mostrar/ocultar formulario -->
-    <div class="mb-6">
-        <button id="toggle-form-btn" onclick="toggleNewTeamForm()" class="bg-[#00B140] text-white px-4 py-2 rounded-lg hover:brightness-110">
-            Añadir Nueva Plantilla
-        </button>
-    </div>
+<!-- Botón para mostrar/ocultar formulario -->
+<div class="mb-6 flex gap-4 flex-wrap">
+    <button id="toggle-form-btn" onclick="toggleNewTeamForm()" class="bg-[#00B140] text-white px-4 py-2 rounded-lg mb-3 hover:brightness-110">
+        Añadir Nueva Plantilla
+    </button>
 
-    <!-- Formulario para crear plantilla (oculto inicialmente) -->
-    <div id="new-team-form" class="hidden transition-opacity duration-300">
-        @include('teams.team_form')
-    </div>
+    <form action="{{ route('teams.demo') }}" method="POST">
+        @csrf
+        <button type="submit" class="bg-[#FACC15] text-black px-4 py-2 rounded-lg mb-3 hover:brightness-110">
+            Crear Plantilla de Demostración
+        </button>
+    </form>
+</div>
+
+<!-- Formulario para crear plantilla (oculto inicialmente) -->
+<div id="new-team-form" class="hidden transition-opacity duration-300">
+    @include('teams.team_form')
+</div>
 
     <!-- Mensajes de alerta -->
     @include('components.alert')

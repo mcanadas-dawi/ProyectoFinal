@@ -132,20 +132,31 @@ class PlayersController extends Controller
 public function addPlayerToTeam(Request $request)
 {
     $request->validate([
-        'player_id' => 'required|exists:players,id',
+        'player_ids' => 'required|array',
+        'player_ids.*' => 'exists:players,id',
         'team_id' => 'required|exists:teams,id',
     ]);
 
     $team = Team::findOrFail($request->team_id);
-    $player = Player::findOrFail($request->player_id);
+    $added = 0;
 
-    // Agregar el jugador a la plantilla si no está ya en ella
-    if (!$team->players()->where('players.id', $player->id)->exists()) {
-        $team->players()->attach($player->id);
-        session()->flash('added_player', 'Jugador añadido correctamente a la plantilla.');
+    foreach ($request->player_ids as $playerId) {
+        $player = Player::findOrFail($playerId);
+
+        if (!$team->players()->where('players.id', $player->id)->exists()) {
+            $team->players()->attach($player->id);
+            $added++;
+        }
+    }
+
+    if ($added > 0) {
+        session()->flash('added_player', "$added jugador(es) añadido(s) correctamente a la plantilla.");
+    } else {
+        session()->flash('added_player', "Todos los jugadores seleccionados ya estaban en la plantilla.");
     }
 
     return redirect()->back();
 }
+
 
 }

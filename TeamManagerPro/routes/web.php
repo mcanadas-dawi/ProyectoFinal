@@ -28,6 +28,8 @@ Route::middleware(['auth', 'verified'])->group(function () {
     Route::resource('teams', TeamsController::class)->except(['index']);
     Route::get('/teams/{team}', [TeamsController::class, 'show'])->name('teams.show');
     Route::get('/teams', [TeamsController::class, 'index'])->name('teams.index');
+    Route::post('/teams/demo', [TeamsController::class, 'createDemo'])->name('teams.demo');
+
 
 
     // 📌 Jugadores
@@ -63,7 +65,9 @@ Route::middleware(['auth', 'verified'])->group(function () {
     Route::put('/ligas/{id}', [RivalesLigaController::class, 'update'])->name('rivales_liga.update');
     Route::delete('/liga/{team}/delete', [RivalesLigaController::class, 'destroyLiga'])->name('liga.delete');
     Route::get('/ligas', [RivalesLigaController::class, 'index'])->name('rivales_liga.index');
+    
 });
+
 
 
 require __DIR__.'/auth.php';

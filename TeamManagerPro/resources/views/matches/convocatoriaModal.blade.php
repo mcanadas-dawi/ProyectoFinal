@@ -8,7 +8,7 @@
 
             <!-- Lista de jugadores con checkboxes -->
             <div class="max-h-60 overflow-y-auto mb-4">
-                <button type="button" onclick="toggleSelectAll()" class="bg-[#00B140] text-white px-4 py-2 rounded-lg mb-3 hover:brightness-110 w-full">
+                <button type="button" onclick="toggleSelectAll()" class="bg-[#FACC15] text-black px-4 py-2 rounded-lg mb-3 hover:brightness-110 ">
                     Seleccionar Todos
                 </button>
 

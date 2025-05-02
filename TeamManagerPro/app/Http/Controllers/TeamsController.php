@@ -9,6 +9,8 @@ use App\Models\RivalLiga;
 use App\Models\MatchPlayerStat;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Log;
+use Database\Seeders\DemoTeamSeeder;
+
 
 
 
@@ -142,5 +144,15 @@ class TeamsController extends Controller
         'golesFavor' => $golesFavor,
         'golesContra' => $golesContra,
     ];
+}
+
+public function createDemo()
+{
+    $userId = Auth::id(); // Igual que en store()
+
+    // Ejecutar seeder con el ID del usuario actual
+    (new DemoTeamSeeder())->run($userId);
+
+    return redirect()->route('teams.index')->with('success', '¡Plantilla de demostración creada con éxito!');
 }
 }
