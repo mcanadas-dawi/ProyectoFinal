@@ -37,7 +37,7 @@
                             </td>
 
                             <td class="p-2 text-center">
-                                <input type="number" name="players[{{ $player->id }}][minutos_jugados]" min="0"
+                                <input type="number" name="players[{{ $player->id }}][minutos_jugados]" min="0" max="120"
                                     class="w-16 p-2 rounded text-black text-center" value="{{ $stats->minutos_jugados ?? 0 }}">
                             </td>
 
@@ -108,5 +108,6 @@
             }
         });
     });
+
 </script>
 @endsection

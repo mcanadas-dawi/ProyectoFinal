@@ -236,7 +236,7 @@
                 <!-- Goles a Favor -->
                 <td class="p-2 text-center">
                     <span id="goles-favor-{{ $match->id }}">{{ $match->goles_a_favor }}</span>
-                    <input type="number" name="goles_a_favor" class="hidden w-16 p-1 border rounded bg-white text-black" 
+                    <input type="number" name="goles_a_favor" class="hidden w-16 p-1 border rounded bg-white text-black" min="0" 
                         id="edit-goles-favor-{{ $match->id }}" 
                         value="{{ $match->goles_a_favor }}"
                         onchange="updateResultado('{{ $match->id }}')">
@@ -245,7 +245,7 @@
                 <!-- Goles en Contra -->
                 <td class="p-2 text-center">
                     <span id="goles-contra-{{ $match->id }}">{{ $match->goles_en_contra }}</span>
-                    <input type="number" name="goles_en_contra" class="hidden w-16 p-1 border rounded bg-white text-black" 
+                    <input type="number" name="goles_en_contra" class="hidden w-16 p-1 border rounded bg-white text-black" min="0"
                         id="edit-goles-contra-{{ $match->id }}" 
                         value="{{ $match->goles_en_contra }}"
                         onchange="updateResultado('{{ $match->id }}')">
@@ -260,7 +260,7 @@
                     <!-- Actuación del Equipo -->
                     <td class="p-2 text-center">
                         <span id="actuacion-{{ $match->id }}">{{ $match->actuacion_equipo !== null ? number_format($match->actuacion_equipo, 2) : 'N/A' }}</span>
-                        <input type="number" name="actuacion_equipo" step="0.01" min="0" max="10" class="hidden w-16 p-1 border rounded bg-white text-black" id="edit-actuacion-{{ $match->id }}" value="{{ $match->actuacion_equipo }}">
+                        <input type="number" name="actuacion_equipo" step="0.1" min="1" max="10" class="hidden w-16 p-1 border rounded bg-white text-black" id="edit-actuacion-{{ $match->id }}" value="{{ $match->actuacion_equipo }}">
                     </td>
 
                     <td class="p-2 text-center">
@@ -366,7 +366,7 @@
                             </td>
                             <td class="p-2 text-center">
                                 <span id="goles-favor-{{ $match->id }}">{{ $match->goles_a_favor }}</span>
-                                <input type="number" name="goles_a_favor"
+                                <input type="number" name="goles_a_favor" min="0"
                                     class="hidden w-16 p-1 border rounded bg-white text-black" 
                                     id="edit-goles-favor-{{ $match->id }}"
                                     value="{{ $match->goles_a_favor }}"
@@ -374,7 +374,7 @@
                             </td>
                             <td class="p-2 text-center">
                                 <span id="goles-contra-{{ $match->id }}">{{ $match->goles_en_contra }}</span>
-                                <input type="number" name="goles_en_contra"
+                                <input type="number" name="goles_en_contra" min="0"
                                     class="hidden w-16 p-1 border rounded bg-white text-black"
                                     id="edit-goles-contra-{{ $match->id }}"
                                     value="{{ $match->goles_en_contra }}"
@@ -386,7 +386,7 @@
                             </td>
                             <td class="p-2 text-center">
                                 <span id="actuacion-{{ $match->id }}">{{ $match->actuacion_equipo !== null ? number_format($match->actuacion_equipo, 2) : 'N/A' }}</span>
-                                <input type="number" name="actuacion_equipo" step="0.01" min="0" max="10"
+                                <input type="number" name="actuacion_equipo" step="0.1" min="1" max="10"
                                     class="hidden w-16 p-1 border rounded bg-white text-black"
                                     id="edit-actuacion-{{ $match->id }}" value="{{ $match->actuacion_equipo }}">
                             </td>
@@ -903,49 +903,6 @@ function submitForm(action, data) {
     form.submit();
 }
 
-// 📌 Actualizar resultado de partido en base a los goles
-function updateResultado(matchId) {
-    // Obtener los valores de los campos de goles
-    const golesFavor = parseInt(document.getElementById(`edit-goles-favor-${matchId}`).value) || 0;
-    const golesContra = parseInt(document.getElementById(`edit-goles-contra-${matchId}`).value) || 0;
-
-    // Calcular el resultado según la lógica proporcionada
-    let resultado = 'Derrota';
-    if (golesFavor > golesContra) {
-        resultado = 'Victoria';
-    } else if (golesFavor === golesContra) {
-        resultado = 'Empate';
-    }
-
-    // Actualizar el resultado en la interfaz
-    document.getElementById(`resultado-${matchId}`).innerText = resultado;
-    document.getElementById(`edit-resultado-${matchId}`).value = resultado;
-
-    // Actualizar el color de la fila
-    actualizarColorFila(matchId);
-
-    // Mostrar los valores actualizados en los campos
-    document.getElementById(`goles-favor-${matchId}`).innerText = golesFavor;
-    document.getElementById(`goles-contra-${matchId}`).innerText = golesContra;
-}
-
-// 📌 Cambiar el color de la fila según el resultado
-function actualizarColorFila(id) {
-    const resultado = document.getElementById(`edit-resultado-${id}`).value;
-    const fila = document.getElementById(`match-row-${id}`);
-
-    // Limpiar clases de color anteriores
-    fila.classList.remove("bg-green-700", "bg-yellow-500", "bg-red-300");
-
-    // Asignar el color adecuado según el resultado
-    if (resultado === "Victoria") {
-        fila.classList.add("bg-green-700");
-    } else if (resultado === "Empate") {
-        fila.classList.add("bg-yellow-500");
-    } else if (resultado === "Derrota") {
-        fila.classList.add("bg-red-300");
-    }
-}
 function calcularEdad(fechaNacimiento) {
         const hoy = new Date();
         const nacimiento = new Date(fechaNacimiento);
