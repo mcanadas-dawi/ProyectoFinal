@@ -41,10 +41,11 @@
         <table class="min-w-[700px] w-full text-center border-collapse bg-white rounded-lg">
             <thead class="bg-[#15803D] text-white uppercase text-sm">
                 <tr class="border-b">
-                    <th class="p-2">Victorias</th>
-                    <th class="p-2">Empates</th>
-                    <th class="p-2">Derrotas</th>
+                    <th class="p-2">Partidos Jugados</th> 
                     <th class="p-2">Puntos</th>
+                    <th class="p-2">Victorias</th>
+                    <th class="p-2 ">Empates</th>
+                    <th class="p-2">Derrotas</th>
                     <th class="p-2">Goles a Favor</th>
                     <th class="p-2">Goles en Contra</th>
                     <th class="p-2">Tarjetas Amarillas</th>
@@ -53,16 +54,27 @@
                 </tr>
             </thead>
             <tbody class="text-black">
-            <td class="p-2">{{ $stats['victorias'] ?? 0 }}</td>
-            <td class="p-2">{{ $stats['empates'] ?? 0 }}</td>
-            <td class="p-2">{{ $stats['derrotas'] ?? 0 }}</td>
+            <td class="p-2 font-bold" >{{ $stats['partidos_jugados'] ?? 0 }}</td>
             <td class="p-2 font-bold">{{ $stats['puntos'] ?? 0 }}</td>
-            <td class="p-2">{{ $stats['goles_favor'] ?? 0 }}</td>
-            <td class="p-2">{{ $stats['goles_contra'] ?? 0 }}</td>
+            <td class="p-2 text-[#00B140] font-bold">{{ $stats['victorias'] ?? 0 }}</td>
+            <td class="p-2 text-yellow-600 font-bold">{{ $stats['empates'] ?? 0 }}</td>
+            <td class="p-2 text-[#DC2626] font-bold">{{ $stats['derrotas'] ?? 0 }}</td>
+            <td class="p-2 text-[#00B140] font-bold">{{ $stats['goles_favor'] ?? 0 }}</td>
+            <td class="p-2 text-[#DC2626] font-bold">{{ $stats['goles_contra'] ?? 0 }}</td>
             <td class="p-2 text-yellow-600 font-bold">{{ $stats['tarjetas_amarillas'] ?? 0 }}</td>
             <td class="p-2 text-[#DC2626] font-bold">{{ $stats['tarjetas_rojas'] ?? 0 }}</td>
-            <td class="p-2 text-[#00B140] font-bold">{{ number_format($stats['valoracion_media'] ?? 0, 2) }}</td>
+            @php
+                $valoracion = $stats['valoracion_media'] ?? 0;
+                $color = match(true) {
+                    $valoracion < 4 => 'text-[#DC2626]',         // rojo
+                    $valoracion < 6 => 'text-[#FACC15]',         // amarillo
+                    default => 'text-[#00B140]',                 // verde
+                };
+            @endphp
 
+            <td class="p-2 {{ $color }} font-bold">
+                {{ number_format($valoracion, 2) }}
+            </td>
                 </tr>
             </tbody>
         </table>

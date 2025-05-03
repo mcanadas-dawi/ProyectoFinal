@@ -75,6 +75,7 @@ class TeamsController extends Controller
         $topTarjetas = collect($topStats)->sortByDesc(fn($s) => $s['amarillas'] + $s['rojas'])->take(5);
     
         $stats = [
+            'partidos_jugados' => $partidosLiga->count(),
             'victorias' => $victorias,
             'empates' => $empates,
             'derrotas' => $derrotas,
