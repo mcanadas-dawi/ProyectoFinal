@@ -19,7 +19,10 @@ class DemoTeamSeeder extends Seeder
 
         $userId = $userId ?? \App\Models\User::first()?->id ?? 1;
 
-        $count = Team::where('nombre', 'LIKE', 'Plantilla de demostración%')->count() + 1;
+         // Contar las plantillas creadas por el usuario autenticado
+         $count = Team::where('user_id', $userId)
+         ->where('nombre', 'LIKE', 'Plantilla de demostración%')
+         ->count() + 1;
 
         // Crear la plantilla
         $team = Team::create([

@@ -5,9 +5,12 @@ use Illuminate\Http\Request;
 use App\Models\Player;
 use App\Models\Team;
 use Illuminate\Support\Facades\Log;
+use Illuminate\Support\Facades\Auth;
+
 
 class PlayersController extends Controller
 {
+
     public function store(Request $request)
     {
         Log::info('🔍 Iniciando la creación de jugador', $request->all());
@@ -126,9 +129,6 @@ class PlayersController extends Controller
     }
 }
 
-    
-    
-
 public function addPlayerToTeam(Request $request)
 {
     $request->validate([
@@ -137,13 +137,20 @@ public function addPlayerToTeam(Request $request)
         'team_id' => 'required|exists:teams,id',
     ]);
 
-    $team = Team::findOrFail($request->team_id);
+    $team = Team::where('id', $request->team_id)
+        ->where('user_id', Auth::id()) // Verificar que el equipo pertenece al usuario autenticado
+        ->firstOrFail();
+
     $added = 0;
 
     foreach ($request->player_ids as $playerId) {
-        $player = Player::findOrFail($playerId);
+        $player = Player::where('id', $playerId)
+            ->whereHas('teams', function ($query) {
+                $query->where('user_id', Auth::id()); // Verificar que el jugador pertenece a una plantilla del usuario autenticado
+            })
+            ->first();
 
-        if (!$team->players()->where('players.id', $player->id)->exists()) {
+        if ($player && !$team->players()->where('players.id', $player->id)->exists()) {
             $team->players()->attach($player->id);
             $added++;
         }
@@ -152,7 +159,7 @@ public function addPlayerToTeam(Request $request)
     if ($added > 0) {
         session()->flash('added_player', "$added jugador(es) añadido(s) correctamente a la plantilla.");
     } else {
-        session()->flash('added_player', "Todos los jugadores seleccionados ya estaban en la plantilla.");
+        session()->flash('added_player', "No se pudieron añadir los jugadores seleccionados. Verifica que pertenecen a tus plantillas.");
     }
 
     return redirect()->back();

@@ -16,10 +16,11 @@ use Database\Seeders\DemoTeamSeeder;
 
 class TeamsController extends Controller
 {
+
     public function index()
     {
-        $teams = Team::all();
-        return view('dashboard.index', compact('teams'));
+    $teams = Team::where('user_id', Auth::id())->get(); // Filtrar por usuario autenticado
+    return view('dashboard.index', compact('teams'));
     }
 
     public function show($id)

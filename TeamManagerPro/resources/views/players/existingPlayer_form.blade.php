@@ -12,8 +12,9 @@
                 <button type="button" onclick="toggleSelectAllPlayers()" class="bg-[#FACC15] text-black px-4 py-2 rounded-lg mb-3 hover:brightness-110 ">
                     Seleccionar Todos
                 </button>
-
-                @foreach ($allPlayers as $player)
+                @foreach ($allPlayers->filter(function ($player) use ($team) {
+                    return $player->teams->contains('user_id', Auth::id()) && !$player->teams->contains('id', $team->id);
+                }) as $player)
                     <div class="flex items-center mb-2">
                         <input type="checkbox" id="add-player-{{ $player->id }}" name="player_ids[]"
                             value="{{ $player->id }}"
@@ -46,4 +47,5 @@ function toggleSelectAllPlayers() {
         checkbox.checked = !allSelected;
     });
 }
+
 </script>
