@@ -1,76 +1,80 @@
 <!-- Modal del Alineador -->
-<div id="alineadorModal" class="hidden fixed inset-0 bg-[#1E293B]/80 flex justify-center items-center z-50">
-    <div class="bg-[#1E3A8A] rounded-lg p-6 w-3/4 max-h-[90vh] overflow-y-auto flex flex-col text-white font-sans">
-        <h2 class="text-2xl font-title text-[#FACC15] mb-4 text-center uppercase">Alineador Táctico</h2>
+    <div id="alineadorModal" class="hidden fixed inset-0 bg-[#1E293B]/80 flex justify-center items-center z-50">
+        <div class="bg-[#1E3A8A] rounded-lg p-6 w-3/4 max-h-[90vh] overflow-y-auto flex flex-col text-white font-sans">
+            <h2 class="text-2xl font-title text-[#FACC15] mb-4 text-center uppercase">Alineador Táctico</h2>
 
-        <button type="button" class="absolute top-4 left-4 bg-[#EF4444] p-2 rounded-full shadow-lg" aria-label="Close" onclick="closeAlineador()"  style="top: 25px; left: 200px; z-index: 1051;">
-            <i class="bi bi-x-octagon-fill text-white"></i>
-        </button>
-
-        <!-- Seleccionar Formación -->
-        <label class="block font-semibold mb-1 text-[#FACC15]">Seleccionar Formación:</label>
-        <select id="formation-selector" class="w-full p-2 border rounded-lg mb-4 bg-white text-black" onchange="updateFormation()">
-            <option value="" disabled selected>Seleccionar...</option>
-            @if ($team->modalidad == 'F5')
-                <option value="1-1-2-1">1-1-2-1</option>
-                <option value="1-2-1-1">1-2-1-1</option>
-                <option value="libref5">Formación personalizada</option>
-            @elseif ($team->modalidad == 'F7')
-                <option value="1-3-2-1">1-3-2-1</option>
-                <option value="1-2-3-1">1-2-3-1</option>
-                <option value="libref7">Formación personalizada</option>
-            @elseif ($team->modalidad == 'F8')
-                <option value="1-3-3-1">1-3-3-1</option>
-                <option value="1-2-4-1">1-2-4-1</option>
-                <option value="libref8">Formación personalizada</option>
-            @elseif ($team->modalidad == 'F11')
-                <option value="1-4-4-2">1-4-4-2</option>
-                <option value="1-4-3-3">1-4-3-3</option>
-                <option value="1-5-3-2">1-5-3-2</option>
-                <option value="libref11">Formación personalizada</option>
-            @endif
-        </select>
-
-        <!-- Lista de Jugadores Convocados -->
-        <h3 class="text-xl font-title text-[#FACC15] mt-4 uppercase">Jugadores Convocados</h3>
-        <div id="convocados-list" class="bg-[#1E293B] p-2 rounded-lg min-h-[150px] max-h-[40vh] overflow-y-auto shadow-inner">
-            <div id="convocados-body" class="flex flex-wrap gap-2">
-                <!-- Jugadores convocados aquí -->
-            </div>
-        </div>
-
-        <!-- Campo de Fútbol -->
-        <div id="field-container" class="relative bg-green-600 h-96 w-4/5 mx-auto flex justify-center items-center mt-4 border border-white rounded-lg shadow">
-            <img src="{{ asset('Imagenes/campo_futbol.jpg') }}" alt="Campo de Fútbol" class="w-full h-full  rounded-lg">
-            <div id="player-spots" class="absolute inset-0 flex justify-center items-center">
-                <!-- Posiciones de los jugadores -->
-            </div>
-        </div>
-
-        <!-- Botones de acción -->
-        <div class="flex justify-center gap-4 mt-4">
-            <button id="edit-system-btn" class="hidden bg-[#1E3A8A] text-white px-4 py-2 rounded-lg hover:brightness-110 border border-white" onclick="enableEditMode()">
-                Editar Formación
+            <button type="button" class="absolute top-4 left-4 bg-[#EF4444] p-2 rounded-full shadow-lg no-capturar" aria-label="Close" onclick="closeAlineador()"  style="top: 25px; left: 200px; z-index: 1051;">
+                <i class="bi bi-x-octagon-fill text-white"></i>
             </button>
-            
-            <button id="save-system-btn" class="hidden bg-[#00B140] text-white px-4 py-2 rounded-lg hover:brightness-110" onclick="saveFormationChanges()">
-                Guardar Formación
-            </button>
-        </div>
 
-        <!-- Suplentes -->
-        <h3 class="text-xl font-title text-[#FACC15] mt-4 uppercase">Suplentes</h3>
-        <div id="suplentes-list" class="bg-[#1E293B] border border-white p-3 rounded-lg shadow-inner">
-            <div id="suplentes-body" class="flex flex-wrap gap-3 justify-center">
-                <!-- Jugadores suplentes aquí -->
-                <br id="br-placeholder">
+            <!-- Seleccionar Formación -->
+             <div class="no-capturar">
+                <label class="block font-semibold mb-1 text-[#FACC15]"><h3 class="text-xl font-title text-[#FACC15] mt-4 uppercase">Seleccionar formación:</h3></label>
+                <br>
+                <select id="formation-selector" class="w-full p-2 border rounded-lg mb-4 bg-white text-black" onchange="updateFormation()">
+                    <option value="" disabled selected>Seleccionar...</option>
+                    @if ($team->modalidad == 'F5')
+                        <option value="1-1-2-1">1-1-2-1</option>
+                        <option value="1-2-1-1">1-2-1-1</option>
+                        <option value="libref5">Formación personalizada</option>
+                    @elseif ($team->modalidad == 'F7')
+                        <option value="1-3-2-1">1-3-2-1</option>
+                        <option value="1-2-3-1">1-2-3-1</option>
+                        <option value="libref7">Formación personalizada</option>
+                    @elseif ($team->modalidad == 'F8')
+                        <option value="1-3-3-1">1-3-3-1</option>
+                        <option value="1-2-4-1">1-2-4-1</option>
+                        <option value="libref8">Formación personalizada</option>
+                    @elseif ($team->modalidad == 'F11')
+                        <option value="1-4-4-2">1-4-4-2</option>
+                        <option value="1-4-3-3">1-4-3-3</option>
+                        <option value="1-5-3-2">1-5-3-2</option>
+                        <option value="libref11">Formación personalizada</option>
+                    @endif
+                </select>
+             </div>
+            <!-- Lista de Jugadores Convocados -->
+            <div id="convocados-section" class= "no-capturar">
+                <h3 class="text-xl font-title text-[#FACC15] mt-4 uppercase">Jugadores Convocados</h3>
+                <br>
+                <div id="convocados-list" class="bg-[#1E293B] p-2 rounded-lg min-h-[150px] max-h-[40vh] overflow-y-auto shadow-inner">
+                    <div id="convocados-body" class="flex flex-wrap gap-2">
+                        <!-- Jugadores convocados aquí -->
+                    </div>
+                </div>
             </div>
-        </div>
-        <div class="flex justify-center gap-4 mt-4">
+
+            <!-- Campo de Fútbol -->
+            <div id="field-container" class="relative bg-green-600 h-96 w-4/5 mx-auto flex justify-center items-center mt-4 border border-white rounded-lg shadow">
+                <img src="{{ asset('Imagenes/campo_futbol.jpg') }}" alt="Campo de Fútbol" class="w-full h-full  rounded-lg">
+                <div id="player-spots" class="absolute inset-0 flex justify-center items-center">
+                    <!-- Posiciones de los jugadores -->
+                </div>
+            </div>
+
+            <!-- Botones de acción -->
+            <div class="flex justify-center gap-4 mt-4">
+                <button id="edit-system-btn" class="hidden bg-[#1E3A8A] text-white px-4 py-2 rounded-lg hover:brightness-110 border border-white no-capturar" onclick="enableEditMode()">
+                    Editar Formación
+                </button>
+                
+                <button id="save-system-btn" class="hidden bg-[#00B140] text-white px-4 py-2 rounded-lg hover:brightness-110 no-capturar" onclick="saveFormationChanges()">
+                    Guardar Formación
+                </button>
+            </div>
+
+            <!-- Suplentes -->
+            <h3 class="text-xl font-title text-[#FACC15] mt-4 uppercase">Suplentes</h3>
+            <br>
+            <div id="suplentes-list" class="bg-[#1E293B] border border-white p-3 rounded-lg shadow-inner">
+                <div id="suplentes-body" class="flex flex-wrap gap-3 justify-center">
+                    <!-- Jugadores suplentes aquí -->
+                    <br id="br-placeholder">
+                </div>
+            </div>
+        <div class="flex justify-center gap-4 mt-4 no-capturar">
         <button id="capturarBtn" class="bg-[#00B140] text-white px-4 py-2 rounded-lg hover:brightness-110">Guardar alineación</button>
-        <button id="descargarBtn" class="bg-[#FACC15] text-black px-4 py-2 rounded-lg hover:brightness-110">
-            Descargar alineación
-        </button>
+        <button id="descargarBtn" class="bg-[#FACC15] text-black px-4 py-2 rounded-lg hover:brightness-110">Descargar alineación</button>
         </div>
 
     </div>
@@ -281,7 +285,7 @@ function updateFormation(formation = null, alineacionGuardada = []) {
             }
         }
 
-        fieldContainer.appendChild(positionDiv);
+        fieldContainer.append(positionDiv);
 
         enableDragDrop(positionDiv); // 🔹 Activar la función de arrastrar jugadores  
     });
@@ -310,7 +314,7 @@ function loadConvocados() {
             event.dataTransfer.setData("playerId", player.id);
         };
 
-        convocadosBody.appendChild(playerDiv);
+        convocadosBody.append(playerDiv);
     });
 }
 
@@ -334,7 +338,7 @@ function addToConvocados(playerId) {
         event.dataTransfer.setData("playerId", player.id);
     };
 
-    convocadosBody.appendChild(playerDiv);
+    convocadosBody.append(playerDiv);
 }
 
 
@@ -375,7 +379,7 @@ function addToSuplentes(playerId) {
             event.dataTransfer.setData("playerId", player.id);
         };
 
-        suplentesBody.appendChild(playerDiv);
+        suplentesBody.append(playerDiv);
     }
 }
 
@@ -403,7 +407,20 @@ function removeFromConvocados(playerId) {
     if (playerDiv) {
         playerDiv.remove();
     }
+    toggleConvocadosSection();
 }
+
+function toggleConvocadosSection() {
+    const section = document.getElementById('convocados-section');
+    const body = document.getElementById('convocados-body');
+
+    if (body && body.children.length === 0) {
+        section.classList.add('hidden');
+    } else {
+        section.classList.remove('hidden');
+    }
+}
+
 
 document.getElementById('formation-selector').addEventListener('change', function() {
     let formationSelector = document.getElementById('formation-selector');
@@ -439,61 +456,82 @@ function removePlaceholderBr() {
     }
 }
 
+function ocultarElementos(selector) {
+    document.querySelectorAll(selector).forEach(el => {
+        el.style.display = 'none';
+    });
+}
+
+function mostrarElementos(selector) {
+    document.querySelectorAll(selector).forEach(el => {
+        el.style.display = '';
+    });
+}
+
 document.getElementById("capturarBtn").addEventListener("click", function () {
     const contenedor = document.getElementById("alineadorModal");
-    html2canvas(contenedor, {
-        allowTaint: true,
-        useCORS: true,
-        logging: true,
-        backgroundColor: null,
-        scale: 2, 
-    }).then(function (canvas) {
-        const imageData = canvas.toDataURL("image/png");
 
-        fetch("/guardar-alineacion", {
-            method: "POST",
-            headers: {
-                "Content-Type": "application/json",
-                "X-CSRF-TOKEN": document.querySelector('meta[name="csrf-token"]').getAttribute("content") // Laravel token
-            },
-            body: JSON.stringify({
-                imagen: imageData
+    // Ocultar los botones antes de la captura
+    ocultarElementos('.no-capturar');
+        html2canvas(contenedor, {
+            allowTaint: true,
+            useCORS: true,
+            logging: true,
+            backgroundColor: null,
+            scale: 2,
+        }).then(function (canvas) {
+            // Restaurar los botones
+            mostrarElementos('.no-capturar');
+
+            const imageData = canvas.toDataURL("image/png");
+
+            fetch("/guardar-alineacion", {
+                method: "POST",
+                headers: {
+                    "Content-Type": "application/json",
+                    "X-CSRF-TOKEN": document.querySelector('meta[name="csrf-token"]').getAttribute("content")
+                },
+                body: JSON.stringify({
+                    imagen: imageData
+                })
             })
-        })
-        .then(response => response.json())
-        .then(data => {
-            alert("Imagen guardada correctamente en el servidor.");
-        })
-        .catch(error => {
-            console.error("Error al guardar la imagen:", error);
+            .then(response => response.json())
+            .then(data => {
+                alert("Alineación guardada correctamente.");
+            })
+            .catch(error => {
+                console.error("Error al guardar la imagen:", error);
+            });
         });
-    });
 });
 
 document.getElementById("descargarBtn").addEventListener("click", function () {
     const contenedor = document.getElementById("alineadorModal");
 
-    // Asegurar que las fuentes están listas
+    // Ocultar los botones antes de la captura
+    ocultarElementos('.no-capturar');
+
     document.fonts.ready.then(() => {
-        setTimeout(() => {
             html2canvas(contenedor, {
                 allowTaint: true,
                 useCORS: true,
-                backgroundColor: null, // Captura fondo transparente si lo hay
-                scale: 2, // Mejora la calidad de imagen
+                backgroundColor: null,
+                scale: 2,
             }).then(function (canvas) {
+                // Restaurar los botones
+                mostrarElementos('.no-capturar');
+
                 const imageData = canvas.toDataURL("image/png");
 
-                // Crear enlace y forzar la descarga
                 const link = document.createElement("a");
                 link.href = imageData;
                 link.download = "alineacion.png";
-                document.body.appendChild(link);
+                document.body.append(link);
                 link.click();
                 document.body.removeChild(link);
             });
-        }, 100); // Espera breve para asegurar render
     });
 });
+
 
 </script>

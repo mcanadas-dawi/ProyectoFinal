@@ -55,7 +55,7 @@ function openConvocatoriaModal(matchId) {
         input = document.createElement('input');
         input.type = 'hidden';
         input.name = 'match_id';
-        document.getElementById('convocatoriaForm').appendChild(input);
+        document.getElementById('convocatoriaForm').append(input);
     }
     input.value = matchId;
 

@@ -908,10 +908,10 @@ function submitForm(action, data) {
         input.type = 'hidden';
         input.name = key;
         input.value = data[key];
-        form.appendChild(input);
+        form.append(input);
     }
 
-    document.body.appendChild(form);
+    document.body.append(form);
     form.submit();
 }
 

@@ -92,7 +92,7 @@ function generarJornadas() {
         const notaLocal = document.createElement('div');
         notaLocal.className = "bg-blue-100 border-l-4 border-blue-500 text-blue-700 p-4 rounded mb-4 text-sm";
         notaLocal.innerHTML = `<strong>Nota:</strong> Marca "Local" en las jornadas que tu equipo juegue en casa.`;
-        jornadasContainer.appendChild(notaLocal);
+        jornadasContainer.append(notaLocal);
     }
 
     for (let i = 1; i <= numeroRivales; i++) {
@@ -112,8 +112,8 @@ function generarJornadas() {
         inputRival.required = true;
         inputRival.className = "text-gray-800 dark:text-white";
 
-        jornadaDiv.appendChild(label);
-        jornadaDiv.appendChild(inputRival);
+        jornadaDiv.append(label);
+        jornadaDiv.append(inputRival);
 
         if (!soloIda) {
             const checkboxWrapper = document.createElement('div');
@@ -129,20 +129,20 @@ function generarJornadas() {
             localLabel.setAttribute('for', `local_${i}`);
             localLabel.textContent = "Local";
             localLabel.className = "text-gray-800 dark:text-white";
-            checkboxWrapper.appendChild(localCheckbox);
-            checkboxWrapper.appendChild(localLabel);
+            checkboxWrapper.append(localCheckbox);
+            checkboxWrapper.append(localLabel);
 
-            jornadaDiv.appendChild(checkboxWrapper);
+            jornadaDiv.append(checkboxWrapper);
         }
 
-        jornadasContainer.appendChild(jornadaDiv);
+        jornadasContainer.append(jornadaDiv);
     }
 
     if (!soloIda) {
         const notaVuelta = document.createElement('div');
         notaVuelta.className = "bg-yellow-100 border-l-4 border-yellow-500 text-yellow-700 p-4 rounded mt-4 text-sm";
         notaVuelta.innerHTML = `<strong>Nota:</strong> Las jornadas de la segunda vuelta se generarán automáticamente.`;
-        jornadasContainer.appendChild(notaVuelta);
+        jornadasContainer.append(notaVuelta);
     }
 }
 </script>
