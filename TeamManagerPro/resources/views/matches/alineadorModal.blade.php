@@ -41,7 +41,7 @@
 
         <!-- Campo de Fútbol -->
         <div id="field-container" class="relative bg-green-600 h-96 w-4/5 mx-auto flex justify-center items-center mt-4 border border-white rounded-lg shadow">
-            <img src="{{ asset('Imagenes/campo_futbol.jpg') }}" alt="Campo de Fútbol" class="w-full h-full object-cover rounded-lg">
+            <img src="{{ asset('Imagenes/campo_futbol.jpg') }}" alt="Campo de Fútbol" class="w-full h-full  rounded-lg">
             <div id="player-spots" class="absolute inset-0 flex justify-center items-center">
                 <!-- Posiciones de los jugadores -->
             </div>
@@ -66,12 +66,19 @@
                 <br id="br-placeholder">
             </div>
         </div>
+        <div class="flex justify-center gap-4 mt-4">
+        <button id="capturarBtn" class="bg-[#00B140] text-white px-4 py-2 rounded-lg hover:brightness-110">Guardar alineación</button>
+        <button id="descargarBtn" class="bg-[#FACC15] text-black px-4 py-2 rounded-lg hover:brightness-110">
+            Descargar alineación
+        </button>
+        </div>
+
     </div>
 </div>
-
+<script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
 <script>
  // ALINEADOR 
- let alineadorData = document.getElementById("alineador-data");
+let alineadorData = document.getElementById("alineador-data");
 let allPlayers = [];
 let selectedPlayers = {}; 
 let currentMatchId = null;
@@ -210,7 +217,7 @@ function enableDragDrop(positionDiv) {
             if (player) {
                 removeFromField(playerId);
                 removeFromSuplentes(playerId);
-                removeFromConvocados(playerId); // 🔹 Ahora también lo elimina de la lista de convocados
+                removeFromConvocados(playerId); 
 
                 positionDiv.textContent = player.dorsal;
                 positionDiv.setAttribute("data-player-id", player.id);
@@ -235,19 +242,19 @@ function updateFormation(formation = null, alineacionGuardada = []) {
     fieldContainer.innerHTML = "";
 
     let formations = {
-        '1-4-4-2': [[10, 45], [30, 80], [30, 55], [30, 35], [30, 10], [50, 80], [50, 55], [50, 35], [50, 10], [70, 55], [70, 35]],
-        '1-4-3-3': [[10, 45], [30, 80], [30, 55], [30, 35], [30, 10], [50, 20], [50, 45], [50, 70], [70, 20], [70, 45], [70, 70]],
-        '1-5-3-2': [[10, 45], [30, 20], [30, 45], [30, 70], [40, 87], [40, 0], [50, 20], [50, 45], [50, 70], [70, 55], [70, 35]],
-        '1-1-2-1': [[10, 45], [30, 45], [50,25 ], [50, 65], [70, 45]],
-        '1-2-1-1': [[10, 45], [30, 25], [30, 65], [50, 45], [70, 45]],
-        '1-3-2-1': [[10, 45], [30, 20], [30, 45], [30, 70], [50, 30], [50, 60], [70, 45]],
-        '1-2-3-1': [[10, 45], [30, 30], [30, 60], [50, 20], [50, 45], [50, 70], [70, 45],],
-        '1-2-4-1': [[10, 45], [30, 30], [30, 60], [50, 30], [50, 87], [50, 0], [50, 60], [70, 45],],
-        '1-3-3-1': [[10, 45], [30, 20], [30, 45], [30, 70], [50, 20], [50, 45], [50, 70], [70, 45],],
-        'libref5':[[10, 45],[20,45],[30,45],[40,45],[50,45]],
-        'libref7':[[10, 45],[20,45],[30,45],[40,45],[50,45],[60,45],[70,45]],
-        'libref8':[[10, 45],[20,45],[30,45],[40,45],[50,45],[60,45],[70,45],[80,45]],
-        'libref11': [[10, 45], [20, 20], [20, 40], [20, 60], [20, 80], [30, 20], [30, 40], [30, 60], [30, 80], [40, 40], [40, 60]]
+        '1-4-4-2': [[7, 44], [30, 76], [30, 53], [30, 33], [30, 10], [50, 76], [50, 53], [50, 33], [50, 10], [70, 53], [70, 33]],
+        '1-4-3-3': [[7, 44], [30, 76], [30, 53], [30, 33], [30, 10], [50, 20], [50, 44], [50, 70], [70, 20], [70, 44], [70, 70]],
+        '1-5-3-2': [[7, 44], [30, 22], [30, 44], [30, 66], [38, 76], [38, 10], [50, 22], [50, 44], [50, 66], [70, 53], [70, 33]],
+        '1-1-2-1': [[7, 44], [30, 44], [50, 24], [50, 64], [70, 44]],
+        '1-2-1-1': [[7, 44], [30, 33], [30, 53], [50, 44], [70, 44]],
+        '1-3-2-1': [[7, 44], [30, 22], [30, 44], [30, 66], [50, 33], [50, 53], [70, 44]],
+        '1-2-3-1': [[7, 44], [30, 33], [30, 53], [50, 20], [50, 44], [50, 68], [70, 44],],
+        '1-2-4-1': [[7, 44], [30, 33], [30, 53], [50, 76], [50, 53], [50, 33], [50, 10], [70, 44],],
+        '1-3-3-1': [[7, 44], [30, 22], [30, 44], [30, 66], [50, 22], [50, 44], [50, 66], [70, 44],],
+        'libref5':[[7, 44],[20,44],[30,44],[40,44],[50,44]],
+        'libref7':[[7, 44],[20,44],[30,44],[40,44],[50,44],[60,44],[70,44]],
+        'libref8':[[7, 44],[20,44],[30,44],[40,44],[50,44],[60,44],[70,44],[80,44]],
+        'libref11': [[7, 44], [20, 20], [20, 40], [20, 60], [20, 80], [30, 20], [30, 40], [30, 60], [30, 80], [40, 40], [40, 60]]
 
     };
 
@@ -287,7 +294,7 @@ function loadConvocados() {
     convocadosBody.innerHTML = "";
 
     if (!currentMatchId) {
-        console.error("⚠ Error: currentMatchId no está definido.");
+        console.error(" Error: currentMatchId no está definido.");
         return;
     }
 
@@ -346,7 +353,7 @@ function enableSuplentesDrop() {
         if (playerId) {
             addToSuplentes(playerId);
             removeFromField(playerId);
-            removeFromConvocados(playerId); // 🔹 También lo elimina de la lista de convocados
+            removeFromConvocados(playerId); 
         }
     };
 }
@@ -431,5 +438,62 @@ function removePlaceholderBr() {
         modal.classList.add('hidden');
     }
 }
+
+document.getElementById("capturarBtn").addEventListener("click", function () {
+    const contenedor = document.getElementById("alineadorModal");
+    html2canvas(contenedor, {
+        allowTaint: true,
+        useCORS: true,
+        logging: true,
+        backgroundColor: null,
+        scale: 2, 
+    }).then(function (canvas) {
+        const imageData = canvas.toDataURL("image/png");
+
+        fetch("/guardar-alineacion", {
+            method: "POST",
+            headers: {
+                "Content-Type": "application/json",
+                "X-CSRF-TOKEN": document.querySelector('meta[name="csrf-token"]').getAttribute("content") // Laravel token
+            },
+            body: JSON.stringify({
+                imagen: imageData
+            })
+        })
+        .then(response => response.json())
+        .then(data => {
+            alert("Imagen guardada correctamente en el servidor.");
+        })
+        .catch(error => {
+            console.error("Error al guardar la imagen:", error);
+        });
+    });
+});
+
+document.getElementById("descargarBtn").addEventListener("click", function () {
+    const contenedor = document.getElementById("alineadorModal");
+
+    // Asegurar que las fuentes están listas
+    document.fonts.ready.then(() => {
+        setTimeout(() => {
+            html2canvas(contenedor, {
+                allowTaint: true,
+                useCORS: true,
+                backgroundColor: null, // Captura fondo transparente si lo hay
+                scale: 2, // Mejora la calidad de imagen
+            }).then(function (canvas) {
+                const imageData = canvas.toDataURL("image/png");
+
+                // Crear enlace y forzar la descarga
+                const link = document.createElement("a");
+                link.href = imageData;
+                link.download = "alineacion.png";
+                document.body.appendChild(link);
+                link.click();
+                document.body.removeChild(link);
+            });
+        }, 100); // Espera breve para asegurar render
+    });
+});
 
 </script>

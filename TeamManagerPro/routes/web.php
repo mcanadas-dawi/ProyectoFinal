@@ -66,6 +66,8 @@ Route::middleware(['auth', 'verified'])->group(function () {
     Route::delete('/liga/{team}/delete', [RivalesLigaController::class, 'destroyLiga'])->name('liga.delete');
     Route::get('/ligas', [RivalesLigaController::class, 'index'])->name('rivales_liga.index');
     
+    // 📌 Alineacion
+    Route::post('/guardar-alineacion', [AlineacionesController::class, 'guardarImagen']);
 });
 
 
