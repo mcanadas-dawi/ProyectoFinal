@@ -515,12 +515,12 @@
 <div class="bg-[#1E3A8A] shadow-lg rounded-lg p-4 sm:p-6 mb-6">
     <h2 class="text-2xl font-title text-[#FACC15] uppercase mb-6">Top 5 Liga</h2>
 
-    <!-- Fila 1: Goleadores, Asistencias, Minutos -->
-    <div class="grid sm:grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+    <!-- Tablas en una sola fila para pantallas grandes, apiladas en móviles -->
+    <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
         <!-- Goleadores -->
-        <div class="min-w-[320px]">
+        <div class="w-full">
             <h3 class="text-[#FACC15] text-lg font-bold mb-2 text-center">GOLEADORES</h3>
-            <table class="w-full min-w-[320px] table-fixed text-white bg-[#1E293B] rounded overflow-hidden">
+            <table class="w-full table-fixed text-white bg-[#1E293B] rounded overflow-hidden">
                 <thead class="bg-[#15803D]">
                     <tr>
                         <th class="px-2 py-1 text-center" style="width: 20%;">Top</th>
@@ -541,9 +541,9 @@
         </div>
 
         <!-- Asistencias -->
-        <div class="min-w-[320px]">
+        <div class="w-full">
             <h3 class="text-[#FACC15] text-lg font-bold mb-2 text-center">ASISTENCIAS</h3>
-            <table class="w-full min-w-[320px] table-fixed text-white bg-[#1E293B] rounded overflow-hidden">
+            <table class="w-full table-fixed text-white bg-[#1E293B] rounded overflow-hidden">
                 <thead class="bg-[#15803D]">
                     <tr>
                         <th class="px-2 py-1 text-center" style="width: 20%;">Top</th>
@@ -564,9 +564,9 @@
         </div>
 
         <!-- Minutos jugados -->
-        <div class="min-w-[320px]">
+        <div class="w-full">
             <h3 class="text-[#FACC15] text-lg font-bold mb-2 text-center">MINUTOS JUGADOS</h3>
-            <table class="w-full min-w-[320px] table-fixed text-white bg-[#1E293B] rounded overflow-hidden">
+            <table class="w-full table-fixed text-white bg-[#1E293B] rounded overflow-hidden">
                 <thead class="bg-[#15803D]">
                     <tr>
                         <th class="px-2 py-1 text-center" style="width: 20%;">Top</th>
@@ -585,14 +585,11 @@
                 </tbody>
             </table>
         </div>
-    </div>
 
-    <!-- Fila 2: Valoración media, Tarjetas -->
-    <div class="grid sm:grid-cols-1 md:grid-cols-2 gap-6 mt-6 justify-center">
         <!-- Valoración media -->
-        <div class="min-w-[320px]">
+        <div class="w-full">
             <h3 class="text-[#FACC15] text-lg font-bold mb-2 text-center">VALORACIÓN MEDIA</h3>
-            <table class="w-full min-w-[320px] table-fixed text-white bg-[#1E293B] rounded overflow-hidden">
+            <table class="w-full table-fixed text-white bg-[#1E293B] rounded overflow-hidden">
                 <thead class="bg-[#15803D]">
                     <tr>
                         <th class="px-2 py-1 text-center" style="width: 20%;">Top</th>
@@ -613,9 +610,9 @@
         </div>
 
         <!-- Tarjetas -->
-        <div class="min-w-[320px]">
+        <div class="w-full">
             <h3 class="text-[#FACC15] text-lg font-bold mb-2 text-center">TARJETAS</h3>
-            <table class="w-full min-w-[320px] table-fixed text-white bg-[#1E293B] rounded overflow-hidden">
+            <table class="w-full table-fixed text-white bg-[#1E293B] rounded overflow-hidden">
                 <thead class="bg-[#15803D]">
                     <tr>
                         <th class="px-2 py-1 text-center" style="width: 12%;">Top</th>
@@ -638,9 +635,31 @@
                 </tbody>
             </table>
         </div>
+        <!-- 📊 Tabla MVP -->
+        <div class="w-full">
+            <h2 class="text-[#FACC15] text-lg font-bold mb-2 text-center">MVP</h2>
+
+            <table class="w-full table-fixed text-white bg-[#1E293B] rounded overflow-hidden">
+                <thead class="bg-[#15803D]">
+                    <tr>
+                        <th class="px-2 py-1 text-center" style="width: 20%;">Top</th>
+                        <th class="px-2 py-1 text-center" style="width: 50%;">Jugador</th>
+                        <th class="px-2 py-1 text-center" style="width: 30%;">Nº MVPs</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @foreach ($mvpStats as $index => $mvp)
+                    <tr class="border-t border-gray-700">
+                        <td class="px-2 py-1 text-center">{{ $index + 1 }}</td>
+                        <td class="px-2 py-1 text-center">{{ $mvp['jugador']->nombre }} {{ $mvp['jugador']->apellido }}</td>
+                        <td class="px-2 py-1 text-center">{{ $mvp['mvp_count'] }}</td>
+                    </tr>
+                    @endforeach
+                </tbody>
+            </table>
+        </div>
     </div>
 </div>
-
 
 @include('matches.alineadorModal')
 @include('matches.convocatoriaModal')

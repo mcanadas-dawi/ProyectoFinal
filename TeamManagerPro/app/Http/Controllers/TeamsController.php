@@ -10,7 +10,7 @@ use App\Models\MatchPlayerStat;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Log;
 use Database\Seeders\DemoTeamSeeder;
-
+use Illuminate\Support\Facades\DB; 
 
 
 
@@ -87,11 +87,29 @@ class TeamsController extends Controller
             'tarjetas_amarillas' => $topStats ? array_sum(array_column($topStats, 'amarillas')) : 0,
             'tarjetas_rojas' => $topStats ? array_sum(array_column($topStats, 'rojas')) : 0,
         ];
+
+          // 📊 Tabla MVP
+    $mvpStats = MatchPlayerStat::select('player_id', DB::raw('COUNT(*) as mvp_count'))
+    ->whereHas('match', function ($q) use ($team) {
+        $q->where('team_id', $team->id);
+    })
+    ->whereRaw('valoracion = (SELECT MAX(valoracion) FROM match_player_stats WHERE match_id = match_player_stats.match_id)')
+    ->groupBy('player_id')
+    ->orderByDesc('mvp_count')
+    ->take(5)
+    ->get()
+    ->map(function ($stat) {
+        $player = Player::find($stat->player_id);
+        return [
+            'jugador' => $player,
+            'mvp_count' => $stat->mvp_count,
+        ];
+    });
     
         return view('dashboard.team_show', compact(
             'team', 'allPlayers', 'stats',
             'partidosAmistosos', 'partidosLiga', 'hayLiga',
-            'topGoles', 'topAsistencias', 'topMinutos', 'topValoracion', 'topTarjetas'
+            'topGoles', 'topAsistencias', 'topMinutos', 'topValoracion', 'topTarjetas','mvpStats'
         ));
     }
     
