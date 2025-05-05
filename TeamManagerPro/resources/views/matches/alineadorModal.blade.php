@@ -132,8 +132,6 @@ function openAlineador(matchId) {
     fetchConvocados(currentMatchId)
         .then(convocados => {
             allPlayers = convocados;
-            console.log("✅ Jugadores cargados desde el backend:", allPlayers);
-
             loadConvocados();
 
             // Mostrar el contenido del modal después de cargar los datos
