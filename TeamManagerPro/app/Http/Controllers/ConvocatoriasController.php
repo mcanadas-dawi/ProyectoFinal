@@ -64,22 +64,24 @@ class ConvocatoriasController extends Controller
     }
     
     public function getConvocados($matchId)
-{
-    try {
-        $match = Matches::findOrFail($matchId);
-
-        // Obtener jugadores convocados
-        $convocados = $match->players()->wherePivot('convocado', true)->get();
-
-        // Verificar si hay convocados
-        if ($convocados->isEmpty()) {
-            return response()->json(['convocados' => [], 'message' => 'No hay jugadores convocados.']);
+    {
+        try {
+            $match = Matches::with(['players' => function ($query) {
+                $query->wherePivot('convocado', true); // Filtrar solo jugadores convocados
+            }])->findOrFail($matchId);
+    
+            $convocados = $match->players;
+    
+            return response()->json([
+                'convocados' => $convocados,
+                'success' => true,
+            ]);
+        } catch (\Exception $e) {
+            return response()->json([
+                'convocados' => [],
+                'success' => false,
+                'message' => 'No hay jugadores convocados para este partido.',
+            ]);
         }
-
-        return response()->json(['convocados' => $convocados, 'success' => true]);
-    } catch (\Exception $e) {
-        return response()->json(['success' => false, 'message' => $e->getMessage()], 500);
     }
-}
-
 }

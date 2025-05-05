@@ -87,11 +87,32 @@ let selectedPlayers = {};
 let currentMatchId = null;
 let editMode = false; // 🔹 Estado de edición
 
+function fetchConvocados(matchId) {
+    return new Promise((resolve, reject) => {
+        fetch(`/matches/${matchId}/get-convocados`)
+            .then(response => response.json())
+            .then(data => {
+                if (!data.success) {
+                    reject("Error al cargar convocados: " + data.message);
+                } else {
+                    resolve(data.convocados);
+                }
+            })
+            .catch(error => {
+                reject("Error al realizar la solicitud: " + error);
+            });
+    });
+}
+
 function openAlineador(matchId) {
     currentMatchId = matchId;
     let formationSelector = document.getElementById('formation-selector');
     let editButton = document.getElementById('edit-system-btn');
     let saveButton = document.getElementById('save-system-btn');
+    let modalContent = document.querySelector('#alineadorModal > div'); // Contenido del modal
+
+    // Ocultar el contenido del modal mientras se cargan los datos
+    modalContent.style.visibility = 'hidden';
 
     // Restablecer el selector de formación a "Seleccionar..."
     formationSelector.selectedIndex = 0;
@@ -104,24 +125,25 @@ function openAlineador(matchId) {
     editButton.classList.add('hidden');
     saveButton.classList.add('hidden');
 
-    fetch(`/matches/${currentMatchId}/get-convocados`)
-    .then(response => response.json())
-    .then(data => {
-        if (!data.success) {
-            console.error("Error al cargar convocados:", data.message);
-            return;
-        }
+    // Limpiar la variable global allPlayers
+    allPlayers = [];
 
-        // Asignar los jugadores obtenidos a la variable global
-        allPlayers = data.convocados;
-        console.log("✅ Jugadores cargados desde el backend:", allPlayers);
+    // Usar la promesa para cargar los convocados
+    fetchConvocados(currentMatchId)
+        .then(convocados => {
+            allPlayers = convocados;
+            console.log("✅ Jugadores cargados desde el backend:", allPlayers);
 
-        loadConvocados();
-    })
-    .catch(error => console.error("Error al cargar jugadores convocados:", error));
+            loadConvocados();
+
+            // Mostrar el contenido del modal después de cargar los datos
+            modalContent.style.visibility = 'visible';
+        })
+        .catch(error => {
+            console.error(error);
+            modalContent.style.visibility = 'visible'; // Mostrar el contenido del modal incluso si hay un error
+        });
 }
-
-
 
 
 // 🔹 Activar modo edición (Mover libremente los círculos)
