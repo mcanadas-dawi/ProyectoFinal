@@ -15,7 +15,7 @@ class DemoTeamSeeder extends Seeder
 {
     public function run($userId = null)
     {
-        $faker = Faker::create();
+        $faker = Faker::create('es_ES');
 
         $userId = $userId ?? \App\Models\User::first()?->id ?? 1;
 
@@ -50,7 +50,28 @@ class DemoTeamSeeder extends Seeder
             $players[] = $player;
             
         }
-
+        $equiposPrimeraDivision = [
+            'Real Madrid',
+            'FC Barcelona',
+            'Atlético de Madrid',
+            'Sevilla FC',
+            'Real Sociedad',
+            'Real Betis',
+            'Villarreal CF',
+            'Athletic Club',
+            'Valencia CF',
+            'Celta de Vigo',
+            'RCD Espanyol',
+            'Getafe CF',
+            'Rayo Vallecano',
+            'CA Osasuna',
+            'Real Valladolid',
+            'UD Almería',
+            'Cádiz CF',
+            'RCD Mallorca',
+            'Granada CF',
+            'UD Las Palmas',
+        ];
        // Crear partidos amistosos con estadísticas y valoraciones
         for ($i = 0; $i < 3; $i++) {
             $golesFavor = rand(0, 5);
@@ -59,13 +80,13 @@ class DemoTeamSeeder extends Seeder
             $match = Matches::create([
                 'team_id' => $team->id,
                 'tipo' => 'amistoso',
-                'equipo_rival' => $faker->words(2, true),
-                'fecha_partido' => $faker->date('Y-m-d'),
+                'equipo_rival' => $faker->randomElement($equiposPrimeraDivision), // Seleccionar un equipo aleatorio
+                'fecha_partido' => $faker->dateTimeBetween('-6 months', '+6 months')->format('Y-m-d'), // Fecha dentro de 6 meses antes o después
                 'local' => (bool)rand(0, 1),
                 'goles_a_favor' => $golesFavor,
                 'goles_en_contra' => $golesContra,
-                'resultado' => 'Pendiente', // temporal
-                'actuacion_equipo' => 0,     // temporal
+                'resultado' => 'Pendiente', 
+                'actuacion_equipo' => 0,     
             ]);
 
             // Calcular resultado real
@@ -118,13 +139,13 @@ class DemoTeamSeeder extends Seeder
                 'team_id' => $team->id,
                 'tipo' => 'liga',
                 'rival_liga_id' => $rival->id,
-                'equipo_rival' => $rival->nombre_equipo,
-                'fecha_partido' => $faker->date('Y-m-d'),
+                'equipo_rival' => $faker->randomElement($equiposPrimeraDivision), // Seleccionar un equipo aleatorio
+                'fecha_partido' => $faker->dateTimeBetween('-6 months', '+6 months')->format('Y-m-d'), // Fecha dentro de 6 meses antes o después
                 'local' => true,
                 'goles_a_favor' => $golesFavor,
                 'goles_en_contra' => $golesContra,
-                'resultado' => 'Pendiente', // temporal
-                'actuacion_equipo' => 0,     // temporal
+                'resultado' => 'Pendiente', 
+                'actuacion_equipo' => 0,     
             ]);
 
             // Calcular resultado real

@@ -22,7 +22,7 @@ class MatchPlayerStat extends Model
     ];
 
     protected $casts = [
-        'titular' => 'boolean',
+        'titular' => 'integer',
         'minutos_jugados' => 'integer',
         'goles' => 'integer',
         'asistencias' => 'integer',
