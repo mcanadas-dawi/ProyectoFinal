@@ -13,12 +13,34 @@ use App\Models\PlayerTeamStats;
 
 class DemoTeamSeeder extends Seeder
 {
+
     public function run($userId = null)
     {
         $faker = Faker::create('es_ES');
 
         $userId = $userId ?? \App\Models\User::first()?->id ?? 1;
-
+        $equiposPrimeraDivision = [
+            'Real Madrid',
+            'FC Barcelona',
+            'Atlético de Madrid',
+            'Sevilla FC',
+            'Real Sociedad',
+            'Real Betis',
+            'Villarreal CF',
+            'Athletic Club',
+            'Valencia CF',
+            'Celta de Vigo',
+            'RCD Espanyol',
+            'Getafe CF',
+            'Rayo Vallecano',
+            'CA Osasuna',
+            'Real Valladolid',
+            'UD Almería',
+            'Cádiz CF',
+            'RCD Mallorca',
+            'Granada CF',
+            'UD Las Palmas',
+        ];
          // Contar las plantillas creadas por el usuario autenticado
          $count = Team::where('user_id', $userId)
          ->where('nombre', 'LIKE', 'Plantilla de demostración%')
@@ -50,28 +72,7 @@ class DemoTeamSeeder extends Seeder
             $players[] = $player;
             
         }
-        $equiposPrimeraDivision = [
-            'Real Madrid',
-            'FC Barcelona',
-            'Atlético de Madrid',
-            'Sevilla FC',
-            'Real Sociedad',
-            'Real Betis',
-            'Villarreal CF',
-            'Athletic Club',
-            'Valencia CF',
-            'Celta de Vigo',
-            'RCD Espanyol',
-            'Getafe CF',
-            'Rayo Vallecano',
-            'CA Osasuna',
-            'Real Valladolid',
-            'UD Almería',
-            'Cádiz CF',
-            'RCD Mallorca',
-            'Granada CF',
-            'UD Las Palmas',
-        ];
+        
        // Crear partidos amistosos con estadísticas y valoraciones
         for ($i = 0; $i < 3; $i++) {
             $golesFavor = rand(0, 5);
@@ -128,7 +129,7 @@ class DemoTeamSeeder extends Seeder
         for ($jornada = 1; $jornada <= 5; $jornada++) {
             $rival = RivalLiga::create([
                 'team_id' => $team->id,
-                'nombre_equipo' => $faker->words(2, true),
+                'nombre_equipo' => $faker->randomElement($equiposPrimeraDivision),
                 'jornada' => $jornada,
             ]);
 
@@ -145,7 +146,11 @@ class DemoTeamSeeder extends Seeder
                 'goles_a_favor' => $golesFavor,
                 'goles_en_contra' => $golesContra,
                 'resultado' => 'Pendiente', 
-                'actuacion_equipo' => 0,     
+                'actuacion_equipo' => match ($match->resultado) {
+                    'Victoria' => rand(7, 10),
+                    'Empate' => rand(5, 7),
+                    'Derrota' => rand(1, 4),
+                },     
             ]);
 
             // Calcular resultado real
@@ -203,7 +208,7 @@ class DemoTeamSeeder extends Seeder
                     'asistencias' => $stats->sum('asistencias'),
                     'titular' => $titular,
                     'suplente' => $suplente,
-                    'valoracion' => round($stats->avg('valoracion') ?? 0, 2),
+                    'valoracion' => round($stats->avg('valoracion') ?? 5),
                     'tarjetas_amarillas' => $stats->sum('tarjetas_amarillas'),
                     'tarjetas_rojas' => $stats->sum('tarjetas_rojas'),
                 ]
