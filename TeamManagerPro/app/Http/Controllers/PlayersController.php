@@ -46,15 +46,6 @@ class PlayersController extends Controller
             $player->fecha_nacimiento = $request->fecha_nacimiento;
             $player->posicion = $request->posicion;
             $player->perfil = $request->perfil;
-            $player->minutos_jugados = 0;
-            $player->goles = 0;
-            $player->asistencias = 0;
-            $player->goles_encajados = 0;
-            $player->titular = 0;
-            $player->suplente = 0;
-            $player->valoracion = 0.0;
-            $player->tarjetas_amarillas = 0;
-            $player->tarjetas_rojas = 0;
     
             if (!$player->save()) {
                 Log::error('❌ Error al guardar el jugador utilizando save().');

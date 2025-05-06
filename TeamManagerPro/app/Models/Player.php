@@ -10,21 +10,10 @@ class Player extends Model
 
     protected $fillable = [
         'nombre', 'apellido', 'dni', 'dorsal', 'fecha_nacimiento',
-        'posicion', 'perfil', 'minutos_jugados', 'goles',
-        'asistencias', 'goles_encajados', 'titular',
-        'suplente', 'valoracion', 'tarjetas_amarillas', 'tarjetas_rojas'
+        'posicion', 'perfil'
     ];
 
     protected $casts = [
-        'minutos_jugados' => 'integer',
-        'goles' => 'integer',
-        'asistencias' => 'integer',
-        'goles_encajados' => 'integer',
-        'titular' => 'integer',
-        'suplente' => 'integer',
-        'valoracion' => 'decimal:2',
-        'tarjetas_amarillas' => 'integer',
-        'tarjetas_rojas' => 'integer',
     ];
 
     // 📌 RELACIONES
@@ -37,8 +26,7 @@ class Player extends Model
     public function matches()
     {
         return $this->belongsToMany(Matches::class, 'player_match', 'player_id', 'match_id')
-                    ->withPivot('valoracion','convocado','posicion')
-                    ->withTimestamps();
+                    ->withPivot('valoracion','convocado');
     }
 
     // 📌 Obtiene la valoración promedio del jugador en una plantilla
@@ -96,40 +84,4 @@ class Player extends Model
     
         return $resumen;
     }
-    
-    
-
-
-    // 📌 MUTATORS Y ACCESSORS
-
-    public function getMinutosJugadosAttribute($value)
-    {
-        return $value ?? 0;
-    }
-
-    public function getGolesAttribute($value)
-    {
-        return $value ?? 0;
-    }
-
-    public function getAsistenciasAttribute($value)
-    {
-        return $value ?? 0;
-    }
-
-    public function getTarjetasAmarillasAttribute($value)
-    {
-        return min($value ?? 0, 2); // Nunca más de 2 amarillas
-    }
-
-    public function getTarjetasRojasAttribute($value)
-    {
-        return min($value ?? 0, 1); // Nunca más de 1 roja
-    }
-
-    public function getValoracionAttribute($value)
-    {
-        return $value ?? 0.0;
-    }
 }
-
