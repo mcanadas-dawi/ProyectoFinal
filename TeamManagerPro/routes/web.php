@@ -50,7 +50,8 @@ Route::middleware(['auth', 'verified'])->group(function () {
     Route::get('/matches/{matchId}/get-convocados', [ConvocatoriasController::class, 'getConvocados']);
 
     // 📌 Alineaciones
-    Route::get('/matches/{match}/get-alineacion', [AlineacionesController::class, 'get'])->name('matches.getAlineacion');
+    Route::get('/matches/{match}/get-alineacion', [AlineacionesController::class, 'getAlineacion'])->name('alineaciones.get');
+    Route::post('/matches/{match}/guardar-alineacion', [AlineacionesController::class, 'guardarAlineacion'])->name('alineaciones.save');
 
     // 📌 Estadísticas de Jugadores en Partidos
     Route::post('/matches/{match}/stats', [MatchPlayerStatController::class, 'store'])->name('matches.stats.store');
@@ -65,9 +66,7 @@ Route::middleware(['auth', 'verified'])->group(function () {
     Route::put('/ligas/{id}', [RivalesLigaController::class, 'update'])->name('rivales_liga.update');
     Route::delete('/liga/{team}/delete', [RivalesLigaController::class, 'destroyLiga'])->name('liga.delete');
     Route::get('/ligas', [RivalesLigaController::class, 'index'])->name('rivales_liga.index');
-    
-    // 📌 Alineacion
-    Route::post('/guardar-alineacion', [AlineacionesController::class, 'guardarImagen']);
+
 });
 
 

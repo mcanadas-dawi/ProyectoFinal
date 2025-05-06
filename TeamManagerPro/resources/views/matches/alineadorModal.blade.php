@@ -1,3 +1,19 @@
+
+<!-- Contenedor principal que engloba ambos modales -->
+<div id="alineadorContainer" class="hidden fixed inset-0 bg-[#1E293B]/80 flex justify-center items-center z-50">
+<!-- Modal de alineación guardada -->
+<div id="alineacionGuardada" class="hidden bg-[#1E3A8A] rounded-lg p-6 w-3/4 max-h-[90vh] overflow-y-auto flex flex-col items-center justify-center text-white font-sans">
+        <h3 class="text-xl font-title text-[#FACC15] mt-4 uppercase">Alineación Guardada</h3>
+        <img id="imagenAlineacion" src="" alt="Alineación Guardada" class="rounded-lg shadow-lg max-w-full h-auto mt-4">
+        <div class="flex gap-4 mt-4">
+            <button onclick="modificarAlineacion()" class="bg-[#00B140] text-white px-4 py-2 rounded-lg hover:brightness-110 mt-4">
+                Modificar Alineación
+            </button>
+            <button onclick="closeAlineador()" class="bg-[#EF4444] text-white px-4 py-2 rounded-lg hover:brightness-110 mt-4">
+                Cerrar
+            </button>
+        </div>
+    </div>
 <!-- Modal del Alineador -->
     <div id="alineadorModal" class="hidden fixed inset-0 bg-[#1E293B]/80 flex justify-center items-center z-50">
         <div class="bg-[#1E3A8A] rounded-lg p-6 w-3/4 max-h-[90vh] overflow-y-auto flex flex-col text-white font-sans">
@@ -79,6 +95,7 @@
 
     </div>
 </div>
+</div>
 <script>
  // ALINEADOR 
 let alineadorData = document.getElementById("alineador-data");
@@ -106,44 +123,90 @@ function fetchConvocados(matchId) {
 
 function openAlineador(matchId) {
     currentMatchId = matchId;
+    let alineacionGuardadaDiv = document.getElementById('alineacionGuardada');
+    let imagenAlineacion = document.getElementById('imagenAlineacion');
+    let container = document.getElementById('alineadorContainer');
+    
+    // Mantener todo oculto inicialmente
+    container.classList.add('hidden');
+    alineacionGuardadaDiv.classList.add('hidden');
+    document.getElementById('alineadorModal').classList.add('hidden');
+    
+    // Verificar si hay una imagen guardada para este partido
+    fetch(`/matches/${currentMatchId}/get-alineacion`)
+        .then(response => {
+            if (!response.ok) {
+                throw new Error(`HTTP error! status: ${response.status}`);
+            }
+            return response.json();
+        })
+        .then(data => {
+            if (data.success && data.ruta) {
+                // Precargar la imagen antes de mostrar el modal
+                imagenAlineacion.onload = function() {
+                    // Una vez que la imagen está cargada, mostrar el contenedor y la imagen
+                    container.classList.remove('hidden');
+                    alineacionGuardadaDiv.classList.remove('hidden');
+                };
+                
+                // En caso de error al cargar la imagen
+                imagenAlineacion.onerror = function() {
+                    console.error("Error al cargar la imagen de alineación");
+                    container.classList.remove('hidden');
+                    cargarModalNormal();
+                };
+                
+                // Iniciar la carga de la imagen
+                imagenAlineacion.src = data.url || `/storage/${data.ruta}`;
+            } else {
+                // Si no hay imagen, mostrar el contenedor y cargar los jugadores
+                container.classList.remove('hidden');
+                cargarModalNormal();
+            }
+        })
+        .catch(error => {
+            console.error("Error al verificar la alineación guardada:", error);
+            // Si hay un error, mostrar el contenedor y el modal clásico
+            container.classList.remove('hidden');
+            cargarModalNormal();
+        });
+}
+
+function cargarModalNormal() {
     let formationSelector = document.getElementById('formation-selector');
     let editButton = document.getElementById('edit-system-btn');
     let saveButton = document.getElementById('save-system-btn');
-    let modalContent = document.querySelector('#alineadorModal > div'); // Contenido del modal
-
-    // Ocultar el contenido del modal mientras se cargan los datos
+    let modalContent = document.getElementById('alineadorModal');
+    
+    document.getElementById('alineacionGuardada').classList.add('hidden');
+    modalContent.classList.remove('hidden');
     modalContent.style.visibility = 'hidden';
-
-    // Restablecer el selector de formación a "Seleccionar..."
+    
     formationSelector.selectedIndex = 0;
-
+    
     let fieldContainer = document.getElementById('player-spots');
     fieldContainer.innerHTML = "";
-    document.getElementById('alineadorModal').classList.remove('hidden');
-
-    // Ocultar botones al abrir el modal
+    
     editButton.classList.add('hidden');
     saveButton.classList.add('hidden');
-
-    // Limpiar la variable global allPlayers
+    
     allPlayers = [];
-
-    // Usar la promesa para cargar los convocados
+    
     fetchConvocados(currentMatchId)
         .then(convocados => {
             allPlayers = convocados;
             loadConvocados();
-
-            // Mostrar el contenido del modal después de cargar los datos
             modalContent.style.visibility = 'visible';
         })
         .catch(error => {
             console.error(error);
-            modalContent.style.visibility = 'visible'; // Mostrar el contenido del modal incluso si hay un error
+            modalContent.style.visibility = 'visible';
         });
 }
 
-
+function modificarAlineacion() {
+    cargarModalNormal();
+}
 // 🔹 Activar modo edición (Mover libremente los círculos)
 function enableEditMode() {
     editMode = true;
@@ -469,9 +532,12 @@ function removePlaceholderBr() {
     });
 
     function closeAlineador() {
-    const modal = document.getElementById('alineadorModal');
-    if (modal) {
-        modal.classList.add('hidden');
+    const container = document.getElementById('alineadorContainer');
+    if (container) {
+        container.classList.add('hidden');
+        // Ocultar también los modales internos
+        document.getElementById('alineacionGuardada').classList.add('hidden');
+        document.getElementById('alineadorModal').classList.add('hidden');
     }
 }
 
@@ -504,24 +570,35 @@ document.getElementById("capturarBtn").addEventListener("click", function () {
 
             const imageData = canvas.toDataURL("image/png");
 
-            fetch("/guardar-alineacion", {
-                method: "POST",
-                headers: {
-                    "Content-Type": "application/json",
-                    "X-CSRF-TOKEN": document.querySelector('meta[name="csrf-token"]').getAttribute("content")
-                },
-                body: JSON.stringify({
-                    imagen: imageData
-                })
+            fetch(`/matches/${currentMatchId}/guardar-alineacion`, {
+            method: "POST",
+            headers: {
+                "Content-Type": "application/json",
+                "X-CSRF-TOKEN": document.querySelector('meta[name="csrf-token"]').getAttribute("content")
+            },
+            body: JSON.stringify({
+                imagen: imageData
             })
-            .then(response => response.json())
-            .then(data => {
-                alert("Alineación guardada correctamente.");
-            })
-            .catch(error => {
-                console.error("Error al guardar la imagen:", error);
-            });
+        })
+        .then(response => {
+            if (!response.ok) {
+                throw new Error(`HTTP error! status: ${response.status}`);
+            }
+            return response.json();
+        })
+        .then(data => {
+            if (data.success) {
+                closeAlineador();
+                openAlineador(currentMatchId);
+            } else {
+                alert("Error al guardar la alineación: " + data.message);
+            }
+        })
+        .catch(error => {
+            console.error("Error al guardar la imagen:", error);
+            alert("Error al guardar la imagen. Por favor, inténtalo de nuevo.");
         });
+    });
 });
 
 document.getElementById("descargarBtn").addEventListener("click", function () {
