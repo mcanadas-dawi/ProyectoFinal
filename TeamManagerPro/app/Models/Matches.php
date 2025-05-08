@@ -11,7 +11,7 @@ class Matches extends Model
 
     protected $fillable = [
         'team_id', 'rival_liga_id', 'tipo', 'equipo_rival', 'fecha_partido',
-        'resultado', 'goles_a_favor', 'goles_en_contra', 'actuacion_equipo'
+        'resultado', 'goles_a_favor', 'goles_en_contra', 'actuacion_equipo', 'local'
     ];
 
     // 📌 RELACIONES

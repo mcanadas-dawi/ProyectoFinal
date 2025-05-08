@@ -125,11 +125,25 @@ class DemoTeamSeeder extends Seeder
         }
 
 
-        // Crear liga con partidos, estadísticas y valoraciones
+        $rivalesLiga = $faker->randomElements($equiposPrimeraDivision, 5);
+        
+        // Decidir aleatoriamente cuántos partidos serán local en la primera vuelta (2 o 3)
+        $partidosLocalesIda = rand(2, 3);
+        
+        // Generar un array aleatorio con los índices de partidos locales
+        $indicesLocalesIda = (array) array_rand(range(0, 4), $partidosLocalesIda);
+        
+        // PRIMERA VUELTA (Jornadas 1-5)
         for ($jornada = 1; $jornada <= 5; $jornada++) {
+            $indice = $jornada - 1;
+            $nombreRival = $rivalesLiga[$indice];
+            
+            // Determinar si este partido es local en la ida
+            $esLocalEnIda = in_array($indice, $indicesLocalesIda);
+            
             $rival = RivalLiga::create([
                 'team_id' => $team->id,
-                'nombre_equipo' => $faker->randomElement($equiposPrimeraDivision),
+                'nombre_equipo' => $nombreRival,
                 'jornada' => $jornada,
             ]);
 
@@ -140,17 +154,13 @@ class DemoTeamSeeder extends Seeder
                 'team_id' => $team->id,
                 'tipo' => 'liga',
                 'rival_liga_id' => $rival->id,
-                'equipo_rival' => $faker->randomElement($equiposPrimeraDivision), // Seleccionar un equipo aleatorio
-                'fecha_partido' => $faker->dateTimeBetween('-6 months', '+6 months')->format('Y-m-d'), // Fecha dentro de 6 meses antes o después
-                'local' => true,
+                'equipo_rival' => $nombreRival,
+                'fecha_partido' => $faker->dateTimeBetween('-6 months', '+1 month')->format('Y-m-d'),
+                'local' => $esLocalEnIda,  // Asignar según el array de índices locales
                 'goles_a_favor' => $golesFavor,
                 'goles_en_contra' => $golesContra,
-                'resultado' => 'Pendiente', 
-                'actuacion_equipo' => match ($match->resultado) {
-                    'Victoria' => rand(7, 10),
-                    'Empate' => rand(5, 7),
-                    'Derrota' => rand(1, 4),
-                },     
+                'resultado' => 'Pendiente',
+                'actuacion_equipo' => 0,
             ]);
 
             // Calcular resultado real
@@ -166,27 +176,88 @@ class DemoTeamSeeder extends Seeder
             }
             $match->save();
 
-            foreach ($players as $player) {
-                if (rand(0, 1)) {
-                    MatchPlayerStat::create([
-                        'player_id' => $player->id,
-                        'match_id' => $match->id,
-                        'titular' => rand(0, 1),
-                        'minutos_jugados' => rand(10, 90),
-                        'goles' => rand(0, 3),
-                        'asistencias' => rand(0, 2),
-                        'tarjetas_amarillas' => rand(1, 100) <= 25 ? 1 : 0,
-                        'tarjetas_rojas' => rand(1, 100) <= 10 ? 1 : 0,
-                        'valoracion' => match ($match->resultado) {
-                            'Victoria' => rand(7, 10),
-                            'Empate' => rand(5, 7),
-                            'Derrota' => rand(1, 4),
-                        },
-                    ]);
-                }
+            // Generar estadísticas de jugadores para este partido
+            $this->generarEstadisticasJugadores($match, $players, $faker);
+        }
+        
+        // SEGUNDA VUELTA (Jornadas 6-10)
+        for ($jornada = 6; $jornada <= 10; $jornada++) {
+            $indice = $jornada - 6;  // 0-4 para los mismos rivales
+            $nombreRival = $rivalesLiga[$indice];
+            
+            // En la vuelta, invertir si es local o visitante
+            $esLocalEnVuelta = !in_array($indice, $indicesLocalesIda);
+            
+            $rival = RivalLiga::create([
+                'team_id' => $team->id,
+                'nombre_equipo' => $nombreRival,
+                'jornada' => $jornada,
+            ]);
+
+            $golesFavor = rand(0, 5);
+            $golesContra = rand(0, 5);
+
+            $match = Matches::create([
+                'team_id' => $team->id,
+                'tipo' => 'liga',
+                'rival_liga_id' => $rival->id,
+                'equipo_rival' => $nombreRival,
+                'fecha_partido' => $faker->dateTimeBetween('+1 month', '+6 months')->format('Y-m-d'),
+                'local' => $esLocalEnVuelta,  // Invertir respecto a la ida
+                'goles_a_favor' => $golesFavor,
+                'goles_en_contra' => $golesContra,
+                'resultado' => 'Pendiente',
+                'actuacion_equipo' => 0,
+            ]);
+
+            // Calcular resultado real
+            if ($golesFavor > $golesContra) {
+                $match->resultado = 'Victoria';
+                $match->actuacion_equipo = rand(7, 10);
+            } elseif ($golesFavor == $golesContra) {
+                $match->resultado = 'Empate';
+                $match->actuacion_equipo = rand(5, 7);
+            } else {
+                $match->resultado = 'Derrota';
+                $match->actuacion_equipo = rand(1, 4);
+            }
+            $match->save();
+
+            // Generar estadísticas de jugadores para este partido
+            $this->generarEstadisticasJugadores($match, $players, $faker);
+        }
+
+        // Actualizar estadísticas globales por jugador
+        $this->actualizarEstadisticasGlobales($players, $team);
+    }
+
+    // Método auxiliar para generar estadísticas de jugadores
+    private function generarEstadisticasJugadores($match, $players, $faker)
+    {
+        foreach ($players as $player) {
+            if (rand(0, 1)) {
+                MatchPlayerStat::create([
+                    'player_id' => $player->id,
+                    'match_id' => $match->id,
+                    'titular' => rand(0, 1),
+                    'minutos_jugados' => rand(10, 90),
+                    'goles' => rand(0, 3),
+                    'asistencias' => rand(0, 2),
+                    'tarjetas_amarillas' => rand(1, 100) <= 25 ? 1 : 0,
+                    'tarjetas_rojas' => rand(1, 100) <= 10 ? 1 : 0,
+                    'valoracion' => match ($match->resultado) {
+                        'Victoria' => rand(7, 10),
+                        'Empate' => rand(5, 7),
+                        'Derrota' => rand(1, 4),
+                    },
+                ]);
             }
         }
-        // ✅ ACTUALIZAR ESTADÍSTICAS GLOBALES POR JUGADOR
+    }
+
+    // Método auxiliar para actualizar estadísticas globales
+    private function actualizarEstadisticasGlobales($players, $team)
+    {
         foreach ($players as $player) {
             $stats = MatchPlayerStat::where('player_id', $player->id)
                 ->whereHas('match', function ($q) use ($team) {
@@ -208,12 +279,11 @@ class DemoTeamSeeder extends Seeder
                     'asistencias' => $stats->sum('asistencias'),
                     'titular' => $titular,
                     'suplente' => $suplente,
-                    'valoracion' => round($stats->avg('valoracion') ?? 5),
+                    'valoracion' => round($stats->avg('valoracion') ?? 5, 1),
                     'tarjetas_amarillas' => $stats->sum('tarjetas_amarillas'),
                     'tarjetas_rojas' => $stats->sum('tarjetas_rojas'),
                 ]
             );
         }
-
     }
-}    
+}

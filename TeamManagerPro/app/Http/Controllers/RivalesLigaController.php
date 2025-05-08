@@ -5,6 +5,7 @@ use Illuminate\Http\Request;
 use App\Models\RivalLiga;
 use App\Models\Matches;
 use App\Models\Team;
+use Illuminate\Support\Facades\Log;
 
 class RivalesLigaController extends Controller
 {
@@ -48,15 +49,25 @@ class RivalesLigaController extends Controller
     $rivales = $request->input('rivales');
     $soloIda = $request->boolean('solo_ida');
     $teamId = $request->input('team_id'); 
+    $local = $request->input('local', []); 
 
     $jornada = 1;
+    $local = $request->input('local', []);
 
-    foreach ($rivales as $rivalNombre) {
+    // Crear partidos de ida
+    foreach ($rivales as $i => $rivalNombre) {
+        if (empty($rivalNombre)) continue; // Saltar entradas vacías
+
         $rival = RivalLiga::create([
             'nombre_equipo' => $rivalNombre,
             'jornada' => $jornada,
             'team_id' => $teamId,
         ]);
+
+        // Asegurarse de que los índices sean strings tal como vienen del formulario
+        $esLocal = array_key_exists((string)$i, $local);
+        
+        Log::debug("Guardando partido: Jornada $jornada: Rival $rivalNombre, Local: " . ($esLocal ? 'Sí' : 'No'));
 
         Matches::create([
             'team_id' => $teamId,
@@ -64,36 +75,40 @@ class RivalesLigaController extends Controller
             'rival_liga_id' => $rival->id,
             'equipo_rival' => $rivalNombre,
             'fecha_partido' => now()->addDays(7 * ($jornada - 1))->toDateString(),
-            'local' => true,
+            'local' => $esLocal, // Asegurarse que esto se guarde como booleano
         ]);
 
         $jornada++;
     }
-
-    if (!$soloIda) {
-        foreach ($rivales as $rivalNombre) {
-            $rivalVuelta = RivalLiga::create([
-                'nombre_equipo' => $rivalNombre,
-                'jornada' => $jornada,
-                'team_id' => $teamId,
-            ]);
-
-            Matches::create([
-                'team_id' => $teamId,
-                'tipo' => 'liga',
-                'rival_liga_id' => $rivalVuelta->id,
-                'equipo_rival' => $rivalNombre,
-                'fecha_partido' => now()->addDays(7 * ($jornada - 1))->toDateString(),
-                'local' => false,
-            ]);
-
-            $jornada++;
+    
+        // Crear partidos de vuelta (invertir local/visitante)
+        if (!$soloIda) {
+            foreach ($rivales as $i => $rivalNombre) {
+                $rivalVuelta = RivalLiga::create([
+                    'nombre_equipo' => $rivalNombre,
+                    'jornada' => $jornada,
+                    'team_id' => $teamId,
+                ]);
+    
+                // En la vuelta, invertir el valor de local
+                $esLocal = isset($local[$i]);
+    
+                Matches::create([
+                    'team_id' => $teamId,
+                    'tipo' => 'liga',
+                    'rival_liga_id' => $rivalVuelta->id,
+                    'equipo_rival' => $rivalNombre,
+                    'fecha_partido' => now()->addDays(7 * ($jornada - 1))->toDateString(),
+                    'local' => !$esLocal, // Invertir el valor para la vuelta
+                ]);
+    
+                $jornada++;
+            }
         }
+    
+        return redirect()->route('teams.show', ['team' => $teamId])
+            ->with('success', 'Liga creada correctamente.');
     }
-
-    return redirect()->route('teams.show', ['team' => $teamId])
-    ->with('success', 'Liga creada correctamente.');
-}
 
 
     public function update(Request $request, $id)

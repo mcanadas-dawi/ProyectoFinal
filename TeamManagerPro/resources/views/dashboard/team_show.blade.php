@@ -368,7 +368,13 @@
                     };
                 @endphp     
                 <tr id="match-row-{{ $match->id }}" class="border-b hover:bg-[#334155]/60 transition-colors duration-200 {{ $colorTexto }}">
-                    <td class="p-2 text-center">{{ $match->rivalLiga->jornada ?? 'N/A' }}</td>
+                    <td class="p-2 text-center">  
+                        {{ $match->rivalLiga->jornada ?? 'N/A' }}
+                        @if($match->local)
+                            🏠
+                        @else
+                            🚗
+                        @endif</td>
                     <td class="p-2 text-center">{{ $match->rivalLiga->nombre_equipo ?? 'N/A' }}</td>
                             <td class="p-2 text-center">
                                 <span id="fecha-{{ $match->id }}">{{ $match->fecha_partido }}</span>

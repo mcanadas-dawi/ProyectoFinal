@@ -63,7 +63,8 @@ class MatchesController extends Controller
         'resultado' => 'nullable|string|max:50',
         'goles_a_favor' => 'nullable|integer',
         'goles_en_contra' => 'nullable|integer',
-        'actuacion_equipo' => 'nullable|numeric',  // Cambiado a "numeric" en lugar de "string"
+        'actuacion_equipo' => 'nullable|numeric', 
+        'local' => 'required|boolean',
     ]);
 
     try {
@@ -84,6 +85,7 @@ class MatchesController extends Controller
             'goles_a_favor' => $request->goles_a_favor ?? 0,
             'goles_en_contra' => $request->goles_en_contra ?? 0,
             'actuacion_equipo' => $request->actuacion_equipo ?? 0.0,
+            'local' => $request->has('local') ? (bool) $request->local : true, // true por defecto si no viene
         ];
 
         // Solo añadir rival_liga_id si está presente
