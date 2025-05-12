@@ -1,3 +1,6 @@
+# Docs for the Azure Web Apps Deploy action: https://github.com/Azure/webapps-deploy
+# More GitHub Actions for Azure: https://github.com/Azure/actions
+
 name: Build and deploy PHP app to Azure Web App - TeamManagerPro
 
 on:
@@ -10,7 +13,7 @@ jobs:
   build:
     runs-on: ubuntu-latest
     permissions:
-      contents: read
+      contents: read #This is required for actions/checkout
 
     steps:
       - uses: actions/checkout@v4
@@ -19,45 +22,19 @@ jobs:
         uses: shivammathur/setup-php@v2
         with:
           php-version: '8.2'
-          extensions: mbstring, dom, fileinfo, sqlite3
-      
-      # Agregar setup Node.js
-      - name: Setup Node.js
-        uses: actions/setup-node@v3
+
+      - name: Check if composer.json exists
+        id: check_files
+        uses: andstor/file-existence-action@v1
         with:
-          node-version: '18'
+          files: 'composer.json'
 
-      # Ajustar directorio de trabajo si es necesario
-      - name: Navigate to app directory
-        run: |
-          cd TeamManagerPro  # Elimina esta línea si tu app está en la raíz
+      - name: Run composer install if composer.json exists
+        if: steps.check_files.outputs.files_exists == 'true'
+        run: composer validate --no-check-publish && composer install --prefer-dist --no-progress
 
-      - name: Install Composer dependencies
-        run: |
-          cd TeamManagerPro  # Elimina esta línea si tu app está en la raíz
-          composer install --prefer-dist --no-dev --optimize-autoloader
-
-      # Compilar assets frontend
-      - name: Install and build frontend assets
-        run: |
-          cd TeamManagerPro  # Elimina esta línea si tu app está en la raíz
-          npm ci
-          npm run build
-
-      # Optimizar configuración Laravel
-      - name: Optimize Laravel
-        run: |
-          cd TeamManagerPro  # Elimina esta línea si tu app está en la raíz
-          cp .env.example .env
-          php artisan config:cache
-          php artisan route:cache
-          php artisan view:cache
-
-      # Empaquetar solo la carpeta de la app
       - name: Zip artifact for deployment
-        run: |
-          cd TeamManagerPro  # Elimina esta línea si tu app está en la raíz
-          zip -r ../release.zip ./* 
+        run: zip release.zip ./* -r
 
       - name: Upload artifact for deployment job
         uses: actions/upload-artifact@v4
@@ -72,8 +49,8 @@ jobs:
       name: 'Production'
       url: ${{ steps.deploy-to-webapp.outputs.webapp-url }}
     permissions:
-      id-token: write
-      contents: read
+      id-token: write #This is required for requesting the JWT
+      contents: read #This is required for actions/checkout
 
     steps:
       - name: Download artifact from build job
@@ -87,9 +64,9 @@ jobs:
       - name: Login to Azure
         uses: azure/login@v2
         with:
-          client-id: ${{ secrets.AZUREAPPSERVICE_CLIENTID_C89C5973F2784F1F958E687F6B6F7B35 }}
-          tenant-id: ${{ secrets.AZUREAPPSERVICE_TENANTID_E202E676DEE448729284AC5AB20688AB }}
-          subscription-id: ${{ secrets.AZUREAPPSERVICE_SUBSCRIPTIONID_8BE776FD19154B1EAE8E2B29F0FFCC8A }}
+          client-id: ${{ secrets.AZUREAPPSERVICE_CLIENTID_5775218249324C68BB6A3C11A4AC1B36 }}
+          tenant-id: ${{ secrets.AZUREAPPSERVICE_TENANTID_7A96434163F44F149BF7DF57D907F98E }}
+          subscription-id: ${{ secrets.AZUREAPPSERVICE_SUBSCRIPTIONID_C9B0A6BF22594B5DBA0833EDB8B151DB }}
 
       - name: 'Deploy to Azure Web App'
         uses: azure/webapps-deploy@v3
@@ -98,3 +75,4 @@ jobs:
           app-name: 'TeamManagerPro'
           slot-name: 'Production'
           package: .
+          
