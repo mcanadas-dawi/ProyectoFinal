@@ -18,10 +18,13 @@ jobs:
           php-version: '8.2'
 
       - name: Install dependencies
-        run: composer install --prefer-dist --no-progress
-
+        run: |
+          cd TeamManagerPro
+          composer install --prefer-dist --no-progress --no-dev --optimize-autoloader
       - name: Zip artifact for deployment
-        run: zip -r release.zip .
+        run: |
+          cd TeamManagerPro
+          zip -r ../release.zip .
 
       - name: Upload artifact
         uses: actions/upload-artifact@v4
