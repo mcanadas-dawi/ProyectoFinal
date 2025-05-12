@@ -101,4 +101,5 @@ jobs:
           app-name: 'TeamManagerPro'
           slot-name: 'Production'
           package: .
+          clean: true
           
