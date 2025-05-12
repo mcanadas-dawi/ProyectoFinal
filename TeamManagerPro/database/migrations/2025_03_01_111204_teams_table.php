@@ -18,13 +18,6 @@ return new class extends Migration
             $table->foreignId('user_id')->constrained()->onDelete('cascade'); // Relación con usuario
             $table->timestamps();
         });  
-
-        Schema::create('player_team', function (Blueprint $table) {
-            $table->id();
-            $table->foreignId('player_id')->constrained()->onDelete('cascade');
-            $table->foreignId('team_id')->constrained()->onDelete('cascade');
-            $table->timestamps();
-        });
     }
 
     /**
@@ -32,7 +25,6 @@ return new class extends Migration
      */
     public function down(): void
     {
-        Schema::dropIfExists('player_team');
         Schema::dropIfExists('teams');
     }
 };

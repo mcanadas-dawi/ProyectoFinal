@@ -13,16 +13,19 @@ return new class extends Migration
     {
         Schema::create('matches', function (Blueprint $table) {
             $table->id();
-            $table->foreignId('team_id')->constrained()->onDelete('cascade'); // Relacionado con una plantilla
-            $table->integer('numero_jornada');
+            $table->foreignId('team_id')->constrained()->onDelete('cascade');
+            $table->unsignedBigInteger('rival_liga_id')->nullable();
+            $table->string('tipo');
             $table->string('equipo_rival');
             $table->date('fecha_partido');
-            $table->enum('resultado', ['Victoria', 'Empate', 'Derrota'])->nullable();
-            $table->integer('goles_a_favor')->default(0);
-            $table->integer('goles_en_contra')->default(0);
-            $table->decimal('actuacion_equipo', 4, 2)->nullable(); // Evaluación del equipo
+            $table->integer('goles_a_favor')->nullable();
+            $table->integer('goles_en_contra')->nullable();
+            $table->string('resultado')->nullable();
+            $table->float('actuacion_equipo')->nullable();
+            $table->boolean('local')->default(true);
+            $table->string('alineacion_imagen')->nullable();
             $table->timestamps();
-        });   
+        });
     }
 
     /**

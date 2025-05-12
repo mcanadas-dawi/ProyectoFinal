@@ -22,6 +22,7 @@ return new class extends Migration
         $table->integer('tarjetas_rojas')->default(0);
         $table->integer('titular')->default(0);
         $table->integer('suplente')->default(0);
+        $table->decimal('valoracion', 4, 2)->nullable();
         $table->timestamps();
     });
 }

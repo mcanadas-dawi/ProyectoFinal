@@ -10,7 +10,7 @@ return new class extends Migration {
             $table->id();
             $table->foreignId('player_id')->constrained()->onDelete('cascade');
             $table->foreignId('match_id')->constrained()->onDelete('cascade');
-            $table->integer('valoracion')->nullable(); // Puntuación del jugador en el partido (1-10)
+            $table->boolean('convocado')->default(false);
             $table->timestamps();
         });
     }

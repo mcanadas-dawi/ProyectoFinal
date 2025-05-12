@@ -15,17 +15,11 @@ return new class extends Migration
             $table->id();
             $table->string('nombre');
             $table->string('apellido');
+            $table->string('dni', 10)->unique();
             $table->integer('dorsal');
             $table->date('fecha_nacimiento');
             $table->enum('posicion', ['Portero', 'Defensa', 'Centrocampista', 'Delantero']);
             $table->enum('perfil', ['Diestro', 'Zurdo']);
-            $table->integer('minutos_jugados')->default(0);
-            $table->integer('goles')->default(0);
-            $table->integer('asistencias')->default(0);
-            $table->integer('goles_encajados')->default(0); // Solo aplicable a porteros
-            $table->integer('titular')->default(0); 
-            $table->integer('suplente')->default(0);
-            $table->decimal('valoracion', 4, 2)->default(0); // Promedio de rendimiento en partidos
             $table->timestamps();
         });
     }
