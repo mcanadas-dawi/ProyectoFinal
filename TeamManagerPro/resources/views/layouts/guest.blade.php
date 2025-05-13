@@ -22,7 +22,7 @@
 
             @if ($showLogo)
                 <div class="flex justify-center mt-6">
-                    <img src="{{ asset('imagenes/Logo.png') }}" alt="Logo TeamManagerPro" class="w-16 h-auto">
+                    <img src="{{ asset('Imagenes/Logo.png') }}" alt="Logo TeamManagerPro" class="w-16 h-auto">
                 </div>
             @endif
 

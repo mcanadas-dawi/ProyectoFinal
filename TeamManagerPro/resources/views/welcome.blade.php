@@ -1,6 +1,6 @@
 <x-guest-layout :showLogo="false">
     <div class="flex flex-col items-center justify-center text-center px-6 py-12 flex-grow">
-        <img src="{{ asset('imagenes/Logo.png') }}" alt="Logo TeamManagerPro" class="mx-auto mb-8 w-64 rounded-xl shadow-lg">
+        <img src="{{ asset('Imagenes/Logo.png') }}" alt="Logo TeamManagerPro" class="mx-auto mb-8 w-64 rounded-xl shadow-lg">
         
         <h1 class="text-4xl font-bold text-gray-800 dark:text-white mb-4">
             Bienvenido a TeamManagerPro
