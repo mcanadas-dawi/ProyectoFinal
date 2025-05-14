@@ -69,6 +69,7 @@ class Player extends Model
         $resumen = $stats->selectRaw('
             SUM(minutos_jugados) as minutos_jugados,
             SUM(goles) as goles,
+            SUM(goles_encajados) as goles_encajados,
             SUM(asistencias) as asistencias,
             SUM(tarjetas_amarillas) as tarjetas_amarillas,
             SUM(tarjetas_rojas) as tarjetas_rojas,

@@ -64,7 +64,7 @@ class MatchesController extends Controller
         'goles_a_favor' => 'nullable|integer',
         'goles_en_contra' => 'nullable|integer',
         'actuacion_equipo' => 'nullable|numeric', 
-        'local' => 'required|boolean',
+        'local' => 'nullable|boolean', 
     ]);
 
     try {
@@ -81,7 +81,7 @@ class MatchesController extends Controller
             'tipo' => $request->tipo,
             'equipo_rival' => $request->equipo_rival,
             'fecha_partido' => $request->fecha_partido,
-            'resultado' => $request->resultado ?? 'N/A',
+            'resultado' => $request->resultado ?? 'Pendiente',
             'goles_a_favor' => $request->goles_a_favor ?? 0,
             'goles_en_contra' => $request->goles_en_contra ?? 0,
             'actuacion_equipo' => $request->actuacion_equipo ?? 0.0,
@@ -102,13 +102,14 @@ class MatchesController extends Controller
         }
 
         // Mensaje de éxito según el tipo de partido
+        $key = $request->tipo === 'liga' ? 'success_liga' : 'success_amistoso';
         $message = $request->tipo === 'liga' 
             ? 'Partido de liga añadido correctamente.' 
             : 'Partido amistoso añadido correctamente.';
 
         session()->flash('created_match', 'Partido amistoso creado correctamente.');
 
-        return redirect()->back();
+    return redirect()->back()->with($key, $message);
     } catch (\Exception $e) {
         Log::error('❌ Error al crear el partido: ' . $e->getMessage());
         return redirect()->back()->with('error', 'Error al crear el partido.');

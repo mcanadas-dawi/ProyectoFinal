@@ -69,7 +69,12 @@ class TeamsController extends Controller
         }
     
         // Top 5 por cada categoría
-        $topGoles = collect($topStats)->sortByDesc('goles')->take(5);
+        $topGoles = collect($topStats)
+        ->filter(function ($stat) {
+            return $stat['jugador']->posicion !== 'Portero';
+        })
+        ->sortByDesc('goles')
+        ->take(5);
         $topAsistencias = collect($topStats)->sortByDesc('asistencias')->take(5);
         $topMinutos = collect($topStats)->sortByDesc('minutos')->take(5);
         $topValoracion = collect($topStats)->sortByDesc('valoracion')->take(5);

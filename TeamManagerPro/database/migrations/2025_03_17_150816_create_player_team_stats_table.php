@@ -17,6 +17,7 @@ return new class extends Migration
         $table->foreignId('team_id')->constrained()->onDelete('cascade');
         $table->integer('minutos_jugados')->default(0);
         $table->integer('goles')->default(0);
+        $table->integer('goles_encajados')->default(0); // Nuevo campo para goles encajados
         $table->integer('asistencias')->default(0);
         $table->integer('tarjetas_amarillas')->default(0);
         $table->integer('tarjetas_rojas')->default(0);

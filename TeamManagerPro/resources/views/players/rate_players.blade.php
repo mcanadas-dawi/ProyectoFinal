@@ -14,6 +14,7 @@
                     <th class="border border-white p-2">Titular</th>
                     <th class="border border-white p-2">Minutos</th>
                     <th class="border border-white p-2">Goles</th>
+                    <th class="border border-white p-2">Goles Encajados (POR)</th>
                     <th class="border border-white p-2">Asistencias</th>
                     <th class="border border-white p-2">Amarillas</th>
                     <th class="border border-white p-2">Rojas</th>
@@ -27,9 +28,10 @@
                             $stats = $player->matchStats($match->id);
                             $amarillas = $stats->tarjetas_amarillas ?? 0;
                             $rojas = $stats->tarjetas_rojas ?? 0;
+                            $isGoalkeeper = $player->posicion == 'Portero';
                         @endphp
-                        <tr class="border border-white">
-                            <td class="p-2">{{ $player->nombre }} {{ $player->apellido }} (Dorsal: {{ $player->dorsal }})</td>
+                        <tr class="border border-white" data-player-position="{{ $player->posicion }}">
+                            <td class="p-2">{{ $player->nombre }} {{ $player->apellido }} (Dorsal: {{ $player->dorsal }}) - {{ $player->posicion }}</td>
 
                             <td class="p-2 text-center">
                                 <input type="checkbox" name="players[{{ $player->id }}][titular]"
@@ -46,6 +48,12 @@
                                     class="w-16 p-2 rounded text-black text-center" value="{{ $stats->goles ?? 0 }}">
                             </td>
 
+                            <td class="p-2 text-center">
+                                <input type="number" name="players[{{ $player->id }}][goles_encajados]" min="0"
+                                    class="w-16 p-2 rounded text-black text-center" 
+                                    value="{{ $stats->goles_encajados ?? 0 }}"
+                                    {{ $isGoalkeeper ? '' : 'readonly disabled' }}>
+                            </td>
                             <td class="p-2 text-center">
                                 <input type="number" name="players[{{ $player->id }}][asistencias]" min="0"
                                     class="w-16 p-2 rounded text-black text-center" value="{{ $stats->asistencias ?? 0 }}">
@@ -108,6 +116,39 @@
             }
         });
     });
+
+    document.addEventListener('DOMContentLoaded', function() {
+    // Verificar que el código se está ejecutando (debug)
+    console.log("Script inicializado");
+    
+    // Manejar los campos de goles encajados para porteros
+    const rows = document.querySelectorAll('tr');
+    
+    rows.forEach(row => {
+        // Verificar la posición directamente desde el contexto del jugador
+        const golesEncajadosInput = row.querySelector('input[name*="[goles_encajados]"]');
+        const isGoalkeeper = row.getAttribute('data-player-position') === 'Portero';
+        
+        console.log("Fila:", row);
+        console.log("Es portero:", isGoalkeeper);
+        console.log("Input encontrado:", golesEncajadosInput);
+        
+        if (golesEncajadosInput) {
+            if (isGoalkeeper) {
+                golesEncajadosInput.removeAttribute('readonly');
+                golesEncajadosInput.removeAttribute('disabled');
+                golesEncajadosInput.classList.add('bg-white');
+                console.log("Habilitando input para portero");
+            } else {
+                golesEncajadosInput.setAttribute('readonly', 'readonly');
+                golesEncajadosInput.setAttribute('disabled', 'disabled');
+                golesEncajadosInput.classList.add('bg-gray-200');
+                golesEncajadosInput.value = '0';
+                console.log("Deshabilitando input para jugador no portero");
+            }
+        }
+    });
+});
 
 </script>
 @endsection

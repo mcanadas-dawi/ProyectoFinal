@@ -15,6 +15,7 @@ class MatchPlayerStat extends Model
         'titular',
         'minutos_jugados',
         'goles',
+        'goles_encajados',
         'asistencias',
         'tarjetas_amarillas',
         'tarjetas_rojas',
@@ -25,6 +26,7 @@ class MatchPlayerStat extends Model
         'titular' => 'integer',
         'minutos_jugados' => 'integer',
         'goles' => 'integer',
+        'goles_encajados' => 'integer',
         'asistencias' => 'integer',
         'tarjetas_amarillas' => 'integer',
         'tarjetas_rojas' => 'integer',
@@ -51,6 +53,11 @@ class MatchPlayerStat extends Model
     }
 
     public function getGolesAttribute($value)
+    {
+        return $value ?? 0;
+    }
+
+    public function getGolesEncajadosAttribute($value)
     {
         return $value ?? 0;
     }

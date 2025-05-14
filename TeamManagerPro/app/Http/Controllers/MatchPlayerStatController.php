@@ -26,11 +26,6 @@ class MatchPlayerStatController extends Controller
 
         $match = Matches::findOrFail($matchId);
         
-        // Evitar registrar estadísticas si el partido es amistoso
-        if ($match->tipo === 'amistoso') {
-            return response()->json(['message' => 'No se registran estadísticas para partidos amistosos'], 403);
-        }
-
         $playerId = $request->player_id;
         $tarjetasRojas = ($request->tarjetas_amarillas == 2) ? 1 : ($request->tarjetas_rojas ?? 0);
 
@@ -69,7 +64,6 @@ class MatchPlayerStatController extends Controller
 
     public function saveRatings(Request $request, $matchId) 
     {
-        Log::info('Guardando valoraciones', ['match_id' => $matchId, 'players' => $request->players]);
 
         $match = Matches::findOrFail($matchId);
         $teamId = $match->team_id; // Obtener el equipo del partido
@@ -91,6 +85,7 @@ class MatchPlayerStatController extends Controller
         $amarillas = $data['tarjetas_amarillas'] ?? 0;
         $rojas = ($amarillas == 2) ? 1 : ($data['tarjetas_rojas'] ?? 0);
         $valoracion = $data['valoracion'] ?? null;
+        $golesEncajados = ($player->posicion == 'Portero') ? ($data['goles_encajados'] ?? 0) : 0; // Solo para porteros
 
         // Obtener estadísticas del jugador en el partido
         $existingMatchStats = MatchPlayerStat::where('match_id', $matchId)
@@ -108,6 +103,7 @@ class MatchPlayerStatController extends Controller
             $existingMatchStats->update([
                 'minutos_jugados' => $data['minutos_jugados'] ?? 0,
                 'goles' => $data['goles'] ?? 0,
+                'goles_encajados' => $golesEncajados,
                 'asistencias' => $data['asistencias'] ?? 0,
                 'tarjetas_amarillas' => $amarillas,
                 'tarjetas_rojas' => $rojas,
@@ -121,6 +117,7 @@ class MatchPlayerStatController extends Controller
                 'player_id' => $playerId,
                 'minutos_jugados' => $data['minutos_jugados'] ?? 0,
                 'goles' => $data['goles'] ?? 0,
+                'goles_encajados' => $golesEncajados,
                 'asistencias' => $data['asistencias'] ?? 0,
                 'tarjetas_amarillas' => $amarillas,
                 'tarjetas_rojas' => $rojas,
@@ -130,7 +127,7 @@ class MatchPlayerStatController extends Controller
             ]);
         }
 
-        $this->sumarNuevasEstadisticas($stats, $data, $amarillas, $rojas, $esTitular, $esSuplente, $playerId, $teamId);
+        $this->sumarNuevasEstadisticas($stats, $data, $amarillas, $rojas, $esTitular, $esSuplente, $playerId, $teamId, $golesEncajados);
     }
 
     private function restarEstadisticasPrevias($stats, $existingMatchStats)
@@ -138,6 +135,7 @@ class MatchPlayerStatController extends Controller
         $stats->update([
             'minutos_jugados' => max(0, $stats->minutos_jugados - $existingMatchStats->minutos_jugados),
             'goles' => max(0, $stats->goles - $existingMatchStats->goles),
+            'goles_encajados' => max(0, $stats->goles_encajados - $existingMatchStats->goles_encajados),
             'asistencias' => max(0, $stats->asistencias - $existingMatchStats->asistencias),
             'tarjetas_amarillas' => max(0, $stats->tarjetas_amarillas - $existingMatchStats->tarjetas_amarillas),
             'tarjetas_rojas' => max(0, $stats->tarjetas_rojas - $existingMatchStats->tarjetas_rojas),
@@ -146,11 +144,13 @@ class MatchPlayerStatController extends Controller
         ]);
     }
 
-    private function sumarNuevasEstadisticas($stats, $data, $amarillas, $rojas, $esTitular, $esSuplente, $playerId, $teamId)
+    private function sumarNuevasEstadisticas($stats, $data, $amarillas, $rojas, $esTitular, $esSuplente, $playerId, $teamId, $golesEncajados)
+
     {
         $stats->update([
             'minutos_jugados' => $stats->minutos_jugados + ($data['minutos_jugados'] ?? 0),
             'goles' => $stats->goles + ($data['goles'] ?? 0),
+            'goles_encajados' => $stats->goles_encajados + $golesEncajados,
             'asistencias' => $stats->asistencias + ($data['asistencias'] ?? 0),
             'tarjetas_amarillas' => $stats->tarjetas_amarillas + $amarillas,
             'tarjetas_rojas' => $stats->tarjetas_rojas + $rojas,

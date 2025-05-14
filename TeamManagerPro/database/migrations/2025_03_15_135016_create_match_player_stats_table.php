@@ -18,6 +18,7 @@ return new class extends Migration
             $table->boolean('titular')->default(false);
             $table->integer('minutos_jugados')->default(0);
             $table->integer('goles')->default(0);
+            $table->integer('goles_encajados')->default(0);
             $table->integer('asistencias')->default(0);
             $table->integer('tarjetas_amarillas')->default(0);
             $table->integer('tarjetas_rojas')->default(0);

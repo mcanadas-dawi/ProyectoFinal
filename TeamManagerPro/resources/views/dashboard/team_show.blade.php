@@ -116,7 +116,7 @@
                     <th class="p-2">Posición</th>
                     <th class="p-2">Pie</th>
                     <th class="p-2">Minutos</th>
-                    <th class="p-2">Goles</th>
+                    <th class="p-2">Goles/Enc.</th>
                     <th class="p-2">Asist</th>
                     <th class="p-2">Tit</th>
                     <th class="p-2">Supl</th>
@@ -158,7 +158,13 @@
                             </select>
                         </td>
                         <td class="p-2">{{ $stats->minutos_jugados ?? 0 }}</td>
-                        <td class="p-2">{{ $stats->goles ?? 0 }}</td>
+                        <td class="p-2">
+                            @if($player->posicion == 'Portero')
+                            <span class="text-[#DC2626] font-bold">{{ $stats->goles_encajados ?? 0 }}</span>
+                            @else
+                                {{ $stats->goles ?? 0 }}
+                            @endif
+                        </td>
                         <td class="p-2">{{ $stats->asistencias ?? 0 }}</td>
                         <td class="p-2">{{ $stats->titular ?? 0 }}</td>
                         <td class="p-2">{{ $stats->suplente ?? 0 }}</td>
@@ -473,7 +479,7 @@
                     <th class="p-2">Partidos</th>
                     <th class="p-2">Minutos</th>
                     <th class="p-2">Min/Partido</th>
-                    <th class="p-2">Goles/Encajados(POR)</th>
+                    <th class="p-2">Goles/Enc.</th>
                     <th class="p-2">Asist</th>
                     <th class="p-2">Tit</th>
                     <th class="p-2">Supl</th>
@@ -503,7 +509,13 @@
                         <td class="p-2">{{ $stats->partidos ?? 0 }}</td>
                         <td class="p-2">{{ $stats->minutos_jugados ?? 0 }}</td>
                         <td class="p-2">{{ $stats->minutos_por_partido ?? 0 }}</td>
-                        <td class="p-2">{{ $stats->goles ?? 0 }}</td>
+                        <td class="p-2">
+                            @if($player->posicion == 'Portero')
+                                <span class="text-[#DC2626] font-bold">{{ $stats->goles_encajados ?? 0 }}</span>
+                            @else
+                                {{ $stats->goles ?? 0 }}
+                            @endif
+                        </td>
                         <td class="p-2">{{ $stats->asistencias ?? 0 }}</td>
                         <td class="p-2">{{ $stats->titular ?? 0 }}</td>
                         <td class="p-2">{{ $stats->suplente ?? 0 }}</td>
