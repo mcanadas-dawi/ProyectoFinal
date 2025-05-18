@@ -203,15 +203,15 @@ Para crear los paritdos de Liga siga los siguientes pasos:
 
 2. Añada un nombre a la Liga y el número de rivales que participan (sin contar su propio equipo)
 
-![Imagen de añadir liga ida y vuelta](HistoriasUsuario/liga_IdaYVuelta.png)
+![Imagen de añadir liga ida y vuelta](HistoriasUsuario/liga_idaYVuelta.png)
 
 3. Introduzca el nombre de sus rivales por orden de calendario y marque los partidos donde su equipo juegue en casa. La segunda vuelta se generará automáticamente.
 
-![Imagen de añadir liga ida y vuelta](HistoriasUsuario/liga_IdaYVuelta2.png)
+![Imagen de añadir liga ida y vuelta](HistoriasUsuario/liga_idaYVuelta2.png)
 
 4. Los partidos aparecerán en la sección "Partidos de Liga".
 
-![Imagen de añadir liga ida y vuelta](HistoriasUsuario/liga_IdaYVuelta3.png)
+![Imagen de añadir liga ida y vuelta](HistoriasUsuario/liga_idaYVuelta3.png)
 
 
 ### 15. Añadir Liga solo ida
