@@ -153,7 +153,7 @@ function openAlineador(matchId) {
                 imagenAlineacion.onerror = function() {
                     console.error("Error al cargar la imagen de alineación");
                     container.classList.remove('hidden');
-                    cargarModalNormal();
+                    
                 };
                 
                 // Iniciar la carga de la imagen
@@ -161,7 +161,7 @@ function openAlineador(matchId) {
             } else {
                 // Si no hay imagen, mostrar el contenedor y cargar los jugadores
                 container.classList.remove('hidden');
-                cargarModalNormal();
+                
             }
         })
         .catch(error => {
@@ -172,26 +172,44 @@ function openAlineador(matchId) {
         });
 }
 
-function cargarModalNormal() {
-    let formationSelector = document.getElementById('formation-selector');
-    let editButton = document.getElementById('edit-system-btn');
-    let saveButton = document.getElementById('save-system-btn');
-    let modalContent = document.getElementById('alineadorModal');
-    
+
+function modificarAlineacion() {
+    // Ocultar el modal de alineación guardada
     document.getElementById('alineacionGuardada').classList.add('hidden');
+    
+    // Mostrar el modal de alineador
+    let modalContent = document.getElementById('alineadorModal');
     modalContent.classList.remove('hidden');
     modalContent.style.visibility = 'hidden';
     
+    // Limpiar TODOS los contenedores
+    document.getElementById('player-spots').innerHTML = "";
+    document.getElementById('convocados-body').innerHTML = "";
+    document.getElementById('suplentes-body').innerHTML = "";
+    
+    // Agregar el placeholder para suplentes
+    let suplentesBody = document.getElementById('suplentes-body');
+    let placeholder = document.createElement('br');
+    placeholder.id = "br-placeholder";
+    suplentesBody.appendChild(placeholder);
+    
+    // Reiniciar selector de formación
+    let formationSelector = document.getElementById('formation-selector');
     formationSelector.selectedIndex = 0;
     
-    let fieldContainer = document.getElementById('player-spots');
-    fieldContainer.innerHTML = "";
+    // Ocultar botones de edición
+    document.getElementById('edit-system-btn').classList.add('hidden');
+    document.getElementById('save-system-btn').classList.add('hidden');
     
-    editButton.classList.add('hidden');
-    saveButton.classList.add('hidden');
-    
+    // Reiniciar TODAS las variables de estado
+    selectedPlayers = {};
     allPlayers = [];
+    editMode = false;
     
+    // Mostrar la sección de convocados (que podría estar oculta)
+    document.getElementById('convocados-section').classList.remove('hidden');
+    
+    // Cargar TODOS los jugadores desde cero
     fetchConvocados(currentMatchId)
         .then(convocados => {
             allPlayers = convocados;
@@ -199,14 +217,11 @@ function cargarModalNormal() {
             modalContent.style.visibility = 'visible';
         })
         .catch(error => {
-            console.error(error);
+            console.error("Error al cargar convocados:", error);
             modalContent.style.visibility = 'visible';
         });
 }
 
-function modificarAlineacion() {
-    cargarModalNormal();
-}
 // 🔹 Activar modo edición (Mover libremente los círculos)
 function enableEditMode() {
     editMode = true;
