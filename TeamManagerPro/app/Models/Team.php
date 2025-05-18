@@ -52,7 +52,7 @@ class Team extends Model
 
     public function getNombreAttribute($value)
     {
-        return ucfirst($value); // Primera letra en mayúscula
+        return ucfirst($value); 
     }
 }
 
