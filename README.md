@@ -1,4 +1,4 @@
-# ProyectoFinalTeamManagerPro
+# TeamManagerPro
 
 ![TeamManagerPro Logo](TeamManagerPro/public/Imagenes/Logo.png)
 
@@ -110,4 +110,4 @@ Este proyecto ha sido desarrollado como Trabajo Final para el ciclo formativo de
 
 ## 📄 Licencia
 
-Este proyecto está licenciado bajo la [Licencia MIT](LICENSE).
+Este proyecto está licenciado bajo la [Licencia MIT](https://app.copyrighted.com/work/nF9nBQb5OCQyBWX4/?url=https%3A%2F%2Fwww.teammanagerpro.es%2F).
