@@ -161,7 +161,7 @@ function openAlineador(matchId) {
             } else {
                 // Si no hay imagen, mostrar el contenedor y cargar los jugadores
                 container.classList.remove('hidden');
-                
+                modificarAlineacion();
             }
         })
         .catch(error => {
