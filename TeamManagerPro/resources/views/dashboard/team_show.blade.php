@@ -896,7 +896,7 @@ function toggleModalEditPosicion(playerId, editing) {
     const editBtn = document.getElementById(`modal-edit-btn-${playerId}`);
     const saveBtn = document.getElementById(`modal-save-btn-${playerId}`);
     const cancelBtn = document.getElementById(`modal-cancel-btn-${playerId}`);
-    const deleteForm = document.getElementById(`modal-delete-form-${playerId}`);
+    const deleteForm = document.getElementById(`delete-form-${playerId}`);
 
     if (span) span.classList.toggle('hidden', editing);
     if (select) select.classList.toggle('hidden', !editing);
@@ -904,7 +904,15 @@ function toggleModalEditPosicion(playerId, editing) {
     if (editBtn) editBtn.classList.toggle('hidden', editing);
     if (saveBtn) saveBtn.classList.toggle('hidden', !editing);
     if (cancelBtn) cancelBtn.classList.toggle('hidden', !editing);
-    if (deleteForm) deleteForm.classList.toggle('hidden', editing);
+    
+    // Asegurarnos de que el botón de eliminar esté oculto en modo edición
+    if (deleteForm) {
+        if (editing) {
+            deleteForm.classList.add('hidden');
+        } else {
+            deleteForm.classList.remove('hidden');
+        }
+    }
 }
 
 
