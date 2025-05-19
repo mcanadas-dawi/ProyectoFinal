@@ -26,7 +26,7 @@
             @csrf
             @method('DELETE')
             <button type="submit" class="bg-[#EF4444] text-white px-4 py-2 rounded-lg hover:brightness-110 w-full sm:w-auto text-center sm:text-right">
-                Eliminar Equipo
+                Eliminar Plantilla
             </button>
         </form>
     </div>
