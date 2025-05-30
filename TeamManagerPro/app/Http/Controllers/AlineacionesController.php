@@ -9,7 +9,7 @@ use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Storage;
 
-class AlineacionesController extends Controller
+class AlineacionesController 
 {
     public function getAlineacion($matchId)
 {

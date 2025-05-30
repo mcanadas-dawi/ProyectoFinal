@@ -10,7 +10,7 @@ use App\Models\Team;
 use App\Models\PlayerTeamStats;
 use Illuminate\Support\Facades\Log;
 
-class MatchPlayerStatController extends Controller
+class MatchPlayerStatController 
 {
     public function store(Request $request, $matchId)
     {

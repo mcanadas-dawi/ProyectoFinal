@@ -8,7 +8,7 @@ use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Auth;
 
 
-class PlayersController extends Controller
+class PlayersController 
 {
 
     public function store(Request $request)

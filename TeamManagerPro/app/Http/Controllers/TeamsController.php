@@ -14,7 +14,7 @@ use Illuminate\Support\Facades\DB;
 
 
 
-class TeamsController extends Controller
+class TeamsController 
 {
 
     public function index()

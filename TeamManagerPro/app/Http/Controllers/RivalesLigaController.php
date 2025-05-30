@@ -7,7 +7,7 @@ use App\Models\Matches;
 use App\Models\Team;
 use Illuminate\Support\Facades\Log;
 
-class RivalesLigaController extends Controller
+class RivalesLigaController 
 {
     // Mostrar la vista de creación de liga
     public function create()

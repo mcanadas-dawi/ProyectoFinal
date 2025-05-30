@@ -10,7 +10,7 @@ use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Auth;
 
 
-class MatchesController extends Controller
+class MatchesController
 {
     /**
      * Display a listing of the resource.

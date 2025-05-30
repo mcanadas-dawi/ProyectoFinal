@@ -7,7 +7,7 @@ use App\Models\Matches;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Log;
 
-class ConvocatoriasController extends Controller
+class ConvocatoriasController 
 {
     public function store(Request $request)
     {
