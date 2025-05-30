@@ -17,7 +17,7 @@
 <!-- Modal del Alineador -->
     <div id="alineadorModal" class="hidden fixed inset-0 bg-[#1E293B]/80 flex justify-center items-center z-50">
         <div class="bg-[#1E3A8A] rounded-lg p-6 w-3/4 max-h-[90vh] overflow-y-auto flex flex-col text-white font-sans">
-            <h2 class="text-2xl font-title text-[#FACC15] mb-4 text-center uppercase">Alineador Táctico</h2>
+            <h2 class="text-2xl font-title text-[#FACC15] mb-4 text-center uppercase no-capturar">Alineador Táctico</h2>
 
             <button type="button" class="absolute top-4 left-4 bg-[#EF4444] p-2 rounded-full shadow-lg no-capturar" aria-label="Close" onclick="closeAlineador()"  style="top: 25px; left: 200px; z-index: 1051;">
                 <i class="bi bi-x-octagon-fill text-white"></i>
