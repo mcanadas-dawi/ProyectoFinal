@@ -19,7 +19,7 @@
         <div class="bg-[#1E3A8A] rounded-lg p-3 sm:p-6 w-full sm:w-3/4 max-h-[90vh] overflow-y-auto flex flex-col text-white font-sans">
             <h2 class="text-xl sm:text-2xl font-title text-[#FACC15] mb-3 sm:mb-4 text-center uppercase no-capturar">Alineador Táctico</h2>
 
-            <button type="button" class="absolute top-2 right-2 sm:top-4 sm:right-4 bg-[#EF4444] p-2 rounded-full shadow-lg no-capturar" aria-label="Close" onclick="closeAlineador()">
+            <button type="button" class="absolute top-2 left-2 sm:top-4 sm:left-4 bg-[#EF4444] p-2 rounded-full shadow-lg no-capturar" aria-label="Close" onclick="closeAlineador()">
                 <i class="bi bi-x-octagon-fill text-white"></i>
             </button>
 
