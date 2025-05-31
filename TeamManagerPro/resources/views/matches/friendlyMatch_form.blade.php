@@ -1,7 +1,7 @@
 <!-- Modal para Añadir Partido Amistoso -->
-<div id="amistosoModal" class="fixed inset-0 bg-[#1E293B]/80 flex items-center justify-center hidden z-50">
-    <div class="bg-[#1E3A8A] p-6 rounded-lg shadow-lg w-96 text-white font-sans">
-        <h2 class="text-xl font-title text-[#FACC15] mb-4 text-center uppercase">Añadir Partido Amistoso</h2>
+<div id="amistosoModal" class="fixed inset-0 bg-[#1E293B]/80 flex items-center justify-center hidden z-50 p-4 sm:p-0">
+    <div class="bg-[#1E3A8A] p-4 sm:p-6 rounded-lg shadow-lg w-full max-w-xs sm:max-w-sm md:max-w-md text-white font-sans">
+        <h2 class="text-lg sm:text-xl font-title text-[#FACC15] mb-3 sm:mb-4 text-center uppercase">Añadir Partido Amistoso</h2>
 
         <form id="amistosoForm" action="{{ route('matches.store') }}" method="POST" onsubmit="return validateAmistosoForm(event)">
             @csrf
@@ -10,21 +10,21 @@
             <input type="hidden" name="tipo" value="amistoso">
 
             <!-- Equipo Rival -->
-            <label for="equipo_rival" class="block text-[#FACC15] font-semibold mb-1">Equipo Rival:</label>
+            <label for="equipo_rival" class="block text-[#FACC15] font-semibold mb-1 text-sm sm:text-base">Equipo Rival:</label>
             <input type="text" id="equipo_rival" name="equipo_rival" class="w-full border p-2 rounded mb-1 bg-white text-black" required>
             <p id="error-equipo_rival" class="text-red-400 text-sm mb-2 hidden">Solo se permiten letras y espacios.</p>
 
             <!-- Fecha -->
-            <label for="fecha_partido" class="block text-[#FACC15] font-semibold mb-1">Fecha:</label>
+            <label for="fecha_partido" class="block text-[#FACC15] font-semibold mb-1 text-sm sm:text-base">Fecha:</label>
             <input type="date" id="fecha_partido" name="fecha_partido" class="w-full border p-2 rounded mb-1 bg-white text-black" required>
             <p id="error-fecha_partido" class="text-red-400 text-sm mb-2 hidden">La fecha debe estar entre 1 año antes y 1 año después de hoy.</p>
 
             <!-- Botones -->
-            <div class="flex justify-between mt-4">
-                <button type="submit" class="bg-[#00B140] text-white px-4 py-2 rounded hover:brightness-110 w-full mr-2">
+            <div class="flex flex-col sm:flex-row justify-between mt-3 sm:mt-4 gap-2 sm:gap-0">
+                <button type="submit" class="bg-[#00B140] text-white px-3 sm:px-4 py-2 rounded hover:brightness-110 w-full sm:mr-2 text-sm sm:text-base">
                     Guardar
                 </button>
-                <button type="button" onclick="closeModal('amistosoModal')" class="bg-[#EF4444] text-white px-4 py-2 rounded hover:brightness-110 w-full ml-2">
+                <button type="button" onclick="closeModal('amistosoModal')" class="bg-[#EF4444] text-white px-3 sm:px-4 py-2 rounded hover:brightness-110 w-full sm:ml-2 text-sm sm:text-base">
                     Cancelar
                 </button>
             </div>

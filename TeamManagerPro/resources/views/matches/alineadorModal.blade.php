@@ -1,33 +1,33 @@
 
 <!-- Contenedor principal que engloba ambos modales -->
-<div id="alineadorContainer" class="hidden fixed inset-0 bg-[#1E293B]/80 flex justify-center items-center z-50">
+<div id="alineadorContainer" class="hidden fixed inset-0 bg-[#1E293B]/80 flex justify-center items-center z-50 p-2 sm:p-4">
 <!-- Modal de alineación guardada -->
-<div id="alineacionGuardada" class="hidden bg-[#1E3A8A] rounded-lg p-6 w-3/4 max-h-[90vh] overflow-y-auto flex flex-col items-center justify-center text-white font-sans">
-        <h3 class="text-xl font-title text-[#FACC15] mt-4 uppercase">Alineación Guardada</h3>
-        <img id="imagenAlineacion" src="" alt="Alineación Guardada" class="rounded-lg shadow-lg max-w-full h-auto mt-4">
-        <div class="flex gap-4 mt-4">
-            <button onclick="modificarAlineacion()" class="bg-[#00B140] text-white px-4 py-2 rounded-lg hover:brightness-110 mt-4">
+<div id="alineacionGuardada" class="hidden bg-[#1E3A8A] rounded-lg p-3 sm:p-6 w-full sm:w-3/4 max-h-[90vh] overflow-y-auto flex flex-col items-center justify-center text-white font-sans">
+        <h3 class="text-lg sm:text-xl font-title text-[#FACC15] mt-3 sm:mt-4 uppercase">Alineación Guardada</h3>
+        <img id="imagenAlineacion" src="" alt="Alineación Guardada" class="rounded-lg shadow-lg max-w-full h-auto mt-3 sm:mt-4">
+        <div class="flex flex-wrap justify-center gap-2 sm:gap-4 mt-3 sm:mt-4">
+            <button onclick="modificarAlineacion()" class="bg-[#00B140] text-white px-3 sm:px-4 py-2 rounded-lg hover:brightness-110 text-sm sm:text-base">
                 Modificar Alineación
             </button>
-            <button onclick="closeAlineador()" class="bg-[#EF4444] text-white px-4 py-2 rounded-lg hover:brightness-110 mt-4">
+            <button onclick="closeAlineador()" class="bg-[#EF4444] text-white px-3 sm:px-4 py-2 rounded-lg hover:brightness-110 text-sm sm:text-base">
                 Cerrar
             </button>
         </div>
     </div>
 <!-- Modal del Alineador -->
     <div id="alineadorModal" class="hidden fixed inset-0 bg-[#1E293B]/80 flex justify-center items-center z-50">
-        <div class="bg-[#1E3A8A] rounded-lg p-6 w-3/4 max-h-[90vh] overflow-y-auto flex flex-col text-white font-sans">
-            <h2 class="text-2xl font-title text-[#FACC15] mb-4 text-center uppercase no-capturar">Alineador Táctico</h2>
+        <div class="bg-[#1E3A8A] rounded-lg p-3 sm:p-6 w-full sm:w-3/4 max-h-[90vh] overflow-y-auto flex flex-col text-white font-sans">
+            <h2 class="text-xl sm:text-2xl font-title text-[#FACC15] mb-3 sm:mb-4 text-center uppercase no-capturar">Alineador Táctico</h2>
 
-            <button type="button" class="absolute top-4 left-4 bg-[#EF4444] p-2 rounded-full shadow-lg no-capturar" aria-label="Close" onclick="closeAlineador()"  style="top: 25px; left: 200px; z-index: 1051;">
+            <button type="button" class="absolute top-2 right-2 sm:top-4 sm:right-4 bg-[#EF4444] p-2 rounded-full shadow-lg no-capturar" aria-label="Close" onclick="closeAlineador()">
                 <i class="bi bi-x-octagon-fill text-white"></i>
             </button>
 
             <!-- Seleccionar Formación -->
              <div class="no-capturar">
-                <label class="block font-semibold mb-1 text-[#FACC15]"><h3 class="text-xl font-title text-[#FACC15] mt-4 uppercase">Seleccionar formación:</h3></label>
+                <label class="block font-semibold mb-1 text-[#FACC15]"><h3 class="text-lg sm:text-xl font-title text-[#FACC15] mt-3 sm:mt-4 uppercase">Seleccionar formación:</h3></label>
                 <br>
-                <select id="formation-selector" class="w-full p-2 border rounded-lg mb-4 bg-white text-black" onchange="updateFormation()">
+                <select id="formation-selector" class="w-full p-2 border rounded-lg mb-3 sm:mb-4 bg-white text-black" onchange="updateFormation()">
                     <option value="" disabled selected>Seleccionar...</option>
                     @if ($team->modalidad == 'F5')
                         <option value="1-1-2-1">1-1-2-1</option>
@@ -51,9 +51,9 @@
              </div>
             <!-- Lista de Jugadores Convocados -->
             <div id="convocados-section" class= "no-capturar">
-                <h3 class="text-xl font-title text-[#FACC15] mt-4 uppercase">Jugadores Convocados</h3>
+                <h3 class="text-lg sm:text-xl font-title text-[#FACC15] mt-3 sm:mt-4 uppercase">Jugadores Convocados</h3>
                 <br>
-                <div id="convocados-list" class="bg-[#1E293B] p-2 rounded-lg min-h-[150px] max-h-[40vh] overflow-y-auto shadow-inner">
+                <div id="convocados-list" class="bg-[#1E293B] p-2 rounded-lg min-h-[100px] sm:min-h-[150px] max-h-[30vh] sm:max-h-[40vh] overflow-y-auto shadow-inner">
                     <div id="convocados-body" class="flex flex-wrap gap-2">
                         <!-- Jugadores convocados aquí -->
                     </div>
@@ -61,36 +61,36 @@
             </div>
 
             <!-- Campo de Fútbol -->
-            <div id="field-container" class="relative bg-green-600 h-96 w-4/5 mx-auto flex justify-center items-center mt-4 border border-white rounded-lg shadow">
-                <img src="{{ asset('Imagenes/campo_futbol.jpg') }}" alt="Campo de Fútbol" class="w-full h-full  rounded-lg">
+            <div id="field-container" class="relative bg-green-600 h-[240px] sm:h-96 w-full sm:w-4/5 mx-auto flex justify-center items-center mt-3 sm:mt-4 border border-white rounded-lg shadow">
+                <img src="{{ asset('Imagenes/campo_futbol.jpg') }}" alt="Campo de Fútbol" class="w-full h-full rounded-lg">
                 <div id="player-spots" class="absolute inset-0 flex justify-center items-center">
                     <!-- Posiciones de los jugadores -->
                 </div>
             </div>
 
             <!-- Botones de acción -->
-            <div class="flex justify-center gap-4 mt-4">
-                <button id="edit-system-btn" class="hidden bg-[#1E3A8A] text-white px-4 py-2 rounded-lg hover:brightness-110 border border-white no-capturar" onclick="enableEditMode()">
+            <div class="flex justify-center gap-2 sm:gap-4 mt-3 sm:mt-4">
+                <button id="edit-system-btn" class="hidden bg-[#1E3A8A] text-white px-3 sm:px-4 py-2 rounded-lg hover:brightness-110 border border-white no-capturar text-sm sm:text-base" onclick="enableEditMode()">
                     Editar Formación
                 </button>
                 
-                <button id="save-system-btn" class="hidden bg-[#00B140] text-white px-4 py-2 rounded-lg hover:brightness-110 no-capturar" onclick="saveFormationChanges()">
+                <button id="save-system-btn" class="hidden bg-[#00B140] text-white px-3 sm:px-4 py-2 rounded-lg hover:brightness-110 no-capturar text-sm sm:text-base" onclick="saveFormationChanges()">
                     Guardar Formación
                 </button>
             </div>
 
             <!-- Suplentes -->
-            <h3 class="text-xl font-title text-[#FACC15] mt-4 uppercase">Suplentes</h3>
+            <h3 class="text-lg sm:text-xl font-title text-[#FACC15] mt-3 sm:mt-4 uppercase">Suplentes</h3>
             <br>
-            <div id="suplentes-list" class="bg-[#1E293B] border border-white p-3 rounded-lg shadow-inner">
-                <div id="suplentes-body" class="flex flex-wrap gap-3 justify-center">
+            <div id="suplentes-list" class="bg-[#1E293B] border border-white p-2 sm:p-3 rounded-lg shadow-inner">
+                <div id="suplentes-body" class="flex flex-wrap gap-2 sm:gap-3 justify-center">
                     <!-- Jugadores suplentes aquí -->
                     <br id="br-placeholder">
                 </div>
             </div>
-        <div class="flex justify-center gap-4 mt-4 no-capturar">
-        <button id="capturarBtn" class="bg-[#00B140] text-white px-4 py-2 rounded-lg hover:brightness-110">Guardar alineación</button>
-        <button id="descargarBtn" class="bg-[#FACC15] text-black px-4 py-2 rounded-lg hover:brightness-110">Descargar alineación</button>
+        <div class="flex flex-wrap justify-center gap-2 sm:gap-4 mt-3 sm:mt-4 no-capturar">
+        <button id="capturarBtn" class="bg-[#00B140] text-white px-3 sm:px-4 py-2 rounded-lg hover:brightness-110 text-sm sm:text-base">Guardar alineación</button>
+        <button id="descargarBtn" class="bg-[#FACC15] text-black px-3 sm:px-4 py-2 rounded-lg hover:brightness-110 text-sm sm:text-base">Descargar alineación</button>
         </div>
 
     </div>
@@ -361,10 +361,15 @@ function updateFormation(formation = null, alineacionGuardada = []) {
 
     if (!formations[selectedFormation]) return;
 
-    formations[selectedFormation].forEach((pos, index) => {
+      //Responsive para moviles
+    const isMobile = window.innerWidth < 640; // sm breakpoint in Tailwind
+    const spotSize = isMobile ? "w-8 h-8" : "w-12 h-12";
+    const fontSize = isMobile ? "text-xs" : "text-base";
+
+     formations[selectedFormation].forEach((pos, index) => {
         let positionDiv = document.createElement('div');
-        positionDiv.className = "dropzone w-12 h-12 bg-white border border-gray-800 rounded-full flex items-center justify-center cursor-pointer";
-        positionDiv.classList.add("text-black", "font-bold");
+        positionDiv.className = `dropzone ${spotSize} bg-white border border-gray-800 rounded-full flex items-center justify-center cursor-pointer`;
+        positionDiv.classList.add("text-black", "font-bold", fontSize);
         positionDiv.style.position = "absolute";
         positionDiv.style.top = `${pos[1]}%`;
         positionDiv.style.left = `${pos[0]}%`;

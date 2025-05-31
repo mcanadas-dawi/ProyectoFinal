@@ -1,21 +1,21 @@
 @extends('layouts.dashboard')
 @section('content')
 
-<div class="min-h-screen bg-[#1E293B] text-white font-sans p-6">
+<div class="min-h-screen bg-[#1E293B] text-white font-sans p-4 sm:p-6">
     <!-- Título principal -->
-    <h1 class="text-4xl font-title text-[#00B140] mb-6 uppercase tracking-wide">
+    <h1 class="text-3xl sm:text-4xl font-title text-[#00B140] mb-6 uppercase tracking-wide">
         Gestión de Plantillas
     </h1>
 
 <!-- Botón para mostrar/ocultar formulario -->
-<div class="mb-6 flex gap-4 flex-wrap">
-    <button id="toggle-form-btn" onclick="toggleNewTeamForm()" class="bg-[#00B140] text-white px-4 py-2 rounded-lg mb-3 hover:brightness-110">
+<div class="mb-6 flex flex-wrap gap-3">
+    <button id="toggle-form-btn" onclick="toggleNewTeamForm()" class="bg-[#00B140] text-white px-3 py-2 rounded-lg hover:brightness-110 text-sm sm:text-base">
         Añadir Nueva Plantilla
     </button>
 
     <form action="{{ route('teams.demo') }}" method="POST">
         @csrf
-        <button type="submit" class="bg-[#FACC15] text-black px-4 py-2 rounded-lg mb-3 hover:brightness-110">
+        <button type="submit" class="bg-[#FACC15] text-black px-3 py-2 rounded-lg hover:brightness-110 text-sm sm:text-base">
             Crear Plantilla de Demostración
         </button>
     </form>
@@ -32,9 +32,9 @@
     <!-- Listado de equipos -->
     <div class="mt-6">
         @foreach ($teams as $team)
-            <div class="bg-[#1E3A8A] rounded-lg p-6 mb-6 shadow-lg">
-                <div class="flex justify-between items-center">
-                    <h2 class="text-2xl font-title uppercase tracking-wide text-white">
+            <div class="bg-[#1E3A8A] rounded-lg p-4 sm:p-6 mb-6 shadow-lg">
+                <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-3">
+                    <h2 class="text-xl sm:text-2xl font-title uppercase tracking-wide text-white">
                         <a href="{{ route('teams.show', $team->id) }}" class="hover:underline text-[#FACC15]">
                             {{ $team->nombre }} ({{ strtoupper($team->modalidad) }})
                         </a>
@@ -44,7 +44,7 @@
                     <form action="{{ route('teams.destroy', $team->id) }}" method="POST" onsubmit="return confirmDelete(event, '{{ $team->nombre }}')">
                         @csrf
                         @method('DELETE')
-                        <button type="submit" class="bg-[#EF4444] text-white px-4 py-2 rounded-lg hover:brightness-110 font-sans">
+                        <button type="submit" class="bg-[#EF4444] text-white px-3 py-2 rounded-lg hover:brightness-110 font-sans text-sm sm:text-base">
                             Eliminar
                         </button>
                     </form>
@@ -59,7 +59,7 @@
                         <input type="hidden" name="tipo" value="liga">
                         <input type="number" name="jornada" placeholder="Número de Jornada" required class="w-full p-2 bg-white text-black rounded-lg mb-2 font-sans">
                         <input type="text" name="nombre_equipo" placeholder="Equipo Rival" required class="w-full p-2 bg-white text-black rounded-lg mb-2 font-sans">
-                        <div class="flex gap-2">
+                        <div class="flex flex-wrap gap-2">
                             <button type="submit" class="bg-[#00B140] text-white px-4 py-2 rounded-lg hover:brightness-110 font-sans">Guardar</button>
                             <button type="button" onclick="toggleSection('competicion-form-{{ $team->id }}')" class="bg-[#EF4444] text-white px-4 py-2 rounded-lg hover:brightness-110 font-sans">Cancelar</button>
                         </div>

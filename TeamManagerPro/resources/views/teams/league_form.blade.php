@@ -1,25 +1,25 @@
 @extends('layouts.dashboard')
 
 @section('content')
-<div class="min-h-screen bg-[#1E293B] text-white font-sans px-8 py-6">
-    <div class="bg-[#1E3A8A] p-10 rounded-lg w-full shadow-lg">
-        <h1 class="text-3xl font-title text-[#FACC15] mb-8 uppercase">Crear Liga</h1>
+<div class="min-h-screen bg-[#1E293B] text-white font-sans px-4 sm:px-6 md:px-8 py-4 sm:py-6">
+    <div class="bg-[#1E3A8A] p-4 sm:p-6 md:p-8 lg:p-10 rounded-lg w-full shadow-lg">
+        <h1 class="text-xl sm:text-2xl md:text-3xl font-title text-[#FACC15] mb-4 sm:mb-6 md:mb-8 uppercase">Crear Liga</h1>
 
         {{-- Mensajes --}}
         @if(session('success'))
-            <div class="bg-[#00B140]/10 border border-[#00B140] text-[#00B140] px-4 py-3 rounded mb-4">
+            <div class="bg-[#00B140]/10 border border-[#00B140] text-[#00B140] px-3 sm:px-4 py-2 sm:py-3 rounded mb-4">
                 {{ session('success') }}
             </div>
         @endif
 
         @if(session('error'))
-            <div class="bg-[#EF4444]/10 border border-[#EF4444] text-[#EF4444] px-4 py-3 rounded mb-4">
+            <div class="bg-[#EF4444]/10 border border-[#EF4444] text-[#EF4444] px-3 sm:px-4 py-2 sm:py-3 rounded mb-4">
                 {{ session('error') }}
             </div>
         @endif
 
         @if ($errors->any())
-            <div class="bg-[#EF4444]/10 border border-[#EF4444] text-[#EF4444] px-4 py-3 rounded mb-4">
+            <div class="bg-[#EF4444]/10 border border-[#EF4444] text-[#EF4444] px-3 sm:px-4 py-2 sm:py-3 rounded mb-4">
                 <strong>Errores:</strong>
                 <ul class="list-disc pl-5 mt-2">
                     @foreach ($errors->all() as $error)
@@ -30,7 +30,7 @@
         @endif
 
         <!-- Contenedor para mensajes de error de validación JS -->
-        <div id="validationErrors" class="bg-[#EF4444]/10 border border-[#EF4444] text-[#EF4444] px-4 py-3 rounded mb-4 hidden">
+        <div id="validationErrors" class="bg-[#EF4444]/10 border border-[#EF4444] text-[#EF4444] px-3 sm:px-4 py-2 sm:py-3 rounded mb-4 hidden">
             <strong>Errores de validación:</strong>
             <ul class="list-disc pl-5 mt-2" id="errorList"></ul>
         </div>
@@ -40,7 +40,7 @@
             <input type="hidden" name="team_id" value="{{ $team->id }}">
 
             <!-- Grid de 3 columnas -->
-            <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+            <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-4 sm:gap-6">
                 <!-- Nombre -->
                 <div class="col-span-1">
                     <label class="block mb-1 font-semibold text-[#FACC15]">Nombre de la Liga:</label>
@@ -58,7 +58,7 @@
                 </div>
 
                 <!-- Ida / Vuelta -->
-                <div class="col-span-1 flex items-center pt-6">
+                <div class="col-span-1 flex items-center pt-4 sm:pt-6">
                     <input type="hidden" name="solo_ida" value="0">
                     <input type="checkbox" id="solo_ida" name="solo_ida" value="1" class="mr-2 accent-[#00B140]" onchange="validarFormulario()">
                     <label for="solo_ida" class="text-white">Solo Ida</label>
@@ -66,16 +66,16 @@
             </div>
 
             <!-- Jornadas dinámicas -->
-            <div id="jornadasContainer" class="space-y-4 mt-6 w-full"></div>
+            <div id="jornadasContainer" class="space-y-3 sm:space-y-4 mt-4 sm:mt-6 w-full"></div>
             <p id="localesError" class="text-[#EF4444] text-sm mt-1 hidden">El número de partidos locales debe ser exactamente la mitad</p>
 
             <!-- Botones -->
-            <div class="flex justify-end mt-8 space-x-4">
+            <div class="flex flex-col sm:flex-row justify-end mt-6 sm:mt-8 space-y-3 sm:space-y-0 sm:space-x-4">
                 <a href="{{ route('teams.show', ['team' => $team->id]) }}"
-                   class="bg-[#EF4444] text-white px-6 py-3 rounded-lg hover:brightness-110">
+                   class="bg-[#EF4444] text-white px-4 sm:px-6 py-2 sm:py-3 rounded-lg hover:brightness-110 text-center">
                     Cancelar
                 </a>
-                <button type="submit" id="submitButton" class="bg-[#00B140] text-white px-6 py-3 rounded-lg hover:brightness-110">
+                <button type="submit" id="submitButton" class="bg-[#00B140] text-white px-4 sm:px-6 py-2 sm:py-3 rounded-lg hover:brightness-110">
                     Crear Liga
                 </button>
             </div>

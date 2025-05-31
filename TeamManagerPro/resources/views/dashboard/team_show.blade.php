@@ -201,18 +201,16 @@
     </div>
 </div>
 
-
-
 <!-- Sección de Partidos Amistosos -->
 @if(session()->has('success_amistoso') || session()->has('success_convocatoria') || session()->has('deleted_match') || session()->has('created_match'))
-<div class="alert-success bg-[#00B140] shadow-lg rounded-lg p-4 sm:p-6 mb-10 text-white font-sans w-full overflow-x-auto  transition-opacity duration-300">
+<div class="alert-success bg-[#00B140] shadow-lg rounded-lg p-4 mb-6 text-white font-sans w-full transition-opacity duration-300">
         {{ session('success_amistoso') ?: session('success_convocatoria') ?: session('deleted_match') ?: session('created_match')  }}
     </div>
 @endif
 
 <div class="bg-[#1E3A8A] shadow-lg rounded-lg p-4 sm:p-6 mb-10 text-white font-sans w-full">
-    <div class="flex items-center justify-center mb-4">
-    <h2 class="text-2xl font-title text-[#FACC15] flex-grow text-left uppercase">Partidos Amistosos</h2>
+    <div class="flex flex-col sm:flex-row items-start sm:items-center justify-between mb-4 gap-3">
+        <h2 class="text-2xl font-title text-[#FACC15] uppercase">Partidos Amistosos</h2>
         <button onclick="openModal('amistosoModal')" class="bg-[#00B140] text-white px-4 py-2 rounded-lg hover:brightness-110">
             Añadir Partido Amistoso
         </button>
@@ -233,98 +231,97 @@
                     <th class="p-2">Acciones</th>
                 </tr>
             </thead>
-    <tbody class="text-gray-800">
-    @if(isset($partidosAmistosos) && count($partidosAmistosos) > 0)
-        @foreach ($partidosAmistosos as $match)
-            @php
-                $colorTexto = match ($match->resultado) {
-                    'Victoria' => 'text-[#00B140]',
-                    'Empate'   => 'text-[#FACC15]',
-                    'Derrota'  => 'text-[#DC2626]',
-                    default    => 'text-white',
-                };
-            @endphp     
-            <tr id="match-row-{{ $match->id }}" class="border-b hover:bg-[#334155]/60 transition-colors duration-200 {{ $colorTexto }}">
-                <td class="p-2 text-center">
-                        <span id="fecha-{{ $match->id }}">{{ $match->fecha_partido }}</span>
-                        <input type="date" name="fecha_partido" class="hidden w-16 p-1 border rounded bg-white text-black" id="edit-fecha-{{ $match->id }}" value="{{ $match->fecha_partido }}">
-                    </td>
-                    <td class="p-2 text-center">{{ $match->equipo_rival }}</td>  
+            <tbody class="text-gray-800">
+            @if(isset($partidosAmistosos) && count($partidosAmistosos) > 0)
+                @foreach ($partidosAmistosos as $match)
+                    @php
+                        $colorTexto = match ($match->resultado) {
+                            'Victoria' => 'text-[#00B140]',
+                            'Empate'   => 'text-[#FACC15]',
+                            'Derrota'  => 'text-[#DC2626]',
+                            default    => 'text-white',
+                        };
+                    @endphp     
+                    <tr id="match-row-{{ $match->id }}" class="border-b hover:bg-[#334155]/60 transition-colors duration-200 {{ $colorTexto }}">
+                        <td class="p-2 text-center">
+                            <span id="fecha-{{ $match->id }}">{{ $match->fecha_partido }}</span>
+                            <input type="date" name="fecha_partido" class="hidden w-16 p-1 border rounded bg-white text-black" id="edit-fecha-{{ $match->id }}" value="{{ $match->fecha_partido }}">
+                        </td>
+                        <td class="p-2 text-center">{{ $match->equipo_rival }}</td>  
 
-                <!-- Goles a Favor -->
-                <td class="p-2 text-center">
-                    <span id="goles-favor-{{ $match->id }}">{{ $match->goles_a_favor }}</span>
-                    <input type="number" name="goles_a_favor" class="hidden w-16 p-1 border rounded bg-white text-black" min="0" 
-                        id="edit-goles-favor-{{ $match->id }}" 
-                        value="{{ $match->goles_a_favor }}"
-                        onchange="updateResultado('{{ $match->id }}')">
-                </td>
-                
-                <!-- Goles en Contra -->
-                <td class="p-2 text-center">
-                    <span id="goles-contra-{{ $match->id }}">{{ $match->goles_en_contra }}</span>
-                    <input type="number" name="goles_en_contra" class="hidden w-16 p-1 border rounded bg-white text-black" min="0"
-                        id="edit-goles-contra-{{ $match->id }}" 
-                        value="{{ $match->goles_en_contra }}"
-                        onchange="updateResultado('{{ $match->id }}')">
-                </td>
+                        <!-- Goles a Favor -->
+                        <td class="p-2 text-center">
+                            <span id="goles-favor-{{ $match->id }}">{{ $match->goles_a_favor }}</span>
+                            <input type="number" name="goles_a_favor" class="hidden w-16 p-1 border rounded bg-white text-black" min="0" 
+                                id="edit-goles-favor-{{ $match->id }}" 
+                                value="{{ $match->goles_a_favor }}"
+                                onchange="updateResultado('{{ $match->id }}')">
+                        </td>
+                        
+                        <!-- Goles en Contra -->
+                        <td class="p-2 text-center">
+                            <span id="goles-contra-{{ $match->id }}">{{ $match->goles_en_contra }}</span>
+                            <input type="number" name="goles_en_contra" class="hidden w-16 p-1 border rounded bg-white text-black" min="0"
+                                id="edit-goles-contra-{{ $match->id }}" 
+                                value="{{ $match->goles_en_contra }}"
+                                onchange="updateResultado('{{ $match->id }}')">
+                        </td>
 
-                <!-- Resultado (Solo Mostrar) -->
-                <td class="p-2 text-center">
-                    <span id="resultado-{{ $match->id }}">{{ $match->resultado }}</span>
-                    <input type="hidden" name="resultado" id="edit-resultado-{{ $match->id }}" value="{{ $match->resultado }}">
-                </td>
+                        <!-- Resultado (Solo Mostrar) -->
+                        <td class="p-2 text-center">
+                            <span id="resultado-{{ $match->id }}">{{ $match->resultado }}</span>
+                            <input type="hidden" name="resultado" id="edit-resultado-{{ $match->id }}" value="{{ $match->resultado }}">
+                        </td>
 
-                    <!-- Actuación del Equipo -->
-                    <td class="p-2 text-center">
-                        <span id="actuacion-{{ $match->id }}">{{ $match->actuacion_equipo !== null ? number_format($match->actuacion_equipo, 2) : 'N/A' }}</span>
-                        <input type="number" name="actuacion_equipo" step="0.1" min="1" max="10" class="hidden w-16 p-1 border rounded bg-white text-black" id="edit-actuacion-{{ $match->id }}" value="{{ $match->actuacion_equipo }}">
-                    </td>
+                        <!-- Actuación del Equipo -->
+                        <td class="p-2 text-center">
+                            <span id="actuacion-{{ $match->id }}">{{ $match->actuacion_equipo !== null ? number_format($match->actuacion_equipo, 2) : 'N/A' }}</span>
+                            <input type="number" name="actuacion_equipo" step="0.1" min="1" max="10" class="hidden w-16 p-1 border rounded bg-white text-black" id="edit-actuacion-{{ $match->id }}" value="{{ $match->actuacion_equipo }}">
+                        </td>
 
-                    <td class="p-2 text-center">
-                        <button onclick="openConvocatoriaModal('{{ $match->id }}')" class="bg-[#6366F1] text-white px-3 py-1 rounded hover:brightness-110">
-                            Convocatoria
-                        </button>
-                    </td>
-                    <td class="p-2 text-center">
-                    <button onclick="openAlineador('{{ $match->id }}')" class="bg-[#3B82F6] text-white px-3 py-1 rounded hover:brightness-110">
-                        Alineador
-                    </button>
-
-                    </td>
-                    <td class="p-2 text-center">
-                    <div class="flex flex-wrap justify-center gap-2">
-                        <a href="{{ route('matches.ratePlayers', $match->id) }}" class="bg-[#FF8C42] text-white px-3 py-1 rounded hover:brightness-110">
-                            Valorar Jugadores 
-                        </a>
-                        <button onclick="editMatch('{{ $match->id }}')" id="edit-btn-match-{{ $match->id }}" class="bg-[#FACC15] text-black px-3 py-1 rounded hover:brightness-110">
-                            Editar
-                        </button>
-                        <button onclick="saveMatch('{{ $match->id }}')" id="save-btn-match-{{ $match->id }}" class="hidden bg-[#00B140] text-white px-3 py-1 rounded hover:brightness-110">
-                            Guardar
-                        </button>
-                        <button onclick="cancelEditMatch('{{ $match->id }}')" id="cancel-btn-match-{{ $match->id }}" class="hidden bg-[#4B5563] text-white px-3 py-1 rounded hover:brightness-110">
-                            Cancelar
-                        </button>
-                        <form action="{{ route('matches.destroy', $match->id) }}" method="POST" onsubmit="return confirm('¿Estás seguro de que deseas eliminar este partido? Esta acción no se puede deshacer.')" id="delete-form-match-{{ $match->id }}">
-                            @csrf
-                            @method('DELETE')
-                            <button type="submit" class="bg-[#DC2626] text-white px-3 py-1 rounded hover:brightness-110">
-                                Eliminar
+                        <td class="p-2 text-center">
+                            <button onclick="openConvocatoriaModal('{{ $match->id }}')" class="bg-[#6366F1] text-white px-3 py-1 rounded hover:brightness-110 text-sm sm:text-base">
+                                Convocatoria
                             </button>
-                        </form>
-                    </div>
-                    @include('matches.editFriendlyMatch_form', ['match' => $match])
-                </td>
-            </tr>
-        @endforeach
-        @else
-        <tr>
-            <td colspan="10" class="text-center text-gray-600 p-2">No hay partidos amistosos registrados.</td>
-        </tr>
-        @endif
-    </tbody>
-    </table>
+                        </td>
+                        <td class="p-2 text-center">
+                            <button onclick="openAlineador('{{ $match->id }}')" class="bg-[#3B82F6] text-white px-3 py-1 rounded hover:brightness-110 text-sm sm:text-base">
+                                Alineador
+                            </button>
+                        </td>
+                        <td class="p-2 text-center">
+                            <div class="flex flex-wrap justify-center gap-1 sm:gap-2">
+                                <a href="{{ route('matches.ratePlayers', $match->id) }}" class="bg-[#FF8C42] text-white px-2 sm:px-3 py-1 rounded hover:brightness-110 text-sm sm:text-base">
+                                    Valorar Jugadores
+                                </a>
+                                <button onclick="editMatch('{{ $match->id }}')" id="edit-btn-match-{{ $match->id }}" class="bg-[#FACC15] text-black px-2 sm:px-3 py-1 rounded hover:brightness-110 text-sm sm:text-base">
+                                    Editar
+                                </button>
+                                <button onclick="saveMatch('{{ $match->id }}')" id="save-btn-match-{{ $match->id }}" class="hidden bg-[#00B140] text-white px-2 sm:px-3 py-1 rounded hover:brightness-110 text-sm sm:text-base">
+                                    Guardar
+                                </button>
+                                <button onclick="cancelEditMatch('{{ $match->id }}')" id="cancel-btn-match-{{ $match->id }}" class="hidden bg-[#4B5563] text-white px-2 sm:px-3 py-1 rounded hover:brightness-110 text-sm sm:text-base">
+                                    Cancelar
+                                </button>
+                                <form action="{{ route('matches.destroy', $match->id) }}" method="POST" onsubmit="return confirm('¿Estás seguro de que deseas eliminar este partido? Esta acción no se puede deshacer.')" id="delete-form-match-{{ $match->id }}">
+                                    @csrf
+                                    @method('DELETE')
+                                    <button type="submit" class="bg-[#DC2626] text-white px-2 sm:px-3 py-1 rounded hover:brightness-110 text-sm sm:text-base">
+                                        Eliminar
+                                    </button>
+                                </form>
+                            </div>
+                            @include('matches.editFriendlyMatch_form', ['match' => $match])
+                        </td>
+                    </tr>
+                @endforeach
+                @else
+                <tr>
+                    <td colspan="10" class="text-center text-gray-600 p-2">No hay partidos amistosos registrados.</td>
+                </tr>
+                @endif
+            </tbody>
+        </table>
     </div>
 </div>
 
@@ -336,12 +333,12 @@
 @endif
 
 <div class="bg-[#1E3A8A] shadow-lg rounded-lg p-4 sm:p-6 mb-6 text-white">
-    <div class="flex items-center justify-center mb-4">
-        <h2 class="text-2xl font-title text-[#FACC15] flex-grow text-left uppercase">Partidos de Liga</h2>
+    <div class="flex flex-col sm:flex-row items-start sm:items-center justify-between mb-4 gap-3">
+        <h2 class="text-2xl font-title text-[#FACC15] uppercase">Partidos de Liga</h2>
         <form action="{{ route('liga.delete', ['team' => $team->id]) }}" method="POST" onsubmit="return confirm('¿Seguro que deseas eliminar esta liga y todos sus partidos?');" class="text-center sm:text-right">
             @csrf
             @method('DELETE')
-            <button class="bg-[#DC2626] text-white px-4 py-2 rounded hover:brightness-110">
+            <button class="bg-[#DC2626] text-white px-3 sm:px-4 py-2 rounded hover:brightness-110 w-full sm:w-auto text-sm sm:text-base">
                 Eliminar Liga
             </button>
         </form>
@@ -365,95 +362,93 @@
             <tbody>
                 @if(isset($partidosLiga) && count($partidosLiga) > 0)
                     @foreach ($partidosLiga as $match)
-                @php
-                    $colorTexto = match ($match->resultado) {
-                        'Victoria' => 'text-[#00B140]',
-                        'Empate'   => 'text-[#FACC15]',
-                        'Derrota'  => 'text-[#DC2626]',
-                        default    => 'text-white',
-                    };
-                @endphp     
-                <tr id="match-row-{{ $match->id }}" class="border-b hover:bg-[#334155]/60 transition-colors duration-200 {{ $colorTexto }}">
-                    <td class="p-2 text-center">  
-                        {{ $match->rivalLiga->jornada ?? 'N/A' }}
-                        @if($match->local)
-                            🏠
-                        @else
-                            🚗
-                        @endif</td>
-                    <td class="p-2 text-center">{{ $match->rivalLiga->nombre_equipo ?? 'N/A' }}</td>
-                            <td class="p-2 text-center">
-                                <span id="fecha-{{ $match->id }}">{{ $match->fecha_partido }}</span>
-                                <input type="date" name="fecha_partido"
-                                    class="hidden w-16 p-1 border rounded bg-white text-black"
-                                    id="edit-fecha-{{ $match->id }}" value="{{ $match->fecha_partido }}">
-                            </td>
-                            <td class="p-2 text-center">
-                                <span id="goles-favor-{{ $match->id }}">{{ $match->goles_a_favor }}</span>
-                                <input type="number" name="goles_a_favor" min="0"
-                                    class="hidden w-16 p-1 border rounded bg-white text-black" 
-                                    id="edit-goles-favor-{{ $match->id }}"
-                                    value="{{ $match->goles_a_favor }}"
-                                    onchange="updateResultado('{{ $match->id }}')">
-                            </td>
-                            <td class="p-2 text-center">
-                                <span id="goles-contra-{{ $match->id }}">{{ $match->goles_en_contra }}</span>
-                                <input type="number" name="goles_en_contra" min="0"
-                                    class="hidden w-16 p-1 border rounded bg-white text-black"
-                                    id="edit-goles-contra-{{ $match->id }}"
-                                    value="{{ $match->goles_en_contra }}"
-                                    onchange="updateResultado('{{ $match->id }}')">
-                            </td>
-                            <td class="p-2 text-center">
-                                <span id="resultado-{{ $match->id }}">{{ $match->resultado }}</span>
-                                <input type="hidden" name="resultado" id="edit-resultado-{{ $match->id }}" value="{{ $match->resultado }}">
-                            </td>
-                            <td class="p-2 text-center">
-                                <span id="actuacion-{{ $match->id }}">{{ $match->actuacion_equipo !== null ? number_format($match->actuacion_equipo, 2) : 'N/A' }}</span>
-                                <input type="number" name="actuacion_equipo" step="0.1" min="1" max="10"
-                                    class="hidden w-16 p-1 border rounded bg-white text-black"
-                                    id="edit-actuacion-{{ $match->id }}" value="{{ $match->actuacion_equipo }}">
-                            </td>
-                            <td class="p-2 text-center">
-                                <button onclick="openConvocatoriaModal('{{ $match->id }}')"
-                                        class="bg-[#6366F1] text-white px-3 py-1 rounded hover:brightness-110">
-                                    Convocatoria
-                                </button>
-                            </td>
-                            <td class="p-2 text-center">
-                                <button onclick="openAlineador('{{ $match->id }}')"
-                                        class="bg-[#3B82F6] text-white px-3 py-1 rounded hover:brightness-110">
-                                    Alineador
-                                </button>
-                            </td>
-                            <td class="p-2 text-center">                            
-                                <div class="flex flex-wrap justify-center gap-2">
-                                    <a href="{{ route('matches.ratePlayers', ['match' => $match->id]) }}"
-                                    class="bg-[#FF8C42] text-white px-3 py-1 rounded block hover:brightness-110">
-                                        Valorar Jugadores
-                                    </a>
-                                    @include('matches.editLeagueMatch_form', ['match' => $match])
+                    @php
+                        $colorTexto = match ($match->resultado) {
+                            'Victoria' => 'text-[#00B140]',
+                            'Empate'   => 'text-[#FACC15]',
+                            'Derrota'  => 'text-[#DC2626]',
+                            default    => 'text-white',
+                        };
+                    @endphp     
+                    <tr id="match-row-{{ $match->id }}" class="border-b hover:bg-[#334155]/60 transition-colors duration-200 {{ $colorTexto }}">
+                        <td class="p-2 text-center">  
+                            {{ $match->rivalLiga->jornada ?? 'N/A' }}
+                            @if($match->local)
+                                🏠
+                            @else
+                                🚗
+                            @endif
+                        </td>
+                        <td class="p-2 text-center">{{ $match->rivalLiga->nombre_equipo ?? 'N/A' }}</td>
+                        <td class="p-2 text-center">
+                            <span id="fecha-{{ $match->id }}">{{ $match->fecha_partido }}</span>
+                            <input type="date" name="fecha_partido"
+                                class="hidden w-16 p-1 border rounded bg-white text-black"
+                                id="edit-fecha-{{ $match->id }}" value="{{ $match->fecha_partido }}">
+                        </td>
+                        <td class="p-2 text-center">
+                            <span id="goles-favor-{{ $match->id }}">{{ $match->goles_a_favor }}</span>
+                            <input type="number" name="goles_a_favor" min="0"
+                                class="hidden w-16 p-1 border rounded bg-white text-black" 
+                                id="edit-goles-favor-{{ $match->id }}"
+                                value="{{ $match->goles_a_favor }}"
+                                onchange="updateResultado('{{ $match->id }}')">
+                        </td>
+                        <td class="p-2 text-center">
+                            <span id="goles-contra-{{ $match->id }}">{{ $match->goles_en_contra }}</span>
+                            <input type="number" name="goles_en_contra" min="0"
+                                class="hidden w-16 p-1 border rounded bg-white text-black"
+                                id="edit-goles-contra-{{ $match->id }}"
+                                value="{{ $match->goles_en_contra }}"
+                                onchange="updateResultado('{{ $match->id }}')">
+                        </td>
+                        <td class="p-2 text-center">
+                            <span id="resultado-{{ $match->id }}">{{ $match->resultado }}</span>
+                            <input type="hidden" name="resultado" id="edit-resultado-{{ $match->id }}" value="{{ $match->resultado }}">
+                        </td>
+                        <td class="p-2 text-center">
+                            <span id="actuacion-{{ $match->id }}">{{ $match->actuacion_equipo !== null ? number_format($match->actuacion_equipo, 2) : 'N/A' }}</span>
+                            <input type="number" name="actuacion_equipo" step="0.1" min="1" max="10"
+                                class="hidden w-16 p-1 border rounded bg-white text-black"
+                                id="edit-actuacion-{{ $match->id }}" value="{{ $match->actuacion_equipo }}">
+                        </td>
+                        <td class="p-2 text-center">
+                            <button onclick="openConvocatoriaModal('{{ $match->id }}')"
+                                    class="bg-[#6366F1] text-white px-2 sm:px-3 py-1 rounded hover:brightness-110 text-sm sm:text-base">
+                                Convocatoria
+                            </button>
+                        </td>
+                        <td class="p-2 text-center">
+                            <button onclick="openAlineador('{{ $match->id }}')"
+                                    class="bg-[#3B82F6] text-white px-2 sm:px-3 py-1 rounded hover:brightness-110 text-sm sm:text-base">
+                                Alineador
+                            </button>
+                        </td>
+                        <td class="p-2 text-center">                            
+                            <div class="flex flex-wrap justify-center gap-1 sm:gap-2">
+                                <a href="{{ route('matches.ratePlayers', ['match' => $match->id]) }}"
+                                class="bg-[#FF8C42] text-white px-2 sm:px-3 py-1 rounded hover:brightness-110 text-sm sm:text-base">
+                                    Valorar Jugadores
+                                </a>
+                                @include('matches.editLeagueMatch_form', ['match' => $match])
                                 <button onclick="editMatch('{{ $match->id }}')"
                                         id="edit-btn-match-{{ $match->id }}"
-                                        class="bg-[#FACC15] text-black px-3 py-1 rounded hover:brightness-110">
+                                        class="bg-[#FACC15] text-black px-2 sm:px-3 py-1 rounded hover:brightness-110 text-sm sm:text-base">
                                     Editar
                                 </button>
-
                                 <button type="button" onclick="saveMatch('{{ $match->id }}')"
                                         id="save-btn-match-{{ $match->id }}"
-                                        class="hidden bg-[#00B140] text-white px-3 py-1 rounded hover:brightness-110">
+                                        class="hidden bg-[#00B140] text-white px-2 sm:px-3 py-1 rounded hover:brightness-110 text-sm sm:text-base">
                                     Guardar
                                 </button>
-
                                 <button onclick="cancelEditMatch('{{ $match->id }}')"
                                         id="cancel-btn-match-{{ $match->id }}"
-                                        class="hidden bg-[#4B5563] text-white px-3 py-1 rounded hover:brightness-110">
+                                        class="hidden bg-[#4B5563] text-white px-2 sm:px-3 py-1 rounded hover:brightness-110 text-sm sm:text-base">
                                     Cancelar
                                 </button>
                             </div>
-                            
-                            </td>
-                        </tr>
+                        </td>
+                    </tr>
                     @endforeach
                 @else
                     <tr>
@@ -464,6 +459,8 @@
         </table>
     </div>
 </div>
+
+
 
 <!-- 📊 Tabla de estadísticas individuales en liga -->
 <div class="bg-[#1E3A8A] shadow-lg rounded-lg p-4 sm:p-6 mb-6 text-white">
