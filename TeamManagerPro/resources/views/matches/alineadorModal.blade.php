@@ -100,7 +100,6 @@
  // ALINEADOR 
 let alineadorData = document.getElementById("alineador-data");
 let allPlayers = [];
-let selectedPlayers = {}; 
 let currentMatchId = null;
 let editMode = false; // 🔹 Estado de edición
 
@@ -202,7 +201,6 @@ function modificarAlineacion() {
     document.getElementById('save-system-btn').classList.add('hidden');
     
     // Reiniciar TODAS las variables de estado
-    selectedPlayers = {};
     allPlayers = [];
     editMode = false;
     
@@ -322,7 +320,6 @@ function enableDragDrop(positionDiv) {
 
                 positionDiv.textContent = player.dorsal;
                 positionDiv.setAttribute("data-player-id", player.id);
-                selectedPlayers[positionDiv.getAttribute("data-index")] = player.id;
             }
         }
     };
@@ -336,7 +333,7 @@ function enableDragDrop(positionDiv) {
 }
 
 // 🔹 Modificar updateFormation para soportar modo edición y jugadores dentro de círculos
-function updateFormation(formation = null, alineacionGuardada = []) {
+function updateFormation(formation = null) {
     let formationSelector = document.getElementById('formation-selector');
     let selectedFormation = formation || formationSelector.value;
     let fieldContainer = document.getElementById('player-spots');
@@ -375,17 +372,6 @@ function updateFormation(formation = null, alineacionGuardada = []) {
         positionDiv.style.left = `${pos[0]}%`;
         positionDiv.setAttribute("data-index", index);
         positionDiv.setAttribute("draggable", true);
-
-        
-        let alineado = alineacionGuardada.find(a => a.posicion == index);
-        if (alineado) {
-            let player = allPlayers.find(p => p.id == alineado.player_id);
-            if (player) {
-                positionDiv.textContent = player.dorsal;
-                positionDiv.setAttribute("data-player-id", player.id);
-                selectedPlayers[index] = player.id;
-            }
-        }
 
         fieldContainer.append(positionDiv);
 
@@ -492,7 +478,6 @@ function removeFromField(playerId) {
         if (position.getAttribute("data-player-id") === playerId) {
             position.textContent = "";
             position.removeAttribute("data-player-id");
-            delete selectedPlayers[position.getAttribute("data-index")];
         }
     });
 }
